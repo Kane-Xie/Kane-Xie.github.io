@@ -2,10 +2,8 @@
 
 
 
-  
 
-
-<html class="theme-next mist use-motion" lang="zh-Hans">
+<html class="theme-next mist" lang="zh-Hans">
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -98,7 +96,7 @@
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
     tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     duoshuo: {
       userId: '0',
       author: '博主'
@@ -239,7 +237,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2019/01/29/new-post/">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2019/01/07/2019-01-07_Presto在Windows环境下编译错误/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kane Xie">
@@ -258,7 +256,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/01/29/new-post/" itemprop="url">new post</a></h1>
+                <a class="post-title-link" href="/2019/01/07/2019-01-07_Presto在Windows环境下编译错误/" itemprop="url">Presto在Windows环境下编译错误</a></h1>
         
 
         <div class="post-meta">
@@ -270,8 +268,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-29T18:09:27+08:00">
-                2019-01-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-07T00:00:00+08:00">
+                2019-01-07
               </time>
             
 
@@ -289,8 +287,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/01/29/new-post/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/01/29/new-post/" itemprop="commentCount"></span>
+                <a href="/2019/01/07/2019-01-07_Presto在Windows环境下编译错误/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/01/07/2019-01-07_Presto在Windows环境下编译错误/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -320,8 +318,17 @@
       
         
           
-            <p>abc </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">def</span><br></pre></td></tr></table></figure>
+            <p>最近在尝试重写presto-kafka，对接kafka1.0，在Windows环境下编译打包presto-kafka时候报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[ERROR] Failed to execute goal io.takari.maven.plugins:presto-maven-plugin:0.1.12:generate-service-descriptor (default-generate-service-descriptor) on project presto-jmx: Execution default-generate-service-descriptor of goal io</span><br><span class="line">.takari.maven.plugins:presto-maven-plugin:0.1.12:generate-service-descriptor failed: A required class was missing while executing io.takari.maven.plugins:presto-maven-plugin:0.1.12:generate-service-descriptor: com\facebook\pres</span><br><span class="line">to\kafka\KafkaColumnHandle (wrong name: com/facebook/presto/kafka/KafkaColumnHandle)</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/prestodb/presto/#requirements" target="_blank" rel="noopener">Presto Github</a>上说的很明确，Presto只支持在Linux环境下编译</p>
+<p><img src="/attachment/20190108/presto-requirements.png" alt=""></p>
+<p>官方在Issues里也确认了这一点，但从报错信息上来看，似乎是类名不对，把<a href="https://github.com/prestodb/presto-maven-plugin" target="_blank" rel="noopener">presto-maven-plugin</a>的代码拉下来看了一下<br><figure class="highlight java"><figcaption><span>ServiceDescriptorGenerator.java</span><a href="https://github.com/prestodb/presto-maven-plugin/blob/master/src/main/java/com/facebook/presto/maven/ServiceDescriptorGenerator.java" target="_blank" rel="noopener">link</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String className = classPath.substring(<span class="number">0</span>, classPath.length() - <span class="number">6</span>).replace(<span class="string">'/'</span>, <span class="string">'.'</span>);</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">line 122</span><br><span class="line"></span><br><span class="line">String className = classPath.substring(0, classPath.length() - 6).replace(&apos;/&apos;, &apos;.&apos;);</span><br></pre></td></tr></table></figure>
+<p>类名是通过把类路径的文件分隔符替换成点号来生成，但问题是Windows的分隔符是反斜杠<code>\</code>，而不是<code>/</code>，所以在Windows环境下这个替换没起作用，造成ClassNotFoundException，把<code>&#39;/&#39;</code>替换成<code>File.separatorChar</code>就好了</p>
+<p>另外还碰到的一个问题是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[ERROR] Failed to execute goal org.apache.maven.plugins:maven-checkstyle-plugin:2.17:check (checkstyle) on project presto-kafka: You have 43401 Checkstyle violations. -&gt; [Help 1]</span><br></pre></td></tr></table></figure>
+<p>原因是重写之后的代码不符合规范，maven-checkstyle-plugin检查失败，如果不打算根据presto的规范改的话，一个粗暴的解决办法是在pom.xml添加properties：<code>&lt;air.check.skip-extended&gt;true&lt;/air.check.skip-extended&gt;</code>，直接忽略检查</p>
+<p>还有一个类似的问题是jar包冲突的检查，可以通过<code>&lt;air.check.fail-dependency&gt;false&lt;/air.check.fail-dependency&gt;</code>忽略</p>
 
           
         
@@ -370,7 +377,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2017/07/23/2017-07-23_0_实时计算平台架构_架构/">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/12/10/2018-12-10_Schema Registry报错50001/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kane Xie">
@@ -389,7 +396,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/07/23/2017-07-23_0_实时计算平台架构_架构/" itemprop="url">实时计算平台架构</a></h1>
+                <a class="post-title-link" href="/2018/12/10/2018-12-10_Schema Registry报错50001/" itemprop="url">Schema Registry报错50001</a></h1>
         
 
         <div class="post-meta">
@@ -401,8 +408,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-23T00:00:00+08:00">
-                2017-07-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-10T00:00:00+08:00">
+                2018-12-10
               </time>
             
 
@@ -420,8 +427,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/07/23/2017-07-23_0_实时计算平台架构_架构/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/23/2017-07-23_0_实时计算平台架构_架构/" itemprop="commentCount"></span>
+                <a href="/2018/12/10/2018-12-10_Schema Registry报错50001/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/12/10/2018-12-10_Schema Registry报错50001/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -451,18 +458,14 @@
       
         
           
-            <p><img src="/attachment/rt-platform/01.PNG" alt=""></p>
-<p><img src="../../../attachment/rt-platform/02.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/03.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/04.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/05.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/06.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/07.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/08.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/09.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/10.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/11.PNG" alt=""></p>
-<p><img src="../attachment/rt-platform/12.PNG" alt=""></p>
+            <blockquote>
+<p>{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}</p>
+</blockquote>
+<p>今天被这个异常搞得很头大，创建/更新/删除schema的时候都报50001错误，官方文档上是这么写的<code>Error code 50001 – Error in the backend datastore</code>，应该是访问后端存储，也就是kafka的_schema这个topic失败，具体失败的原因不清楚，所以看看schema registry的日志，然后。。日志里没有错误。。。再看下kafka日志。。也没有错误。。。</p>
+<p>搜了一下，github有人提了个issue说是message size过大，调整producer的max.request.size和topic level的message.max.bytes和replica.fetch.max.bytes就好了，但理论上我们应该没有哪个schema会超过1M，一般都不会超过100个字段，但还是调整参数试了一下，没用。。。</p>
+<p>没办法只能看源码了，然后发现源码里不！打！印！错！误！日！志！只是封装了Exception的基本信息（Error in the backend datastore。。。）和Error Code返回给客户端，然后详细错误信息。。吞了。。。牛X。。</p>
+<p>给exception加上log，重新编译打包重启，问题其实很简单，producer超时了。schema registry默认producer timeout是500ms，可以通过kafkastore.timeout.ms参数修改，调成2000ms问题就解决了。之所以今天会超时，是有一台broker今天下掉做磁盘raid，重新上线之后数据都清空了，需要从别的broker恢复replica，说来惭愧，这台机器还没来得及升万兆网卡，所以流量几乎打满带宽，而_schema这个topic的其中一个备份刚好在这台机器上，并且schema registry producer的acks默认是-1，即要求所有备份完成之后才会返回response，在流量紧张的情况下500ms之内没有完成写入和备份操作，造成超时。这里顺带提一下，带宽不足的情况下，一定注意server properties的num.recovery.threads.per.data.dir的设置，一般千兆带宽的话默认值1已经就是极限了，经过测试设置为2就会压满带宽，数据正常写入和正常备份都会受影响</p>
+<p>就这么个小事情浪费了一下午的时间，如果有日志的话应该几分钟就能解决，所以打算把schema registry的日志完善一下，顺便接入日志告警平台，一劳永逸</p>
 
           
         
@@ -511,7 +514,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/07/01/带filter的hbase查询优化/">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/10/20/2018-10-20_Flume追踪数据来源/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kane Xie">
@@ -530,7 +533,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2015/07/01/带filter的hbase查询优化/" itemprop="url">带filter的hbase查询优化</a></h1>
+                <a class="post-title-link" href="/2018/10/20/2018-10-20_Flume追踪数据来源/" itemprop="url">Flume追踪数据来源</a></h1>
         
 
         <div class="post-meta">
@@ -542,8 +545,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-07-01T00:00:00+08:00">
-                2015-07-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-20T00:00:00+08:00">
+                2018-10-20
               </time>
             
 
@@ -561,8 +564,162 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2015/07/01/带filter的hbase查询优化/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/01/带filter的hbase查询优化/" itemprop="commentCount"></span>
+                <a href="/2018/10/20/2018-10-20_Flume追踪数据来源/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/10/20/2018-10-20_Flume追踪数据来源/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <div class="note info"><h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2></div>
+
+我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收
+
+流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更坏的情况是收到一些垃圾信息，根本定位不到属于哪个应用或者表，冤无头债无主，一脸懵逼
+
+<div class="note info"><h2 id="解决方案1-0"><a href="#解决方案1-0" class="headerlink" title="解决方案1.0"></a>解决方案1.0</h2></div>
+<p>改造的思路是，在MultiportSyslogTCPSource中接收数据的同时，将client端的ip写到flume event header中，再把header的信息通过kafka sink带到kafka message的headers中，这样后续流处理发生异常时就可以把client ip打印出来，便于找人背锅</p>
+<p>代码也很简单，在MultiportSyslogTCPSource.java的内部静态类MultiportSyslogHandler的messageReceived函数中，从session中取出RemoteAddress，设置到header中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (lineSplitter.parseLine(buf, savedBuf, parsedLine)) &#123;</span><br><span class="line">  Event event = parseEvent(parsedLine, decoder);</span><br><span class="line">  <span class="keyword">if</span> (portHeader != <span class="keyword">null</span>) &#123;</span><br><span class="line">    event.getHeaders().put(portHeader, String.valueOf(port));</span><br><span class="line">  &#125;</span><br><span class="line">  event.getHeaders().put(REMOTE_ADDRESS, ((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress());</span><br><span class="line">  events.add(event);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  logger.trace(<span class="string">"Parsed null event"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 在KafkaSink.java的process函数中，把flume header的所有entry（或者可以只添加key为REMOTE_ADDRESS的entry）添加到kafka record的headers中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; headers = event.getHeaders();</span><br><span class="line"><span class="keyword">for</span>(Entry&lt;String, String&gt; entry:  headers.entrySet()) &#123;</span><br><span class="line"> record.headers().add(entry.getKey(), entry.getValue().getBytes());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2 id="解决方案2-0"><a href="#解决方案2-0" class="headerlink" title="解决方案2.0"></a>解决方案2.0</h2></div>
+<p>问题还没完，由于我们使用nginx来做的HA和负载均衡，后来发现从header里取出来的client ip都是nginx的ip而不是真正客户端的ip。这是因为nginx做反向代理会把request和response转一手，屏蔽掉client和server的信息，如果直接修改request，把nginx的ip改为真正client的ip，server端就会把response发送到真正的client，这样很可能会由于网络不通或者被防火墙拦截掉而响应失败</p>
+<p>这个问题在nginx本身是无解的，所以考虑引入某种机制，在请求体中携带client ip，对比了几种方案之后最终确定用代理协议<a href="https://www.nginx.com/resources/admin-guide/proxy-protocol/" target="_blank" rel="noopener">Proxy Protocol</a></p>
+<p>Nginx开启Proxy Protocol只需要添加配置<code>proxy_protocol on;</code>，例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 6240;</span><br><span class="line">    proxy_connect_timeout 3s;</span><br><span class="line">    proxy_timeout 120s;</span><br><span class="line">    proxy_pass tcp_5240;</span><br><span class="line">    proxy_protocol on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>开启之后，每条数据都会添加一个header（实际上就是在发送原数据之前先发送一条proxy protocol信息），proxy protocol的格式如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PROXY 协议栈 源IP 目的IP 源端口 目的端口</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PROXY TCP4 10.0.0.2 192.168.0.1 49863 6240</span><br></pre></td></tr></table></figure>
+<p>这样flume只需要从header中解析出源IP然后event header中就可以了，具体做法如下（在MultiportSyslogTCPSource基础上改造）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">String msg = parseMsg(parsedLine, decoder);</span><br><span class="line"><span class="keyword">if</span> (StringUtils.isNotEmpty(msg) &amp;&amp; !ProxyProtocolUtil.acceptProxyMetadata(session, msg)) &#123;</span><br><span class="line">	Event event = parseEvent(parsedLine, decoder, msg);</span><br><span class="line">	<span class="keyword">if</span> (portHeader != <span class="keyword">null</span>) &#123;</span><br><span class="line">		event.getHeaders().put(portHeader, String.valueOf(port));</span><br><span class="line">	&#125;</span><br><span class="line">	event.getHeaders().put(REMOTE_ADDRESS, ProxyProtocolUtil.getRemoteAddress(session));</span><br><span class="line">	events.add(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从ParsedBuffer中构造一行数据，然后通过ProxyProtocolUtil.acceptProxyMetadata判断是否符合proxy protocol格式，如果符合，则将源IP提取出来并放到session中；如果不符合，则说明这是原数据，用来构造event，并把session中的源IP写入header中。后续处理和解决方案1.0中一样。ProxyProtocolUtil.acceptProxyMetadata的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyProtocolUtil</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String CLIENT_ADDRESS = <span class="string">"ClientAddress"</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(ProxyProtocolUtil.class);</span><br><span class="line">	<span class="comment">// 108 bytes is the largest buffer needed for the PROXY protocol, but we are a</span></span><br><span class="line">	<span class="comment">// bit more lenient</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_PROXY_HEADER_LENGTH = Byte.MAX_VALUE;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PROX_PROTOCOL_PREFIX = <span class="string">"PROXY"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">acceptProxyMetadata</span><span class="params">(IoSession session, String msg)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (!msg.startsWith(PROX_PROTOCOL_PREFIX)) &#123;</span><br><span class="line">			<span class="keyword">if</span> (LOGGER.isDebugEnabled()) &#123;</span><br><span class="line">				LOGGER.debug(<span class="string">"acceptServerProxyMetadata(session=&#123;&#125;) mismatched protocol header: expected=&#123;&#125;"</span>,</span><br><span class="line">						<span class="keyword">new</span> Object[] &#123; session, PROX_PROTOCOL_PREFIX &#125;);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> parseProxyHeader(session, msg);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			LOGGER.debug(<span class="string">"Not Proxy-Protocol. Msg = "</span> + msg, e);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getRemoteAddress</span><span class="params">(IoSession session)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> (session.containsAttribute(CLIENT_ADDRESS)) &#123;</span><br><span class="line">				<span class="keyword">return</span> ((InetSocketAddress) session.getAttribute(CLIENT_ADDRESS)).getAddress().getHostAddress();</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> ((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="string">"UNKNOWN"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">parseProxyHeader</span><span class="params">(IoSession session, String msg)</span> </span>&#123;</span><br><span class="line">		String[] proxyFields = GenericUtils.split(msg, <span class="string">' '</span>);</span><br><span class="line">		<span class="comment">// Trim all fields just in case more than one space used</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> index = <span class="number">0</span>; index &lt; proxyFields.length; index++) &#123;</span><br><span class="line">			String f = proxyFields[index];</span><br><span class="line">			proxyFields[index] = GenericUtils.trimToEmpty(f);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		String proxyProtocolPrefix = proxyFields[<span class="number">0</span>];</span><br><span class="line">		ValidateUtils.checkTrue(PROX_PROTOCOL_PREFIX.equalsIgnoreCase(proxyProtocolPrefix),</span><br><span class="line">				<span class="string">"Mismatched protocol prefix: %s"</span>, proxyProtocolPrefix);</span><br><span class="line"></span><br><span class="line">		String protocolVersion = proxyFields[<span class="number">1</span>];</span><br><span class="line">		<span class="keyword">if</span> (<span class="string">"TCP4"</span>.equalsIgnoreCase(protocolVersion) || <span class="string">"TCP6"</span>.equalsIgnoreCase(protocolVersion)) &#123;</span><br><span class="line">			String layer3SrcAddress = proxyFields[<span class="number">2</span>];</span><br><span class="line">			String layer3DstAddress = proxyFields[<span class="number">3</span>];</span><br><span class="line">			String layer3SrcPort = proxyFields[<span class="number">4</span>];</span><br><span class="line">			String layer3DstPort = proxyFields[<span class="number">5</span>];</span><br><span class="line">			LOGGER.debug(<span class="string">"parseProxyHeader(session=&#123;&#125;) using &#123;&#125;:&#123;&#125; -&gt; &#123;&#125;:&#123;&#125; proxy"</span>,</span><br><span class="line">					<span class="keyword">new</span> Object[] &#123; session, layer3SrcAddress, layer3SrcPort, layer3DstAddress, layer3DstPort &#125;);</span><br><span class="line"></span><br><span class="line">			session.setAttribute(CLIENT_ADDRESS,</span><br><span class="line">					<span class="keyword">new</span> InetSocketAddress(layer3SrcAddress, Integer.parseInt(layer3SrcPort)));</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			LOGGER.warn(<span class="string">"parseProxyHeader(session=&#123;&#125;) unsuppored sub-protocol - &#123;&#125; - continue as usual"</span>, session,</span><br><span class="line">					protocolVersion);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/10/13/2018-10-13_Flume UDP Source丢包问题/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/13/2018-10-13_Flume UDP Source丢包问题/" itemprop="url">Flume UDP Source丢包问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-13T00:00:00+08:00">
+                2018-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/10/13/2018-10-13_Flume UDP Source丢包问题/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/10/13/2018-10-13_Flume UDP Source丢包问题/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -593,31 +750,994 @@
         
           
             <div class="note info"><h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2></div>
-<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。</p>
-<h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2><p>直接原因是：hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionserver.lease.period所配置的时间，并且客户端没有和regionserver报告其还活着，那么regionserver就会认为Lease已经过期，并从LeaseQueue中删除，当regionserver加载完成后，拿已经被删除的Lease再去取数据的时候，就会出现LeaseException。</p>
-<p>而根本原因在于单个查询请求在server端处理时间过长，经过检查，发现是因为该scan带有一个会把绝大多数数据过滤掉的filter，导致hbase扫描了几百万条数据也没能拿到指定数量（scan的caching）的数据。</p>
-<p>这和全表扫描还不一样。由于有查询缓存，即使是全表扫描，server端在拿到满足缓存需求的数据之后就会返回结果，实际上单个请求并不会扫描整张表。</p>
-<h2 id="相关影响"><a href="#相关影响" class="headerlink" title="相关影响"></a>相关影响</h2><ol>
-<li><p>想象client端发出一个查询请求之后一分多钟没有收到response，用户体验非常的糟糕</p>
+有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求
+
+* flume配置如下
+undefined
+
+* 系统环境如下
+
+undefined
+
+在测试中发现当发送速度超过500/s时开始出现数据丢失，开始以为是网络丢包，但通过tcpdump抓包比对发现并没有丢包
+
+`netstat -su`命令显示有数据包接收失败
+undefined
+
+- `packets received`表示application接收到的数据包的数量
+- `packets to unknown port`表示由于端口没有打开而丢失的数据包数据量，例如应用挂掉或者重启
+- `packet receive errors`表示接收数据包的异常的数量，需要注意的是error和接收失败的数据包并不是一对一的关系，即有一个数据包有可能会产生多个error
+
+<div class="note info"><h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2></div>
+<p>当客户端发送一个udp请求到flume时，整个流转顺序是这样的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Client -&gt; Kernel UDP socket buffer(4MB) -&gt; Flume UDP Source buffer(64KB) -&gt; Flume Channel buffer(磁盘，file channel)</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>flume通过SyslogUDPSource接收UDP请求，底层是使用Netty的OioDatagramChannelFactory来创建服务器端channel，实现BIO（阻塞式IO）。BIO会对每个请求分配一个线程来处理，这种处理模式效率很低。经过测试，Flume UDP只能达到1100+的QPS，0.324MB/s</p>
 </li>
-<li><p>一个请求会占用一个hbase的handler，假设handler数量是100，而client端同时发过来100个这样的带filter的查询请求，那么可以预见，所有的handler将会在这些查询进行中被hold住，导致其他请求（包括查询请求和写入请求）不能得到及时的处理，只能等待。实际上在发生这个问题的时候，最先发现的状况就是写入效率异常的慢。</p>
+<li><p>当client的发送速度大于flume udp source的接收速度时，数据开始在Kernel UDP socket buffer堆积，当buffer满了的时候，后续的请求就会被丢弃，发生packet receive errors</p>
 </li>
-</ol>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>网上有些朋友给出的意见是增大<code>hbase.regionserver.lease.period</code>以减少LeaseException，这我是同意的。</p>
-<p>还有的意见是减小hbase.rpc.timeout，这样client端就能很快得到反馈。这样用户体验确实好了一点，但并没有实际解决问题。。。server端的查询实际上还在跑啊！handler还是没有释放啊！况且一直抛timeout exception给client也不是办法，这个请求永远没有办法处理。</p>
-<p>我们给出的解决方案是，用RandomRowFilter。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FilterList filterList = <span class="keyword">new</span> FilterList(Operator.MUST_PASS_ONE);  </span><br><span class="line"><span class="comment">// RandomRowFilter must on the first of the FilterList  </span></span><br><span class="line">filterList.addFilter(<span class="keyword">new</span> RandomRowFilter(<span class="number">0.01F</span>));  </span><br><span class="line">filterList.addFilter(...);<span class="comment">//add other filters  </span></span><br><span class="line">Scan scan = <span class="keyword">new</span> Scan();  </span><br><span class="line">scan.setFilter(filterList); </span><br></pre></td></tr></table></figure>
-<p>它的原理很简单，hbase每扫描过一条记录，就会生成一个随机数，如果这个随机数小于某个阈值，就终止这次查询并返回已经查询到的结果。那么这个阈值如何定义呢？</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Random random = new Random();  </span><br><span class="line">boolean filterOutRow = !(random.nextFloat() &lt; chance);</span><br></pre></td></tr></table></figure>
-<p>这个chance就是阈值，也就是上面例子中的构造参数0.01F。因此你可以根据需要设定chance的大小，来控制扫描的最大记录数。</p>
-<p>因此假设我们设chance=0.01F，在Scan的时候即使使用了一个很糟糕的filter，server端在扫描了100条记录（数字非确定，以下会说明）后就会终止，并返回当前扫描到的记录，如果需要继续进行查询，使用当前记录的rowkey作为startkey再发起一次查询请求即可。</p>
-<p>但有几点需要注意：</p>
-<ol>
-<li><p>RandomRowFilter只是表达概率而不是确定值。比如设chance=0.01F，并不能保证一定会扫描100条记录就停止，而只是到100就停止的概率最大，但有可能只扫描一条记录，也有可能是一万条。但多次重复取平均值的话，肯定无限趋近于100。</p>
+<li><p>即使平均吞吐量没有超过flume udp的接收能力，但如果出现发送速度波动或者网络波动导致短时间内Kernel UDP socket buffer被填满，也会出现接收失败</p>
 </li>
-<li><p>带RandomRowFilter的查询返回的结果不一定是我们需要的结果。如果只是由于RandomRowFilter扫描终止，会把当前扫描到的那条记录也返回，无论这条记录是不是符合其他filter的要求。我们的做法是检查最后一条记录，看是否符合所有filter的条件。</p>
+</ul>
+<div class="note info"><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2></div>
+<ul>
+<li>网上看了一下，有的建议扩大Kernel UDP socket buffer，比如50MB<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysctl -w net.core.rmem_max=52428800</span><br><span class="line">sysctl -w net.core.netdev_max_backlog=2000</span><br></pre></td></tr></table></figure>
 </li>
-</ol>
+</ul>
+<p>但这只能在一定程度上避免波动的问题，如果发送速度大于接收速度，再大的缓存总会有满的时候</p>
+<ul>
+<li><p>用NIO重写flume SyslogUDPSource，提高处理效率，目前并没有这么做的打算，因为采取了下一个方案</p>
+</li>
+<li><p>部署syslog-ng接收udp请求，并转发到flume tcp source。Syslog-ng是一个轻量框架，并不需要对数据进行过多的处理和缓存，可以直接对udp请求进行转发，并且使用的是多路复用的NIO，因此处理效率很高。即使是这样，经过压力测试发现也同样是有瓶颈，当qps大于24000时开始出现同样的packet receive errors，因为无论如何syslog-ng也是有处理上限的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2.5W QPS，丢包率0.008%</span><br><span class="line">10W QPS，丢包率2.2%</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>以上两种方案在数据量大到一定程度的时候都不可避免的丢包，所以如果可以的话，应该在数据发送之前就进行必要的过滤，把不需要的数据扔掉，降低请求数</p>
+</li>
+<li><p>最终的解决方案，也是我最推崇的：</p>
+</li>
+</ul>
+<blockquote class="blockquote-center"><h1 id="放弃UDP，改用TCP"><a href="#放弃UDP，改用TCP" class="headerlink" title="放弃UDP，改用TCP"></a>放弃UDP，改用TCP</h1></blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/08/08/2018-08-08_es sql site server添加认证信息/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/08/2018-08-08_es sql site server添加认证信息/" itemprop="url">es sql site server添加认证信息</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-08T00:00:00+08:00">
+                2018-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/08/2018-08-08_es sql site server添加认证信息/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/08/08/2018-08-08_es sql site server添加认证信息/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Elasticsearch的权限可以通过search-guard或者xpack(shield)来实现，<a href="https://github.com/NLPchina/elasticsearch-sql" target="_blank" rel="noopener">Elasticsearch-SQL</a>也同步支持了权限认证，只需要把用户名和密码作为参数添加到url中就可以了,例如：<code>http://domain/?base_uri=http://&lt;es_addr&gt;/&amp;username=&lt;usr&gt;&amp;password=&lt;pwd&gt;</code></p>
+<p>具体实现也不复杂，只涉及到前端controllers.js的改动</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// settings</span></span><br><span class="line"><span class="keyword">var</span> settings = location.search.substring(<span class="number">1</span>).split(<span class="string">"&amp;"</span>).reduce(<span class="function"><span class="keyword">function</span> (<span class="params">r, p</span>) </span>&#123;</span><br><span class="line">    r[<span class="built_in">decodeURIComponent</span>(p.split(<span class="string">"="</span>)[<span class="number">0</span>])] = <span class="built_in">decodeURIComponent</span>(p.split(<span class="string">"="</span>)[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">return</span> r;</span><br><span class="line">&#125;, &#123;&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> elasticsearchSqlApp = angular.module(<span class="string">'elasticsearchSqlApp'</span>, [<span class="string">"ngAnimate"</span>, <span class="string">"ngSanitize"</span>]);</span><br><span class="line"></span><br><span class="line"><span class="comment">// auth</span></span><br><span class="line"><span class="keyword">if</span> (settings[<span class="string">'username'</span>]) localStorage.setItem(<span class="string">"auth"</span>, <span class="string">"Basic "</span> + <span class="built_in">window</span>.btoa(settings[<span class="string">'username'</span>] + <span class="string">":"</span> + settings[<span class="string">'password'</span>]));</span><br><span class="line"><span class="keyword">if</span> (localStorage.getItem(<span class="string">"auth"</span>)) &#123;</span><br><span class="line">    elasticsearchSqlApp.config(<span class="function"><span class="keyword">function</span> (<span class="params">$httpProvider</span>) </span>&#123;</span><br><span class="line">        $httpProvider.interceptors.push(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> &#123;</span><br><span class="line">                request: <span class="function"><span class="keyword">function</span> (<span class="params">config</span>) </span>&#123;</span><br><span class="line">                    config.headers[<span class="string">'Authorization'</span>] = localStorage.getItem(<span class="string">"auth"</span>);</span><br><span class="line">                    <span class="keyword">return</span> config;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过location.search读取url中的用户名和密码，然后用window.btoa转成base64字符串组装认证header</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">headers: &#123;</span><br><span class="line">    <span class="string">"Authorization"</span>: <span class="string">"Basic "</span> + <span class="built_in">window</span>.btoa(username + <span class="string">":"</span> + password)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>认证信息通过修改$httpProvider对所有的$http生效，这样所有的es请求(/,/_nodes,/_sql,/_sql,/_explain等等)都会带上认证信息，然后在elasticsearch.yml中配置允许http请求就可以了</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">http.cors.enabled:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="string">http.cors.allow-origin:</span> <span class="string">"*"</span></span><br></pre></td></tr></table></figure>
+<p>但并不能正常使用，界面显示异常</p>
+<blockquote>
+<p>Error occured! response is not avalible.</p>
+</blockquote>
+<p>DEBUG信息显示</p>
+<blockquote>
+<p>Request header field Authorization is not allowed by Access-Control-Allow-Headers in preflight response.</p>
+</blockquote>
+<p>后端服务不允许在header中使用Authorization。解决方法是在elasticsearch.yml中添加配置</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">http.cors.allow-headers:</span> <span class="string">"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Content-Length"</span></span><br></pre></td></tr></table></figure>
+<p>http.cors.allow-headers的默认值是<code>X-Requested-With, Content-Type, Content-Length</code>，修改之后就能通过认证并进行ES SQL查询了</p>
+<p>另外还发现一个小问题，当访问了一个需要认证的ES集群之后，再访问另一个不需要认证的集群，就访问失败，原因是第一次访问之后前端缓存localStorage中就带有认证信息，第二次访问由于没有带用户名和密码参数，所以localStorage不会更新，导致第二次访问也带上了缓存的认证信息，导致访问失败。解决办法也比较简单，如果参数中没有用户名和密码，就把localStorage中的auth清空就行</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (settings[<span class="string">'username'</span>]) &#123;</span><br><span class="line">    localStorage.setItem(<span class="string">"auth"</span>, <span class="string">"Basic "</span> + <span class="built_in">window</span>.btoa(settings[<span class="string">'username'</span>] + <span class="string">":"</span> + settings[<span class="string">'password'</span>]));</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    localStorage.removeItem(<span class="string">"auth"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/08/01/2018-08-01_ES浮点数被识别为字符串/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/01/2018-08-01_ES浮点数被识别为字符串/" itemprop="url">ES浮点数被识别为字符串</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-01T00:00:00+08:00">
+                2018-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/01/2018-08-01_ES浮点数被识别为字符串/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/08/01/2018-08-01_ES浮点数被识别为字符串/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用<code>IndexRequest.source(String source)</code>来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IndexRequest.source(String source, XContentType xContentType)</span><br><span class="line">IndexRequest.source(Map source, XContentType contentType)</span><br></pre></td></tr></table></figure></p>
+<p>第一种写法没有问题，指定XContentType.JSON就和之前版本的写入效果完全一样</p>
+<p>第二种写法就发生了比较诡异的现象，假如json字符串中有值为浮点数，比如{“value”: 0.1}，写入ES之后类型并不是float，而是text。假如字段value之前并不存在，那么ES会自动创建类型为text的字段value，后续就没办法对value做数值类型的计算了。那么为什么浮点类型会被认为是字符串呢？看代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public IndexRequest source(Map source, XContentType contentType) throws ElasticsearchGenerationException &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        XContentBuilder builder = XContentFactory.contentBuilder(contentType);</span><br><span class="line">        builder.map(source);</span><br><span class="line">        return source(builder);</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        throw new ElasticsearchGenerationException(&quot;Failed to generate [&quot; + source + &quot;]&quot;, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参数Map source实际上是会被转换成XContentBuilder来处理，再看<code>builder.map(source);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">private XContentBuilder map(Map&lt;String, ?&gt; values, boolean ensureNoSelfReferences) throws IOException &#123;</span><br><span class="line">    if (values == null) &#123;</span><br><span class="line">        return nullValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // checks that the map does not contain references to itself because</span><br><span class="line">    // iterating over map entries will cause a stackoverflow error</span><br><span class="line">    if (ensureNoSelfReferences) &#123;</span><br><span class="line">        CollectionUtils.ensureNoSelfReferences(values);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    startObject();</span><br><span class="line">    for (Map.Entry&lt;String, ?&gt; value : values.entrySet()) &#123;</span><br><span class="line">        field(value.getKey());</span><br><span class="line">        // pass ensureNoSelfReferences=false as we already performed the check at a higher level</span><br><span class="line">        unknownValue(value.getValue(), false);</span><br><span class="line">    &#125;</span><br><span class="line">    endObject();</span><br><span class="line">    return this;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先检查json(map)中是否有自我引用，然后遍历所有Entry，将key/value写到XContentBuilder中，再看看值是怎么写入的<code>unknownValue(value.getValue(), false);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">private void unknownValue(Object value, boolean ensureNoSelfReferences) throws IOException &#123;</span><br><span class="line">    if (value == null) &#123;</span><br><span class="line">        nullValue();</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    Writer writer = WRITERS.get(value.getClass());</span><br><span class="line">    if (writer != null) &#123;</span><br><span class="line">        writer.write(this, value);</span><br><span class="line">    &#125; else if (value instanceof Path) &#123;</span><br><span class="line">        //Path implements Iterable&lt;Path&gt; and causes endless recursion and a StackOverFlow if treated as an Iterable here</span><br><span class="line">        value((Path) value);</span><br><span class="line">    &#125; else if (value instanceof Map) &#123;</span><br><span class="line">        map((Map&lt;String,?&gt;) value, ensureNoSelfReferences);</span><br><span class="line">    &#125; else if (value instanceof Iterable) &#123;</span><br><span class="line">        value((Iterable&lt;?&gt;) value, ensureNoSelfReferences);</span><br><span class="line">    &#125; else if (value instanceof Object[]) &#123;</span><br><span class="line">        values((Object[]) value, ensureNoSelfReferences);</span><br><span class="line">    &#125; else if (value instanceof Calendar) &#123;</span><br><span class="line">        value((Calendar) value);</span><br><span class="line">    &#125; else if (value instanceof ReadableInstant) &#123;</span><br><span class="line">        value((ReadableInstant) value);</span><br><span class="line">    &#125; else if (value instanceof BytesReference) &#123;</span><br><span class="line">        value((BytesReference) value);</span><br><span class="line">    &#125; else if (value instanceof ToXContent) &#123;</span><br><span class="line">        value((ToXContent) value);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        // This is a &quot;value&quot; object (like enum, DistanceUnit, etc) just toString() it</span><br><span class="line">        // (yes, it can be misleading when toString a Java class, but really, jackson should be used in that case)</span><br><span class="line">        value(Objects.toString(value));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>判断value的类型，如果是ES标准数据类型，直接从WRITERS中获取相应的Writer写入，例如对于Float，调用<code>(builder, value) -&gt; builder.value((Float) value)</code>写入；对于其他类型，调用相应的value重载函数写入；如果列举的类型都不匹配，则当做字符串来处理</p>
+<p>DEBUG一下，发现JSONObject {“value”: 0.1} 执行到这的时候，value.getClass()居然是BigDecimal，跟所有列举的类型都不匹配，所有就当字符串处理了，写入ES时就成了{“value”: “0.1”}，那么为什么值的类型会变成BigDecimal呢？测试一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">JSONObject data = new JSONObject();</span><br><span class="line">data.put(&quot;value&quot;, 0.1);</span><br><span class="line">System.out.println(data.get(&quot;value&quot;).getClass());</span><br></pre></td></tr></table></figure>
+<p>打印结果是<code>class java.lang.Double</code>，没有问题，这是new一个JSONObject的情况，再测试一下字符串parse成JSONObject的情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JSONObject data = JSON.parseObject(&quot;&#123;\&quot;value\&quot;:0.1&#125;&quot;);</span><br><span class="line">System.out.println(data.get(&quot;value&quot;).getClass());</span><br></pre></td></tr></table></figure>
+<p>打印结果是<code>class java.math.BigDecimal</code>，OK破案了，真凶是fastjson，它在parseObject时会把Float识别为BigDecimal，看一下源码，parseObject会调用<code>parse(String text, int features)</code>函数，features的值是常量JSON.DEFAULT_PARSER_FEATURE，这个常量是由一系列的Feature位或计算出来的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static int              DEFAULT_PARSER_FEATURE;</span><br><span class="line">static &#123;</span><br><span class="line">    int features = 0;</span><br><span class="line">    features |= Feature.AutoCloseSource.getMask();</span><br><span class="line">    features |= Feature.InternFieldNames.getMask();</span><br><span class="line">    features |= Feature.UseBigDecimal.getMask();</span><br><span class="line">    features |= Feature.AllowUnQuotedFieldNames.getMask();</span><br><span class="line">    features |= Feature.AllowSingleQuotes.getMask();</span><br><span class="line">    features |= Feature.AllowArbitraryCommas.getMask();</span><br><span class="line">    features |= Feature.SortFeidFastMatch.getMask();</span><br><span class="line">    features |= Feature.IgnoreNotMatch.getMask();</span><br><span class="line">    DEFAULT_PARSER_FEATURE = features;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中有个Feature是UseBigDecimal，这个Feature会使得DefaultJSONParser中会把Float转成BigDecimal</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">case LITERAL_FLOAT:</span><br><span class="line">    Object value = lexer.decimalValue(lexer.isEnabled(Feature.UseBigDecimal));</span><br><span class="line">    lexer.nextToken();</span><br><span class="line">    return value;</span><br></pre></td></tr></table></figure>
+<p>问题根源找到了，解决也就不难了，自定义一个features，把Feature.UseBigDecimal从DEFAULT_PARSER_FEATURE中用异或去掉，然后JSON.parse使用自定义的features就可以了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int features = JSON.DEFAULT_PARSER_FEATURE ^ Feature.UseBigDecimal.getMask();</span><br><span class="line">JSONObject data = (JSONObject) JSON.parse(data.toJSONString(), features);</span><br><span class="line">System.out.println(data.get(&quot;value&quot;).getClass());</span><br></pre></td></tr></table></figure>
+<p>打印<code>class java.lang.Double</code>，解决</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/05/14/2018-05-14_一个坑掉两次。。/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/14/2018-05-14_一个坑掉两次。。/" itemprop="url">一个坑掉两次。。</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-14T00:00:00+08:00">
+                2018-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/14/2018-05-14_一个坑掉两次。。/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/05/14/2018-05-14_一个坑掉两次。。/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>写一个ES的清理小工具，需要找出一个月之前创建的index</p>
+<blockquote>
+<p>if(createTS &lt; System.currentTimeMillis() - 30 <em> 24 </em> 3600 * 1000)</p>
+</blockquote>
+<p>血崩。。。int越界。。。</p>
+<p>然后找出超过100G的index</p>
+<blockquote>
+<p>if(size &gt; 100 <em> 1024 </em> 1024 * 1024)</p>
+</blockquote>
+<p>再次血崩。。。</p>
+<p>这种问题不应该，幸好不是PROD，要不就收拾细软了</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/04/20/2018-04-20_HBase不同版本集群之间数据迁移/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/20/2018-04-20_HBase不同版本集群之间数据迁移/" itemprop="url">HBase不同版本集群之间数据迁移</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T00:00:00+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/20/2018-04-20_HBase不同版本集群之间数据迁移/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/20/2018-04-20_HBase不同版本集群之间数据迁移/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个：</p>
+<div class="note info"><h2 id="export-distcp-import"><a href="#export-distcp-import" class="headerlink" title="export + distcp + import"></a>export + distcp + import</h2></div>
+
+* export
+
+在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下
+undefined
+
+tablename： 需要导出的表名
+
+export_directory： 数据导出到的hdfs目录
+
+options：可以指定参数用于精细化的控制，格式为`[-D <property=value>]*`，例如
+undefined
+
+*  distcp
+
+将CDH4集群导出到export_directory目录中的sequence file拷贝到CDH5集群，这里用到hadoop的distcp命令，用于在不同hadoop集群间拷贝文件
+
+undefined
+
+`注意distcp命令一定要在目标集群(CDH5)上执行`
+
+distcp会在文件拷贝完成后比较源文件和目标文件的checksum，由于CDH4和CDH5的默认checksum算法不一致，CDH4使用CRC32，CDH5使用CRC，因此任务有可能会失败，这里指定`-skipcrccheck`可以忽略这一步骤，或者通过`-Ddfs.checksum.type=CRC32`来指定checksum算法
+
+* import
+
+在import之前，需要先在CDH5集群建表，column family必须和CDH4的表保持一致
+
+然后将distcp过来的sequence file导入HBase表中，命令如下
+undefined
+
+hbase.import.version指定源集群(CDH4)的HBase版本
+
+<div class="note info"><h2 id="拷贝HFile"><a href="#拷贝HFile" class="headerlink" title="拷贝HFile"></a>拷贝HFile</h2></div>
+<p>另一种方案是直接将HFile从CDH4拷贝到CDH5的hdfs文件系统里，然后升级HFile</p>
+<ul>
+<li>distcp</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop distcp -p -update -skipcrccheck webhdfs://cdh4-namenode:http-port/hbase hdfs://cdh5-namenode:rpc-port/hbase</span><br></pre></td></tr></table></figure>
+<ul>
+<li>upgrade</li>
+</ul>
+<p>启动CDH5集群，HBase会自动检测并升级HFile</p>
+<div class="note info"><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2></div>
+<p>总体来讲第一种方案耗时更长，因为需要进行三次mapreduce，但更建议用第一种方案，import/export的机制拥有更高的灵活性，你可以定时增量的迁移数据。除非数据量太大导致export和import耗费太长时间才考虑第二种方案。</p>
+<p>———————————- 我是分割线 ——————————————–</p>
+<p>之前说到第二种方案做upgrade时需要重启集群，实际上有办法避免，方法如下</p>
+<ul>
+<li>拷贝.tableinfo.0000000001文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hadoop fs -mkdir -p /hbase/data/default/&lt;tablename&gt;/.tabledesc</span><br><span class="line">hadoop fs -mv /hbase/data/default/&lt;tablename&gt;/.tableinfo.0000000001 /hbase/data/default/&lt;tablename&gt;/.tabledesc</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>注：这一步是因为CDH4的.tableinfo.0000000001文件在根目录下，CDH5的在.tabledesc下</p>
+<ul>
+<li><p>修复meta</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hbck -fixMeta</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重新分配rs</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hbck -fixAssignments</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>完工</p>
+</li>
+</ul>
+</property=value>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/03/28/2018-03-28_SnowFlake算法在数据链路中的应用/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/28/2018-03-28_SnowFlake算法在数据链路中的应用/" itemprop="url">SnowFlake算法在数据链路中的应用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-28T00:00:00+08:00">
+                2018-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/28/2018-03-28_SnowFlake算法在数据链路中的应用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/28/2018-03-28_SnowFlake算法在数据链路中的应用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <div class="note info"><h2 id="数据链路追踪"><a href="#数据链路追踪" class="headerlink" title="数据链路追踪"></a>数据链路追踪</h2></div>
+
+在实时数据平台中,为了保证数据是可追溯的，一般会在数据生成时给每一条数据分配一个唯一的ID，以及生成的时间，最好再带上数据源的信息，这样DEBUG的时候就能知道数据是从哪来的。然后在数据的每个流转环节中，将每一条数据的ID和到达时间记录到日志或者其他存储中
+
+这样在发生问题或者调试时，就能通过ID重现数据的轨迹，包括数据行经的每个组件以及消耗的时间。这个过程能够通过ELK轻松完成，将所有组件的日志导入ES，然后使用ID在Kibana中搜索，甚至可以通过定制图表来实现数据链路可视化，这里不做展开
+
+以Flume为例，我们可以在最外层的Agent（即跟数据源最近的一层，了解Flume分层架构请自行搜索）通过UUIDInterceptor生成唯一ID，然后连同数据源信息（机房ID,机器ID）和数据接收的时间戳一起放到event header中，最后带到数据流里
+
+> 注： 一般情况下数据的唯一ID和生成时间event_time应该由数据的生成方指定，如果没有，则由Flume生成。当然也可以强制由Flume生成，主要取决于是否将平台与用户之间的网络视同内网
+
+这里有两个问题：
+
+1.一般来讲实时平台的组件数据结构中都有一个rowkey来保存唯一ID，比如kafka message key，es index id，hbase rowkey等等，但不一定有header或者metamap之类的数据结构来保存数据源信息和数据接收时间，因此，如果能把这些额外的信息都保存到ID中就再好不过了
+
+2.UUID太长了，36个字符，并且是字母数字和符号的组合，这非常影响存储的效率
+
+所以可以考虑用SnowFlake算法来解决这两个问题
+
+<div class="note info"><h2 id="SnowFlake算法"><a href="#SnowFlake算法" class="headerlink" title="SnowFlake算法"></a>SnowFlake算法</h2></div>
+<p>先贴代码，来自<a href="https://github.com/beyondfengyu/SnowFlake" target="_blank" rel="noopener">Twitter雪花算法SnowFlake的Java实现</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SnowFlake</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 起始的时间戳</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> START_STMP = <span class="number">1514736000000L</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 每一部分占用的位数</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> SEQUENCE_BIT = <span class="number">12</span>; <span class="comment">// 序列号占用的位数</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> MACHINE_BIT = <span class="number">5</span>; <span class="comment">// 机器标识占用的位数</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> DATACENTER_BIT = <span class="number">5</span>;<span class="comment">// 数据中心占用的位数</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 每一部分的最大值</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> MAX_DATACENTER_NUM = -<span class="number">1L</span> ^ (-<span class="number">1L</span> &lt;&lt; DATACENTER_BIT);</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> MAX_MACHINE_NUM = -<span class="number">1L</span> ^ (-<span class="number">1L</span> &lt;&lt; MACHINE_BIT);</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> MAX_SEQUENCE = -<span class="number">1L</span> ^ (-<span class="number">1L</span> &lt;&lt; SEQUENCE_BIT);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 每一部分向左的位移</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> MACHINE_LEFT = SEQUENCE_BIT;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> DATACENTER_LEFT = MACHINE_LEFT + MACHINE_BIT;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> TIMESTMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">long</span> datacenterId; <span class="comment">// 数据中心</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">long</span> machineId; <span class="comment">// 机器标识</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">long</span> sequence = <span class="number">0L</span>; <span class="comment">// 序列号</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">long</span> lastStmp = -<span class="number">1L</span>;<span class="comment">// 上一次时间戳</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SnowFlake</span><span class="params">(<span class="keyword">long</span> datacenterId, <span class="keyword">long</span> machineId)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (datacenterId &gt; MAX_DATACENTER_NUM || datacenterId &lt; <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"datacenterId can't be greater than MAX_DATACENTER_NUM or less than 0"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (machineId &gt; MAX_MACHINE_NUM || machineId &lt; <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"machineId can't be greater than MAX_MACHINE_NUM or less than 0"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">this</span>.datacenterId = datacenterId;</span><br><span class="line">		<span class="keyword">this</span>.machineId = machineId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 产生下一个ID</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">long</span> <span class="title">nextId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">long</span> currStmp = getNewstmp();</span><br><span class="line">		<span class="keyword">if</span> (currStmp &lt; lastStmp) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Clock moved backwards.  Refusing to generate id"</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (currStmp == lastStmp) &#123;</span><br><span class="line">			<span class="comment">// 相同毫秒内，序列号自增</span></span><br><span class="line">			sequence = (sequence + <span class="number">1</span>) &amp; MAX_SEQUENCE;</span><br><span class="line">			<span class="comment">// 同一毫秒的序列数已经达到最大</span></span><br><span class="line">			<span class="keyword">if</span> (sequence == <span class="number">0L</span>) &#123;</span><br><span class="line">				currStmp = getNextMill();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 不同毫秒内，序列号置为0</span></span><br><span class="line">			sequence = <span class="number">0L</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		lastStmp = currStmp;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> (currStmp - START_STMP) &lt;&lt; TIMESTMP_LEFT <span class="comment">// 时间戳部分</span></span><br><span class="line">				| datacenterId &lt;&lt; DATACENTER_LEFT <span class="comment">// 数据中心部分</span></span><br><span class="line">				| machineId &lt;&lt; MACHINE_LEFT <span class="comment">// 机器标识部分</span></span><br><span class="line">				| sequence; <span class="comment">// 序列号部分</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">long</span> <span class="title">getNextMill</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">long</span> mill = getNewstmp();</span><br><span class="line">		<span class="keyword">while</span> (mill &lt;= lastStmp) &#123;</span><br><span class="line">			mill = getNewstmp();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> mill;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">long</span> <span class="title">getNewstmp</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> System.currentTimeMillis();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		SnowFlake snowFlake = <span class="keyword">new</span> SnowFlake(<span class="number">2</span>, <span class="number">4</span>);</span><br><span class="line">		System.out.println(snowFlake.nextId());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SnowFlake算法用来生成64位的ID，刚好可以用long整型存储，能够用于分布式系统中生产唯一的ID， 并且生成的ID有大致的顺序。以上代码生成的64位ID可以分成5个部分：</p>
+<p><code>0 - 41位时间戳 - 5位数据中心标识 - 5位机器标识 - 12位序列号</code></p>
+<p><code>41位时间戳</code>可以存储大概69年的时间，所以以1970/01/01为基准的话，能保存到2039年，而如果以START_STMP（2018/01/01）为基准存储（currentTimeMillis - START_STMP）,就能够延长到2087年</p>
+<p><code>12位序列号</code>，时间戳相同的记录通过使用递增的序列号来避免冲突，12位序列号能支持每毫秒4096个ID（如果一毫秒内请求书超过4096个，则超过的请求阻塞到下一毫秒，并发量会受到影响），即409.6万QPS，一般能够满足需求，如果不够的话，可以通过减少数据中心或机器的存储位数来增加序列化存储</p>
+<p><code>10位数据源标识</code>，这里拆分为5位数据中心标识和5位机器标识，其实只是逻辑上的区分，总共可支持标记1024个数据源</p>
+<p>获得数据的ID之后，可以通过以下代码解析出数据的接收时间以及数据源信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(<span class="string">"SEQUENCE = "</span> + ((id) &amp; ~(-<span class="number">1L</span> &lt;&lt; SEQUENCE_BIT)));</span><br><span class="line">System.out.println(<span class="string">"MACHINE = "</span> + ((id &gt;&gt; MACHINE_LEFT) &amp; ~(-<span class="number">1L</span> &lt;&lt; MACHINE_BIT)));</span><br><span class="line">System.out.println(<span class="string">"DATACENTER = "</span> + ((id &gt;&gt; DATACENTER_LEFT) &amp; ~(-<span class="number">1L</span> &lt;&lt; DATACENTER_BIT)));</span><br><span class="line">System.out.println(<span class="string">"TIMESTAMP = "</span> + ((id &gt;&gt; TIMESTMP_LEFT) + START_STMP));</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2 id="Flume"><a href="#Flume" class="headerlink" title="Flume"></a>Flume</h2></div>
+<p>SnowFlake在Flume中的使用就很简单了，使用SnowFlakeIntercepter替换掉UUIDInterceptor即可，代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SnowFlakeIntercepter</span> <span class="keyword">implements</span> <span class="title">Interceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> String headerName;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> preserveExisting;</span><br><span class="line">	<span class="keyword">private</span> SnowFlake snowFlake;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> reverse;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HEADER_NAME = <span class="string">"headerName"</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PRESERVE_EXISTING_NAME = <span class="string">"preserveExisting"</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DATACENTER_ID = <span class="string">"datacenter"</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String MACHINE_ID = <span class="string">"machine"</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String REVERSE = <span class="string">"reverse"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="title">SnowFlakeIntercepter</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">		reverse = context.getBoolean(REVERSE, <span class="keyword">true</span>);</span><br><span class="line">		headerName = context.getString(HEADER_NAME, <span class="string">"id"</span>);</span><br><span class="line">		preserveExisting = context.getBoolean(PRESERVE_EXISTING_NAME, <span class="keyword">true</span>);</span><br><span class="line">		snowFlake = <span class="keyword">new</span> SnowFlake(context.getLong(DATACENTER_ID), context.getLong(MACHINE_ID));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Event <span class="title">intercept</span><span class="params">(Event event)</span> </span>&#123;</span><br><span class="line">		Map&lt;String, String&gt; headers = event.getHeaders();</span><br><span class="line">		<span class="keyword">if</span> (preserveExisting &amp;&amp; headers.containsKey(headerName)) &#123;</span><br><span class="line">			<span class="comment">// preserve the existing id</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			String id = snowFlake.nextId() + <span class="string">""</span>;</span><br><span class="line">			headers.put(headerName, reverse ? StringUtils.reverse(id) : id);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> event;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> List&lt;Event&gt; <span class="title">intercept</span><span class="params">(List&lt;Event&gt; events)</span> </span>&#123;</span><br><span class="line">		List&lt;Event&gt; results = <span class="keyword">new</span> ArrayList&lt;Event&gt;(events.size());</span><br><span class="line">		<span class="keyword">for</span> (Event event : events) &#123;</span><br><span class="line">			event = intercept(event);</span><br><span class="line">			<span class="keyword">if</span> (event != <span class="keyword">null</span>) &#123;</span><br><span class="line">				results.add(event);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> results;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> <span class="keyword">implements</span> <span class="title">Interceptor</span>.<span class="title">Builder</span> </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> Context context;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Builder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> SnowFlakeIntercepter <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> SnowFlakeIntercepter(context);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.context = context;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>flume-conf.properties中配置的时候需要指定数据中心标识<code>datacenter</code>和机器标识<code>machine</code>，也可以通过指定<code>reverse</code>=false来关闭ID翻转，默认是true，因为SnowFlake生成的ID默认是递增的，虽然存储效率较高，但应用到某些存储系统时会产生热点问题，比如HBase</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a2.sources.test_src.interceptors=i1</span><br><span class="line">a2.sources.test_src.interceptors.i1.type=com.sdo.dw.rtc.flume.interceptor.SnowFlakeIntercepter$Builder</span><br><span class="line">a2.sources.test_src.interceptors.i1.datacenter=2</span><br><span class="line">a2.sources.test_src.interceptors.i1.machine=4</span><br><span class="line">a2.sources.test_src.interceptors.i1.reverse=false</span><br></pre></td></tr></table></figure>
+<p>这里还有个坑，假如使用了ID翻转，并且在数据流中将ID当做数值类型处理，有可能会产生ID冲突，比如12345和123450在翻转并转成Long型之后都是54321。解决的办法也很简单，将START_STMP设置的足够小，比如0L，以保证生成的ID都足够大就没问题了</p>
+<p>———————————- 8/14 更新 ——————————————–</p>
+<p>之前说到把START_STMP设置的足够小，比如0L，来避免翻转之后产生的冲突。但这里也有问题，SnowFlake算法是能保证产生的id是长整型，但19位的长整型翻转之后就有可能超出Long.MAX_VALUE，比如6433192668775325729，这会给后续的存储带来很大的麻烦。目前我的想法是把生成的id限制在18位，具体做法是数据中心和机器标识一共使用8位存储，然后START_STMP设置为<code>2014/01/01</code>，可以在30年之内保证id的位数维持在18位</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/01/30/2018-01-30_Kafka从0.10.1升级到1.0.0/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/30/2018-01-30_Kafka从0.10.1升级到1.0.0/" itemprop="url">Kafka从0.10.1升级到1.0.0</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T00:00:00+08:00">
+                2018-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/30/2018-01-30_Kafka从0.10.1升级到1.0.0/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/30/2018-01-30_Kafka从0.10.1升级到1.0.0/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:</p>
+<ul>
+<li><p>安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作</p>
+</li>
+<li><p>更新Kafka 1.0的server.properties，添加以下配置</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">inter.broker.protocol.version=0.10.1</span><br><span class="line">log.message.format.version=0.10.1</span><br></pre></td></tr></table></figure>
+<p><code>inter.broker.protocol.version</code>用于指定broker之间的通信协议版本，默认是和当前Kafka版本一致，即新版本中inter.broker.protocol.version为1.0。如果使用默认值，在轮询重启过程中，先重启的Broker将尝试使用1.0的协议与其他未重启的broker通信，由于未重启的broker仍旧是0.10.1版本，并不支持1.0的协议，会导致server.log中频繁报错，新版本broker上的partition无法被加回到ISR中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[2018-01-30 11:19:14,020] INFO [ReplicaFetcher replicaId=81, leaderId=83, fetcherId=0] Retrying leaderEpoch request for partition test_kane-2 as the leader reported an error: UNKNOWN_SERVER_ERROR (kafka.server.ReplicaFetcherThread)</span><br></pre></td></tr></table></figure></p>
+<p><code>log.message.format.version</code>用于指定broker持久化数据的格式，默认是和当前Kafka版本一致，即新版本log.message.format.version为1.0</p>
+<ul>
+<li><p>轮询重启集群：关闭旧版本broker，再启动新版本broker</p>
+</li>
+<li><p>再次更新server.properties，并轮询重启集群</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">inter.broker.protocol.version=1.0</span><br><span class="line">log.message.format.version=1.0</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这里由于我需要使用Record的Header，因此直接把log.message.format.version改成了1.0，否则会报错<code>java.lang.IllegalArgumentException: Magic v1 does not support record headers</code>。但这样做会有风险，即如果producer的版本为1.0，consumer的版本为0.10.1，则consumer会因为无法解析1.0格式的数据而报错。所以建议确保所有consumer都升级到1.0之后，再把log.message.format.version改成1.0</p>
 
           
         
@@ -656,6 +1776,10 @@
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -699,7 +1823,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">72</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -712,7 +1836,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

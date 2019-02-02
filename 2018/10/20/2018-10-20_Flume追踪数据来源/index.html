@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="flume,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收  流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，">
+<meta name="keywords" content="flume">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flume追踪数据来源">
+<meta property="og:url" content="http://kane-xie.github.io/2018/10/20/2018-10-20_Flume追踪数据来源/index.html">
+<meta property="og:site_name" content="Kane Xie">
+<meta property="og:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收  流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-01T08:14:27.832Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flume追踪数据来源">
+<meta name="twitter:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收  流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://kane-xie.github.io/2018/10/20/2018-10-20_Flume追踪数据来源/">
+
+
+
+
+
+  <title>Flume追踪数据来源 | Kane Xie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Kane Xie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/10/20/2018-10-20_Flume追踪数据来源/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Flume追踪数据来源</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-20T00:00:00+08:00">
+                2018-10-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/10/20/2018-10-20_Flume追踪数据来源/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/10/20/2018-10-20_Flume追踪数据来源/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note info"><h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2></div>
+
+我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收
+
+流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更坏的情况是收到一些垃圾信息，根本定位不到属于哪个应用或者表，冤无头债无主，一脸懵逼
+
+<div class="note info"><h2 id="解决方案1-0"><a href="#解决方案1-0" class="headerlink" title="解决方案1.0"></a>解决方案1.0</h2></div>
+<p>改造的思路是，在MultiportSyslogTCPSource中接收数据的同时，将client端的ip写到flume event header中，再把header的信息通过kafka sink带到kafka message的headers中，这样后续流处理发生异常时就可以把client ip打印出来，便于找人背锅</p>
+<p>代码也很简单，在MultiportSyslogTCPSource.java的内部静态类MultiportSyslogHandler的messageReceived函数中，从session中取出RemoteAddress，设置到header中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (lineSplitter.parseLine(buf, savedBuf, parsedLine)) &#123;</span><br><span class="line">  Event event = parseEvent(parsedLine, decoder);</span><br><span class="line">  <span class="keyword">if</span> (portHeader != <span class="keyword">null</span>) &#123;</span><br><span class="line">    event.getHeaders().put(portHeader, String.valueOf(port));</span><br><span class="line">  &#125;</span><br><span class="line">  event.getHeaders().put(REMOTE_ADDRESS, ((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress());</span><br><span class="line">  events.add(event);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  logger.trace(<span class="string">"Parsed null event"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 在KafkaSink.java的process函数中，把flume header的所有entry（或者可以只添加key为REMOTE_ADDRESS的entry）添加到kafka record的headers中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; headers = event.getHeaders();</span><br><span class="line"><span class="keyword">for</span>(Entry&lt;String, String&gt; entry:  headers.entrySet()) &#123;</span><br><span class="line"> record.headers().add(entry.getKey(), entry.getValue().getBytes());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2 id="解决方案2-0"><a href="#解决方案2-0" class="headerlink" title="解决方案2.0"></a>解决方案2.0</h2></div>
+<p>问题还没完，由于我们使用nginx来做的HA和负载均衡，后来发现从header里取出来的client ip都是nginx的ip而不是真正客户端的ip。这是因为nginx做反向代理会把request和response转一手，屏蔽掉client和server的信息，如果直接修改request，把nginx的ip改为真正client的ip，server端就会把response发送到真正的client，这样很可能会由于网络不通或者被防火墙拦截掉而响应失败</p>
+<p>这个问题在nginx本身是无解的，所以考虑引入某种机制，在请求体中携带client ip，对比了几种方案之后最终确定用代理协议<a href="https://www.nginx.com/resources/admin-guide/proxy-protocol/" target="_blank" rel="noopener">Proxy Protocol</a></p>
+<p>Nginx开启Proxy Protocol只需要添加配置<code>proxy_protocol on;</code>，例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 6240;</span><br><span class="line">    proxy_connect_timeout 3s;</span><br><span class="line">    proxy_timeout 120s;</span><br><span class="line">    proxy_pass tcp_5240;</span><br><span class="line">    proxy_protocol on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>开启之后，每条数据都会添加一个header（实际上就是在发送原数据之前先发送一条proxy protocol信息），proxy protocol的格式如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PROXY 协议栈 源IP 目的IP 源端口 目的端口</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PROXY TCP4 10.0.0.2 192.168.0.1 49863 6240</span><br></pre></td></tr></table></figure>
+<p>这样flume只需要从header中解析出源IP然后event header中就可以了，具体做法如下（在MultiportSyslogTCPSource基础上改造）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">String msg = parseMsg(parsedLine, decoder);</span><br><span class="line"><span class="keyword">if</span> (StringUtils.isNotEmpty(msg) &amp;&amp; !ProxyProtocolUtil.acceptProxyMetadata(session, msg)) &#123;</span><br><span class="line">	Event event = parseEvent(parsedLine, decoder, msg);</span><br><span class="line">	<span class="keyword">if</span> (portHeader != <span class="keyword">null</span>) &#123;</span><br><span class="line">		event.getHeaders().put(portHeader, String.valueOf(port));</span><br><span class="line">	&#125;</span><br><span class="line">	event.getHeaders().put(REMOTE_ADDRESS, ProxyProtocolUtil.getRemoteAddress(session));</span><br><span class="line">	events.add(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从ParsedBuffer中构造一行数据，然后通过ProxyProtocolUtil.acceptProxyMetadata判断是否符合proxy protocol格式，如果符合，则将源IP提取出来并放到session中；如果不符合，则说明这是原数据，用来构造event，并把session中的源IP写入header中。后续处理和解决方案1.0中一样。ProxyProtocolUtil.acceptProxyMetadata的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyProtocolUtil</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String CLIENT_ADDRESS = <span class="string">"ClientAddress"</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(ProxyProtocolUtil.class);</span><br><span class="line">	<span class="comment">// 108 bytes is the largest buffer needed for the PROXY protocol, but we are a</span></span><br><span class="line">	<span class="comment">// bit more lenient</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_PROXY_HEADER_LENGTH = Byte.MAX_VALUE;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String PROX_PROTOCOL_PREFIX = <span class="string">"PROXY"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">acceptProxyMetadata</span><span class="params">(IoSession session, String msg)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (!msg.startsWith(PROX_PROTOCOL_PREFIX)) &#123;</span><br><span class="line">			<span class="keyword">if</span> (LOGGER.isDebugEnabled()) &#123;</span><br><span class="line">				LOGGER.debug(<span class="string">"acceptServerProxyMetadata(session=&#123;&#125;) mismatched protocol header: expected=&#123;&#125;"</span>,</span><br><span class="line">						<span class="keyword">new</span> Object[] &#123; session, PROX_PROTOCOL_PREFIX &#125;);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> parseProxyHeader(session, msg);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			LOGGER.debug(<span class="string">"Not Proxy-Protocol. Msg = "</span> + msg, e);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getRemoteAddress</span><span class="params">(IoSession session)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> (session.containsAttribute(CLIENT_ADDRESS)) &#123;</span><br><span class="line">				<span class="keyword">return</span> ((InetSocketAddress) session.getAttribute(CLIENT_ADDRESS)).getAddress().getHostAddress();</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> ((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="string">"UNKNOWN"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">parseProxyHeader</span><span class="params">(IoSession session, String msg)</span> </span>&#123;</span><br><span class="line">		String[] proxyFields = GenericUtils.split(msg, <span class="string">' '</span>);</span><br><span class="line">		<span class="comment">// Trim all fields just in case more than one space used</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> index = <span class="number">0</span>; index &lt; proxyFields.length; index++) &#123;</span><br><span class="line">			String f = proxyFields[index];</span><br><span class="line">			proxyFields[index] = GenericUtils.trimToEmpty(f);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		String proxyProtocolPrefix = proxyFields[<span class="number">0</span>];</span><br><span class="line">		ValidateUtils.checkTrue(PROX_PROTOCOL_PREFIX.equalsIgnoreCase(proxyProtocolPrefix),</span><br><span class="line">				<span class="string">"Mismatched protocol prefix: %s"</span>, proxyProtocolPrefix);</span><br><span class="line"></span><br><span class="line">		String protocolVersion = proxyFields[<span class="number">1</span>];</span><br><span class="line">		<span class="keyword">if</span> (<span class="string">"TCP4"</span>.equalsIgnoreCase(protocolVersion) || <span class="string">"TCP6"</span>.equalsIgnoreCase(protocolVersion)) &#123;</span><br><span class="line">			String layer3SrcAddress = proxyFields[<span class="number">2</span>];</span><br><span class="line">			String layer3DstAddress = proxyFields[<span class="number">3</span>];</span><br><span class="line">			String layer3SrcPort = proxyFields[<span class="number">4</span>];</span><br><span class="line">			String layer3DstPort = proxyFields[<span class="number">5</span>];</span><br><span class="line">			LOGGER.debug(<span class="string">"parseProxyHeader(session=&#123;&#125;) using &#123;&#125;:&#123;&#125; -&gt; &#123;&#125;:&#123;&#125; proxy"</span>,</span><br><span class="line">					<span class="keyword">new</span> Object[] &#123; session, layer3SrcAddress, layer3SrcPort, layer3DstAddress, layer3DstPort &#125;);</span><br><span class="line"></span><br><span class="line">			session.setAttribute(CLIENT_ADDRESS,</span><br><span class="line">					<span class="keyword">new</span> InetSocketAddress(layer3SrcAddress, Integer.parseInt(layer3SrcPort)));</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			LOGGER.warn(<span class="string">"parseProxyHeader(session=&#123;&#125;) unsuppored sub-protocol - &#123;&#125; - continue as usual"</span>, session,</span><br><span class="line">					protocolVersion);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/flume/" rel="tag"># flume</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/13/2018-10-13_Flume UDP Source丢包问题/" rel="next" title="Flume UDP Source丢包问题">
+                <i class="fa fa-chevron-left"></i> Flume UDP Source丢包问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/10/2018-12-10_Schema Registry报错50001/" rel="prev" title="Schema Registry报错50001">
+                Schema Registry报错50001 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/10/20/2018-10-20_Flume追踪数据来源/" data-title="Flume追踪数据来源" data-url="http://kane-xie.github.io/2018/10/20/2018-10-20_Flume追踪数据来源/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Kane Xie</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求"><span class="nav-number">1.</span> <span class="nav-text">需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案1-0"><span class="nav-number">2.</span> <span class="nav-text">解决方案1.0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案2-0"><span class="nav-number">3.</span> <span class="nav-text">解决方案2.0</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kane Xie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

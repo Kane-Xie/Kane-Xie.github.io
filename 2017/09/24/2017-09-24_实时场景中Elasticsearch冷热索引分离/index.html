@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="elasticsearch,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组 首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我">
+<meta name="keywords" content="elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实时场景中Elasticsearch冷热索引分离">
+<meta property="og:url" content="http://kane-xie.github.io/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/index.html">
+<meta property="og:site_name" content="Kane Xie">
+<meta property="og:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组 首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
+<meta property="og:updated_time" content="2019-02-01T07:59:28.670Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实时场景中Elasticsearch冷热索引分离">
+<meta name="twitter:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组 首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我">
+<meta name="twitter:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://kane-xie.github.io/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/">
+
+
+
+
+
+  <title>实时场景中Elasticsearch冷热索引分离 | Kane Xie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Kane Xie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">实时场景中Elasticsearch冷热索引分离</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-24T00:00:00+08:00">
+                2017-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用</p>
+<div class="note info"><h2 id="node分组"><a href="#node分组" class="headerlink" title="node分组"></a>node分组</h2></div>
+首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们在分离索引的时候才能知道热索引应该移到哪些高性能节点上去。这可以在启动时通过给每个节点设置属性来实现。例如我们有一台高性能机器，那么在这台机器上启动ES时我们可以通过以下方式声明它是“高性能的”
+undefined
+
+或者在elasticsearch.yml中配置
+undefined
+
+但是注意，这里的声明仅仅只是声明了一个属性键值对“performance=high”了，相当于给节点逻辑上做了分组，但并没有任何实际的作用，你甚至可以声明“a=b”，但为了可维护性考虑，最好还是起有意义的名称
+
+类似的，我们在另外一台低性能的机器上启动ES时声明它是“低性能的”
+undefined
+
+<div class="note info"><h2 id="冷热分离"><a href="#冷热分离" class="headerlink" title="冷热分离"></a>冷热分离</h2></div>
+<p>然后可以通过维护index的settings<code>index.routing.allocation.*</code>来控制该索引分配到指定的“组”中，即移动到该组相应的节点上。例如我们把index1移动到高性能的机器上，把index2移动到低性能的机器上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT index1/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.routing.allocation.include.performance&quot;: &quot;high&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT index2/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.routing.allocation.include.performance&quot;: &quot;low&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样就做到了冷热索引的分离，今后无论是集群伸缩还是增减备份数，该索引的所有shards（包括replica）都只会被分配在指定的组内，这里要注意，如果任一组内所有的节点都down掉，则绑定在该组节点的index都会处于unassigned状态</p>
+<p>另一个要考虑的问题是如何定义冷热索引。个人建议是先按照QPS将所有index排序，先将大部分QPS较高的index甚至所有index放到高性能组里，然后从QPS最低的index开始一个个移到低性能组里，直到两组index的读写性能基本均衡</p>
+<div class="note info"><h2 id="index拆分"><a href="#index拆分" class="headerlink" title="index拆分"></a>index拆分</h2></div>
+<p>通常我们认为冷索引是指那些不再新增或更新的数据，但在实时场景中，index一般都会持续更新，那么所有的index都是热索引，就没法做分离了。这种情况下我们就需要先做index拆分，具体做法是每隔一定时间，比如每天新建一个index，归为热索引，旧的index一般就不会再有更新，归为冷索引</p>
+<p>这里有一个问题，新建的index是不能与原来重名的，所以我们加个时间后缀用于区分，例如test_index_20170924。但这个做法会带来一个新的麻烦，index的名称每天都在变，所以每次都需要以日期作为后缀才能找到当前的热索引</p>
+<p>用别名可以解决这个问题</p>
+<p><img src="/attachment/20170924/es_alias.png" alt="alias"></p>
+<p>我们给这个这个index起一个别名叫test_alias，指向当日的index，比如test_index_20170924，第二天创建了一个新的index: test_index_20170925，然后把test_alias跟test_index_20170924的关联解除，然后把test_alias指向test_index_20170925。这样我们如果要读写当前热索引，只需要访问test_alias就可以了，从ES用户的角度来看，感觉不到index做了拆分<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;remove&quot; : &#123; &quot;index&quot; : &quot;test_index_20170924&quot;, &quot;alias&quot; : &quot;test_alias&quot; &#125; &#125;,</span><br><span class="line">        &#123; &quot;add&quot;:  &#123; &quot;index&quot;: &quot;test_index_20170925&quot;, &quot;alias&quot;: &quot;test_alias&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意这里remove和add两个动作一定要放在一个transaction里完成，否则如果先remove再add，可能会导致alias短暂不可用，如果先add再remove，可能会导致有短暂时间写入异常，因为alias同时指向两个index，ES无法决定应该写入哪一个</p>
+<p>热索引读写的问题解决了，但还是有一些搜索的问题需要考虑，一个是全文搜索，用通配符是可以的，比如test_index_*，但如果刚好有其他index的前缀也是test_index_就麻烦了，可以通过新建一个别名指向所有的index来解决。还有就是幂等性无法保证的问题，如果你需要用id来保证幂等性，并且无法保证相同id的数据会在同一天写入，那么这个冷热索引分离的方案是行不通的，因为即使id在旧的index里存在，但在新的index里找不到，只能当做一条新数据插入</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/09/2017-09-09_Elasticsearch写入速度优化/" rel="next" title="Elasticsearch写入速度优化">
+                <i class="fa fa-chevron-left"></i> Elasticsearch写入速度优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/30/2017-09-30_Missing artifact jdk.tools：jdk.tools：jar：1.6/" rel="prev" title="Missing artifact jdk.tools：jdk.tools：jar：1.6">
+                Missing artifact jdk.tools：jdk.tools：jar：1.6 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/" data-title="实时场景中Elasticsearch冷热索引分离" data-url="http://kane-xie.github.io/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Kane Xie</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#node分组"><span class="nav-number">1.</span> <span class="nav-text">node分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#冷热分离"><span class="nav-number">2.</span> <span class="nav-text">冷热分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#index拆分"><span class="nav-number">3.</span> <span class="nav-text">index拆分</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kane Xie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

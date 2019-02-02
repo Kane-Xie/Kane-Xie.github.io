@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="可用性,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="评判标准故障转移 故障转移就是在某一个应用服务器不能服务用户请求的时候，通过一定的技术实现用户请求转移到其他应用服务器上来进行业务逻辑处理。例如使用nginx实现多个无状态实例的负载均衡，当其中一个或多个实例失效时，仍能通过其他实例提供服务 冗余备份 冗余备份就是针对某一个服务通过服务器集群或多机房部署来达到服务器冗余和相互备份的目的。例如Kafka和HDFS的备份机制超时设置 超时设置就是主调服">
+<meta name="keywords" content="可用性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统可用性评判标准">
+<meta property="og:url" content="http://kane-xie.github.io/2017/08/21/2017-08-21_系统可用性评判标准/index.html">
+<meta property="og:site_name" content="Kane Xie">
+<meta property="og:description" content="评判标准故障转移 故障转移就是在某一个应用服务器不能服务用户请求的时候，通过一定的技术实现用户请求转移到其他应用服务器上来进行业务逻辑处理。例如使用nginx实现多个无状态实例的负载均衡，当其中一个或多个实例失效时，仍能通过其他实例提供服务 冗余备份 冗余备份就是针对某一个服务通过服务器集群或多机房部署来达到服务器冗余和相互备份的目的。例如Kafka和HDFS的备份机制超时设置 超时设置就是主调服">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-01T09:15:57.235Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="系统可用性评判标准">
+<meta name="twitter:description" content="评判标准故障转移 故障转移就是在某一个应用服务器不能服务用户请求的时候，通过一定的技术实现用户请求转移到其他应用服务器上来进行业务逻辑处理。例如使用nginx实现多个无状态实例的负载均衡，当其中一个或多个实例失效时，仍能通过其他实例提供服务 冗余备份 冗余备份就是针对某一个服务通过服务器集群或多机房部署来达到服务器冗余和相互备份的目的。例如Kafka和HDFS的备份机制超时设置 超时设置就是主调服">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://kane-xie.github.io/2017/08/21/2017-08-21_系统可用性评判标准/">
+
+
+
+
+
+  <title>系统可用性评判标准 | Kane Xie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Kane Xie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2017/08/21/2017-08-21_系统可用性评判标准/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">系统可用性评判标准</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-21T00:00:00+08:00">
+                2017-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/21/2017-08-21_系统可用性评判标准/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/21/2017-08-21_系统可用性评判标准/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="评判标准"><a href="#评判标准" class="headerlink" title="评判标准"></a>评判标准</h1><div class="note info"><h2 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h2></div>
+故障转移就是在某一个应用服务器不能服务用户请求的时候，通过一定的技术实现用户请求转移到其他应用服务器上来进行业务逻辑处理。例如使用nginx实现多个无状态实例的负载均衡，当其中一个或多个实例失效时，仍能通过其他实例提供服务
+<div class="note info"><h2 id="冗余备份"><a href="#冗余备份" class="headerlink" title="冗余备份"></a>冗余备份</h2></div>
+<p>冗余备份就是针对某一个服务通过服务器集群或多机房部署来达到服务器冗余和相互备份的目的。例如Kafka和HDFS的备份机制<br><div class="note info"><h2 id="超时设置"><a href="#超时设置" class="headerlink" title="超时设置"></a>超时设置</h2></div>
+超时设置就是主调服务在调用被调服务的时候设置一个超时等待时间Timeout，主调服务发现超时后，主动进入超时处理流程。超时设置的好处在于当某个服务不可用时，不至于整个系统发生连锁反应
+<div class="note info"><h2 id="异步调用"><a href="#异步调用" class="headerlink" title="异步调用"></a>异步调用</h2></div><br>采用异步调用的方式调用被调服务，有利于将主调服务和被调服务进行解耦，同时提高系统的处理性能<br><div class="note info"><h2 id="服务分级和降级"><a href="#服务分级和降级" class="headerlink" title="服务分级和降级"></a>服务分级和降级</h2></div>
+对于不同的服务可以采用不同的处理方案，出现故障时应该优先保证核心服务的运行。
+<div class="note info"><h2 id="监控告警"><a href="#监控告警" class="headerlink" title="监控告警"></a>监控告警</h2></div><br>服务一旦出现问题能够及时发现，通过自动化处理，或者人工介入处理，从而达到缩短系统的不可用时间，提高可用性。常见的监控指标有：CPU、带宽、内存使用率、网络连接状态，系统调用错误，成功率，PV，UV等<br><div class="note info"><h2 id="防雪崩机制"><a href="#防雪崩机制" class="headerlink" title="防雪崩机制"></a>防雪崩机制</h2></div>
+对于设计的任何一个系统，都需要进行容量的预估和最大容量设置，当外部请求量超过最大容量时，应该启动防雪崩机制，以避免大量外部请求把服务压跨而不能对外提供服务
+<div class="note info"><h2 id="流量缓冲机制"><a href="#流量缓冲机制" class="headerlink" title="流量缓冲机制"></a>流量缓冲机制</h2></div><br>在服务内可以建立队列，当流量过大时，储存一定的用户请求到队列，当流量偏小时再拿出来快速处理，从而达到削峰填谷的作用。例如在大数据存储中Kafka作为缓冲队列的应用<br><div class="note info"><h2 id="自动化测试"><a href="#自动化测试" class="headerlink" title="自动化测试"></a>自动化测试</h2></div><br>对于每一次代码的提交，都能通过自动测试程序对整个服务进行整体的回归测试，这样可以快速地避免代码修改引入新的问题，而导致服务不稳定</p>
+<h1 id="关键指标"><a href="#关键指标" class="headerlink" title="关键指标"></a>关键指标</h1><p><div class="note info"><h2>正常运行时间百分比</h2></div></p>
+<table><thead><tr><th>描述</th><th>通俗叫法</th><th>可用百分比</th><th>年停机时间</th></tr></thead><tbody><tr><td>基本可用性</td><td>2个9</td><td>99%</td><td>87.6小时</td></tr><tr><td>较高可用性</td><td>3个9</td><td>99.9%</td><td>8.8小时</td></tr><tr><td>具有故障自动恢复能力的可用性</td><td>4个9</td><td>99.99%</td><td>53分钟</td></tr><tr><td>极高可用性</td><td>5个9</td><td>99.999%</td><td>5分钟</td></tr></tbody></table>
+
+<p><div class="note info"><h2>容灾恢复能力</h2></div><br><code>RPO</code> 灾难过程中的最大数据丢失量<br><code>RTO</code> 系统从灾难状态恢复到可运行状态所需的时间</p>
+<table><thead><tr><th>容灾等级</th><th>RTO</th><th>RPO</th></tr></thead><tbody><tr><td>第一级</td><td>&lt;2天</td><td>&lt;7天</td></tr><tr><td>第二级</td><td>&lt;24小时</td><td>&lt;7天</td></tr><tr><td>第三级</td><td>&lt;12小时</td><td>&lt;1天</td></tr><tr><td>第四级</td><td>&lt;2小时</td><td>&lt;1天</td></tr><tr><td>第五级</td><td>&lt;30分钟</td><td>&lt;30分钟</td></tr><tr><td>第六级</td><td>&lt;10分钟</td><td>0</td></tr></tbody></table>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/可用性/" rel="tag"># 可用性</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/04/2017-08-04_Elasticsearch环境配置/" rel="next" title="Elasticsearch环境配置">
+                <i class="fa fa-chevron-left"></i> Elasticsearch环境配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/09/2017-09-09_Elasticsearch写入速度优化/" rel="prev" title="Elasticsearch写入速度优化">
+                Elasticsearch写入速度优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/21/2017-08-21_系统可用性评判标准/" data-title="系统可用性评判标准" data-url="http://kane-xie.github.io/2017/08/21/2017-08-21_系统可用性评判标准/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Kane Xie</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#评判标准"><span class="nav-number">1.</span> <span class="nav-text">评判标准</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#故障转移"><span class="nav-number">1.1.</span> <span class="nav-text">故障转移</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#冗余备份"><span class="nav-number">1.2.</span> <span class="nav-text">冗余备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超时设置"><span class="nav-number">1.3.</span> <span class="nav-text">超时设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步调用"><span class="nav-number">1.4.</span> <span class="nav-text">异步调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务分级和降级"><span class="nav-number">1.5.</span> <span class="nav-text">服务分级和降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控告警"><span class="nav-number">1.6.</span> <span class="nav-text">监控告警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防雪崩机制"><span class="nav-number">1.7.</span> <span class="nav-text">防雪崩机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流量缓冲机制"><span class="nav-number">1.8.</span> <span class="nav-text">流量缓冲机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动化测试"><span class="nav-number">1.9.</span> <span class="nav-text">自动化测试</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关键指标"><span class="nav-number">2.</span> <span class="nav-text">关键指标</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">正常运行时间百分比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">容灾恢复能力</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kane Xie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

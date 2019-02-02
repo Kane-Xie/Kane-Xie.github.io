@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="elasticsearch,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M  多线程 单线程批量发送数据无法达到最大效率。使用多">
+<meta name="keywords" content="elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch写入速度优化">
+<meta property="og:url" content="http://kane-xie.github.io/2017/09/09/2017-09-09_Elasticsearch写入速度优化/index.html">
+<meta property="og:site_name" content="Kane Xie">
+<meta property="og:description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M  多线程 单线程批量发送数据无法达到最大效率。使用多">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-01T07:59:28.667Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Elasticsearch写入速度优化">
+<meta name="twitter:description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M  多线程 单线程批量发送数据无法达到最大效率。使用多">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://kane-xie.github.io/2017/09/09/2017-09-09_Elasticsearch写入速度优化/">
+
+
+
+
+
+  <title>Elasticsearch写入速度优化 | Kane Xie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Kane Xie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2017/09/09/2017-09-09_Elasticsearch写入速度优化/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Elasticsearch写入速度优化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-09T00:00:00+08:00">
+                2017-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/09/2017-09-09_Elasticsearch写入速度优化/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/09/2017-09-09_Elasticsearch写入速度优化/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note info"><h2 id="批量操作"><a href="#批量操作" class="headerlink" title="批量操作"></a>批量操作</h2></div>
+
+批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M
+
+<div class="note info"><h2 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h2></div>
+<p>单线程批量发送数据无法达到最大效率。使用多线程或者多进程能够更充分地利用集群资源，同时也能减少fsync的开销，因为数据的集中发送可以减少磁盘交互</p>
+<p>但要注意响应码TOO_MANY_REQUESTS (429)，在Java Client中会返回EsRejectedExecutionException异常，这说明数据总发送速度已经超过了ES集群的处理能力，这时就需要发送端限流，比如加入时间补偿机制。或者也可以调大ES的bulk queue size，通常并不建议这么做，但某些版本的bulk queue size确实过于小，比如5.1的默认值是50,而5.5是200，所以如果你使用的是5.1版本，则可以在elasticsearch.yml加入以下配置<code>thread_pool.bulk.queue_size: 200</code></p>
+<div class="note info"><h2 id="增大refresh-interval"><a href="#增大refresh-interval" class="headerlink" title="增大refresh interval"></a>增大refresh interval</h2></div>
+默认的index.refresh\_interval是1秒，使用默认配置的index会每隔一秒钟创建一个新的segment，这会给ES带来比较大的merge压力，因此如果对延迟没有特别高的要求，可以适当调大index.refresh\_interval，比如10秒
+
+<div class="note info"><h2 id="离线批量导入时关闭refresh和replica"><a href="#离线批量导入时关闭refresh和replica" class="headerlink" title="离线批量导入时关闭refresh和replica"></a>离线批量导入时关闭refresh和replica</h2></div>
+<p>如果你需要一次性从外部系统导入数据到ES，你可以通过设置index.refresh_interval为-1来关掉refresh，设置index.number_of_replicas为0来去掉备份，这样可以大大提升数据的导入速度。refresh关掉能够极大的减少segments，也减少了merge，而去掉备份之后数据只需要写入一次。导入完成之后可以再把refresh和replica打开。值得一提的是，增加备份只是简单的数据传输，这个过程很快，但如果是向一个有备份的index写入数据，实际上在primary shard和replica上都需要进行索引，因此开销会大很多</p>
+<p>但要注意，虽然这可以提升导入性能，但风险也提高了，因为导入过程中如果有节点挂掉，那么这个节点上的shards就不可用了，但如果是离线导入就还好，大不了重新导入就行</p>
+<div class="note info"><h2 id="关闭swap"><a href="#关闭swap" class="headerlink" title="关闭swap"></a>关闭swap</h2></div>
+稍微了解一下操作系统就知道swap对ES简直就是灾难，性能低还是其次，最重要的是会很容易把机器给爆掉，可以使用以下方法关闭swap
+undefined
+
+<div class="note info"><h2 id="给pagecache预留memory"><a href="#给pagecache预留memory" class="headerlink" title="给pagecache预留memory"></a>给pagecache预留memory</h2></div>
+<p>官方说了，一半内存给ES，另外一半内存给lucene，也就是文件系统缓存。这很好理解，在缓存中的操作肯定比磁盘IO要快得多</p>
+<div class="note info"><h2 id="使用自动分配的id"><a href="#使用自动分配的id" class="headerlink" title="使用自动分配的id"></a>使用自动分配的id</h2></div>
+如果你在index request中指定了id，那么ES会先去检查这个id是否存在，如果不存在，就新增一条记录，如果存在，则覆盖，检查id的动作是非常耗时的，特别是数据量特别大的情况下。如果index request中不指定id，ES会自动分配一个唯一的id，省去了id检查的过程，写入速度就得到提高
+
+但如果你希望使用es的id来保证幂等性的话就没别的选择了，只能自己指定id
+
+<div class="note info"><h2 id="使用更好的硬件"><a href="#使用更好的硬件" class="headerlink" title="使用更好的硬件"></a>使用更好的硬件</h2></div>
+<p>主要是磁盘，ES是重度依赖磁盘IO的软件</p>
+<p>最好是SSD，这没什么好说的，就是快</p>
+<p>然后是多块盘做raid0，由于数据是分散在多块盘上，所以如果一块盘坏掉可能会导致所有index不能用，但可以通过replica来规避风险</p>
+<div class="note info"><h2 id="index-buffer-size"><a href="#index-buffer-size" class="headerlink" title="index buffer size"></a>index buffer size</h2></div>
+<p>如果你有重度写入需求，那么最好保证在一个节点上indices.memory.index_buffer_size / shards_count &gt; 512MB（超过这个值索引性能并不会有太明显提高）。indices.memory.index_buffer_size的默认值是10%，也就是说如果机器内存是64G，你把一半32G分配给了ES，那么buffer size为3.2G，能够支撑6.4个疯狂写入的shards</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/21/2017-08-21_系统可用性评判标准/" rel="next" title="系统可用性评判标准">
+                <i class="fa fa-chevron-left"></i> 系统可用性评判标准
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/" rel="prev" title="实时场景中Elasticsearch冷热索引分离">
+                实时场景中Elasticsearch冷热索引分离 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/09/09/2017-09-09_Elasticsearch写入速度优化/" data-title="Elasticsearch写入速度优化" data-url="http://kane-xie.github.io/2017/09/09/2017-09-09_Elasticsearch写入速度优化/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Kane Xie</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#批量操作"><span class="nav-number">1.</span> <span class="nav-text">批量操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程"><span class="nav-number">2.</span> <span class="nav-text">多线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增大refresh-interval"><span class="nav-number">3.</span> <span class="nav-text">增大refresh interval</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#离线批量导入时关闭refresh和replica"><span class="nav-number">4.</span> <span class="nav-text">离线批量导入时关闭refresh和replica</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭swap"><span class="nav-number">5.</span> <span class="nav-text">关闭swap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#给pagecache预留memory"><span class="nav-number">6.</span> <span class="nav-text">给pagecache预留memory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用自动分配的id"><span class="nav-number">7.</span> <span class="nav-text">使用自动分配的id</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用更好的硬件"><span class="nav-number">8.</span> <span class="nav-text">使用更好的硬件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#index-buffer-size"><span class="nav-number">9.</span> <span class="nav-text">index buffer size</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kane Xie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

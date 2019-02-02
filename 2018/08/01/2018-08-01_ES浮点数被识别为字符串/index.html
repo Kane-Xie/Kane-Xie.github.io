@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="fastjson,elasticsearch,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用IndexRequest.source(String source)来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内）12IndexReq">
+<meta name="keywords" content="fastjson,elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES浮点数被识别为字符串">
+<meta property="og:url" content="http://kane-xie.github.io/2018/08/01/2018-08-01_ES浮点数被识别为字符串/index.html">
+<meta property="og:site_name" content="Kane Xie">
+<meta property="og:description" content="最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用IndexRequest.source(String source)来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内）12IndexReq">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-01T07:59:28.691Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ES浮点数被识别为字符串">
+<meta name="twitter:description" content="最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用IndexRequest.source(String source)来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内）12IndexReq">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://kane-xie.github.io/2018/08/01/2018-08-01_ES浮点数被识别为字符串/">
+
+
+
+
+
+  <title>ES浮点数被识别为字符串 | Kane Xie</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Kane Xie</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2018/08/01/2018-08-01_ES浮点数被识别为字符串/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES浮点数被识别为字符串</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-01T00:00:00+08:00">
+                2018-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/08/01/2018-08-01_ES浮点数被识别为字符串/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/08/01/2018-08-01_ES浮点数被识别为字符串/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用<code>IndexRequest.source(String source)</code>来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IndexRequest.source(String source, XContentType xContentType)</span><br><span class="line">IndexRequest.source(Map source, XContentType contentType)</span><br></pre></td></tr></table></figure></p>
+<p>第一种写法没有问题，指定XContentType.JSON就和之前版本的写入效果完全一样</p>
+<p>第二种写法就发生了比较诡异的现象，假如json字符串中有值为浮点数，比如{“value”: 0.1}，写入ES之后类型并不是float，而是text。假如字段value之前并不存在，那么ES会自动创建类型为text的字段value，后续就没办法对value做数值类型的计算了。那么为什么浮点类型会被认为是字符串呢？看代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public IndexRequest source(Map source, XContentType contentType) throws ElasticsearchGenerationException &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        XContentBuilder builder = XContentFactory.contentBuilder(contentType);</span><br><span class="line">        builder.map(source);</span><br><span class="line">        return source(builder);</span><br><span class="line">    &#125; catch (IOException e) &#123;</span><br><span class="line">        throw new ElasticsearchGenerationException(&quot;Failed to generate [&quot; + source + &quot;]&quot;, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参数Map source实际上是会被转换成XContentBuilder来处理，再看<code>builder.map(source);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">private XContentBuilder map(Map&lt;String, ?&gt; values, boolean ensureNoSelfReferences) throws IOException &#123;</span><br><span class="line">    if (values == null) &#123;</span><br><span class="line">        return nullValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // checks that the map does not contain references to itself because</span><br><span class="line">    // iterating over map entries will cause a stackoverflow error</span><br><span class="line">    if (ensureNoSelfReferences) &#123;</span><br><span class="line">        CollectionUtils.ensureNoSelfReferences(values);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    startObject();</span><br><span class="line">    for (Map.Entry&lt;String, ?&gt; value : values.entrySet()) &#123;</span><br><span class="line">        field(value.getKey());</span><br><span class="line">        // pass ensureNoSelfReferences=false as we already performed the check at a higher level</span><br><span class="line">        unknownValue(value.getValue(), false);</span><br><span class="line">    &#125;</span><br><span class="line">    endObject();</span><br><span class="line">    return this;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先检查json(map)中是否有自我引用，然后遍历所有Entry，将key/value写到XContentBuilder中，再看看值是怎么写入的<code>unknownValue(value.getValue(), false);</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">private void unknownValue(Object value, boolean ensureNoSelfReferences) throws IOException &#123;</span><br><span class="line">    if (value == null) &#123;</span><br><span class="line">        nullValue();</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    Writer writer = WRITERS.get(value.getClass());</span><br><span class="line">    if (writer != null) &#123;</span><br><span class="line">        writer.write(this, value);</span><br><span class="line">    &#125; else if (value instanceof Path) &#123;</span><br><span class="line">        //Path implements Iterable&lt;Path&gt; and causes endless recursion and a StackOverFlow if treated as an Iterable here</span><br><span class="line">        value((Path) value);</span><br><span class="line">    &#125; else if (value instanceof Map) &#123;</span><br><span class="line">        map((Map&lt;String,?&gt;) value, ensureNoSelfReferences);</span><br><span class="line">    &#125; else if (value instanceof Iterable) &#123;</span><br><span class="line">        value((Iterable&lt;?&gt;) value, ensureNoSelfReferences);</span><br><span class="line">    &#125; else if (value instanceof Object[]) &#123;</span><br><span class="line">        values((Object[]) value, ensureNoSelfReferences);</span><br><span class="line">    &#125; else if (value instanceof Calendar) &#123;</span><br><span class="line">        value((Calendar) value);</span><br><span class="line">    &#125; else if (value instanceof ReadableInstant) &#123;</span><br><span class="line">        value((ReadableInstant) value);</span><br><span class="line">    &#125; else if (value instanceof BytesReference) &#123;</span><br><span class="line">        value((BytesReference) value);</span><br><span class="line">    &#125; else if (value instanceof ToXContent) &#123;</span><br><span class="line">        value((ToXContent) value);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        // This is a &quot;value&quot; object (like enum, DistanceUnit, etc) just toString() it</span><br><span class="line">        // (yes, it can be misleading when toString a Java class, but really, jackson should be used in that case)</span><br><span class="line">        value(Objects.toString(value));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>判断value的类型，如果是ES标准数据类型，直接从WRITERS中获取相应的Writer写入，例如对于Float，调用<code>(builder, value) -&gt; builder.value((Float) value)</code>写入；对于其他类型，调用相应的value重载函数写入；如果列举的类型都不匹配，则当做字符串来处理</p>
+<p>DEBUG一下，发现JSONObject {“value”: 0.1} 执行到这的时候，value.getClass()居然是BigDecimal，跟所有列举的类型都不匹配，所有就当字符串处理了，写入ES时就成了{“value”: “0.1”}，那么为什么值的类型会变成BigDecimal呢？测试一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">JSONObject data = new JSONObject();</span><br><span class="line">data.put(&quot;value&quot;, 0.1);</span><br><span class="line">System.out.println(data.get(&quot;value&quot;).getClass());</span><br></pre></td></tr></table></figure>
+<p>打印结果是<code>class java.lang.Double</code>，没有问题，这是new一个JSONObject的情况，再测试一下字符串parse成JSONObject的情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JSONObject data = JSON.parseObject(&quot;&#123;\&quot;value\&quot;:0.1&#125;&quot;);</span><br><span class="line">System.out.println(data.get(&quot;value&quot;).getClass());</span><br></pre></td></tr></table></figure>
+<p>打印结果是<code>class java.math.BigDecimal</code>，OK破案了，真凶是fastjson，它在parseObject时会把Float识别为BigDecimal，看一下源码，parseObject会调用<code>parse(String text, int features)</code>函数，features的值是常量JSON.DEFAULT_PARSER_FEATURE，这个常量是由一系列的Feature位或计算出来的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static int              DEFAULT_PARSER_FEATURE;</span><br><span class="line">static &#123;</span><br><span class="line">    int features = 0;</span><br><span class="line">    features |= Feature.AutoCloseSource.getMask();</span><br><span class="line">    features |= Feature.InternFieldNames.getMask();</span><br><span class="line">    features |= Feature.UseBigDecimal.getMask();</span><br><span class="line">    features |= Feature.AllowUnQuotedFieldNames.getMask();</span><br><span class="line">    features |= Feature.AllowSingleQuotes.getMask();</span><br><span class="line">    features |= Feature.AllowArbitraryCommas.getMask();</span><br><span class="line">    features |= Feature.SortFeidFastMatch.getMask();</span><br><span class="line">    features |= Feature.IgnoreNotMatch.getMask();</span><br><span class="line">    DEFAULT_PARSER_FEATURE = features;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中有个Feature是UseBigDecimal，这个Feature会使得DefaultJSONParser中会把Float转成BigDecimal</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">case LITERAL_FLOAT:</span><br><span class="line">    Object value = lexer.decimalValue(lexer.isEnabled(Feature.UseBigDecimal));</span><br><span class="line">    lexer.nextToken();</span><br><span class="line">    return value;</span><br></pre></td></tr></table></figure>
+<p>问题根源找到了，解决也就不难了，自定义一个features，把Feature.UseBigDecimal从DEFAULT_PARSER_FEATURE中用异或去掉，然后JSON.parse使用自定义的features就可以了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int features = JSON.DEFAULT_PARSER_FEATURE ^ Feature.UseBigDecimal.getMask();</span><br><span class="line">JSONObject data = (JSONObject) JSON.parse(data.toJSONString(), features);</span><br><span class="line">System.out.println(data.get(&quot;value&quot;).getClass());</span><br></pre></td></tr></table></figure>
+<p>打印<code>class java.lang.Double</code>，解决</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/fastjson/" rel="tag"># fastjson</a>
+          
+            <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/14/2018-05-14_一个坑掉两次。。/" rel="next" title="一个坑掉两次。。">
+                <i class="fa fa-chevron-left"></i> 一个坑掉两次。。
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/08/2018-08-08_es sql site server添加认证信息/" rel="prev" title="es sql site server添加认证信息">
+                es sql site server添加认证信息 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2018/08/01/2018-08-01_ES浮点数被识别为字符串/" data-title="ES浮点数被识别为字符串" data-url="http://kane-xie.github.io/2018/08/01/2018-08-01_ES浮点数被识别为字符串/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Kane Xie</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kane Xie</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
