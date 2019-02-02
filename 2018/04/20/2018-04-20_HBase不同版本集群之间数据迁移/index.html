@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import  * export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下 undefined  tablename： 需要导出的表名  export_directory： 数据导出">
+<meta name="description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import   export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下1hbase org.apache.hadoop.hbase.mapreduce.Export [option">
 <meta name="keywords" content="hbase">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HBase不同版本集群之间数据迁移">
 <meta property="og:url" content="http://kane-xie.github.io/2018/04/20/2018-04-20_HBase不同版本集群之间数据迁移/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import  * export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下 undefined  tablename： 需要导出的表名  export_directory： 数据导出">
+<meta property="og:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import   export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下1hbase org.apache.hadoop.hbase.mapreduce.Export [option">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.687Z">
+<meta property="og:updated_time" content="2019-02-02T02:47:49.158Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HBase不同版本集群之间数据迁移">
-<meta name="twitter:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import  * export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下 undefined  tablename： 需要导出的表名  export_directory： 数据导出">
+<meta name="twitter:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import   export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下1hbase org.apache.hadoop.hbase.mapreduce.Export [option">
 
 
 
@@ -319,69 +319,59 @@
 
       
         <p>由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个：</p>
-<div class="note info"><h2 id="export-distcp-import"><a href="#export-distcp-import" class="headerlink" title="export + distcp + import"></a>export + distcp + import</h2></div>
+<div class="note info"><h2>export + distcp + import</h2></div>
 
-* export
+<ul>
+<li>export</li>
+</ul>
+<p>在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase org.apache.hadoop.hbase.mapreduce.Export [options] &lt;tablename&gt; &lt;export_directory&gt;</span><br></pre></td></tr></table></figure></p>
+<p>tablename： 需要导出的表名</p>
+<p>export_directory： 数据导出到的hdfs目录</p>
+<p>options：可以指定参数用于精细化的控制，格式为<code>[-D &lt;property=value&gt;]*</code>，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">指定导出的sequence file压缩格式：</span><br><span class="line">-D mapreduce.output.fileoutputformat.compress=true</span><br><span class="line">-D mapreduce.output.fileoutputformat.compress.codec=org.apache.hadoop.io.compress.GzipCodec</span><br><span class="line">-D mapreduce.output.fileoutputformat.compress.type=BLOCK</span><br><span class="line"></span><br><span class="line">控制导出的内容：</span><br><span class="line">-D hbase.mapreduce.scan.column.family=&lt;familyName&gt;</span><br><span class="line">-D hbase.mapreduce.include.deleted.rows=true</span><br><span class="line">-D hbase.mapreduce.scan.row.start=&lt;ROWSTART&gt;</span><br><span class="line">-D hbase.mapreduce.scan.row.stop=&lt;ROWSTOP&gt;</span><br><span class="line"></span><br><span class="line">控制导出性能：</span><br><span class="line">-D hbase.client.scanner.caching=100</span><br><span class="line">-D mapreduce.map.speculative=false</span><br><span class="line">-D mapreduce.reduce.speculative=false</span><br><span class="line"></span><br><span class="line">对于大宽表，建议设置batch size：</span><br><span class="line">-D hbase.export.scanner.batch=10</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>distcp</li>
+</ul>
+<p>将CDH4集群导出到export_directory目录中的sequence file拷贝到CDH5集群，这里用到hadoop的distcp命令，用于在不同hadoop集群间拷贝文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop distcp -p -update -skipcrccheck hftp://cdh4-namenode:port/export_directory hdfs://cdh5-namenode/import_directory</span><br></pre></td></tr></table></figure>
+<p><code>注意distcp命令一定要在目标集群(CDH5)上执行</code></p>
+<p>distcp会在文件拷贝完成后比较源文件和目标文件的checksum，由于CDH4和CDH5的默认checksum算法不一致，CDH4使用CRC32，CDH5使用CRC，因此任务有可能会失败，这里指定<code>-skipcrccheck</code>可以忽略这一步骤，或者通过<code>-Ddfs.checksum.type=CRC32</code>来指定checksum算法</p>
+<ul>
+<li>import</li>
+</ul>
+<p>在import之前，需要先在CDH5集群建表，column family必须和CDH4的表保持一致</p>
+<p>然后将distcp过来的sequence file导入HBase表中，命令如下<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase -Dhbase.import.version=0.94 org.apache.hadoop.hbase.mapreduce.Import &lt;tablename&gt; &lt;import_directory&gt;</span><br></pre></td></tr></table></figure></p>
+<p>hbase.import.version指定源集群(CDH4)的HBase版本</p>
+<div class="note info"><h2>拷贝HFile</h2></div>
 
-在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下
-undefined
-
-tablename： 需要导出的表名
-
-export_directory： 数据导出到的hdfs目录
-
-options：可以指定参数用于精细化的控制，格式为`[-D <property=value>]*`，例如
-undefined
-
-*  distcp
-
-将CDH4集群导出到export_directory目录中的sequence file拷贝到CDH5集群，这里用到hadoop的distcp命令，用于在不同hadoop集群间拷贝文件
-
-undefined
-
-`注意distcp命令一定要在目标集群(CDH5)上执行`
-
-distcp会在文件拷贝完成后比较源文件和目标文件的checksum，由于CDH4和CDH5的默认checksum算法不一致，CDH4使用CRC32，CDH5使用CRC，因此任务有可能会失败，这里指定`-skipcrccheck`可以忽略这一步骤，或者通过`-Ddfs.checksum.type=CRC32`来指定checksum算法
-
-* import
-
-在import之前，需要先在CDH5集群建表，column family必须和CDH4的表保持一致
-
-然后将distcp过来的sequence file导入HBase表中，命令如下
-undefined
-
-hbase.import.version指定源集群(CDH4)的HBase版本
-
-<div class="note info"><h2 id="拷贝HFile"><a href="#拷贝HFile" class="headerlink" title="拷贝HFile"></a>拷贝HFile</h2></div>
 <p>另一种方案是直接将HFile从CDH4拷贝到CDH5的hdfs文件系统里，然后升级HFile</p>
 <ul>
 <li>distcp</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop distcp -p -update -skipcrccheck webhdfs://cdh4-namenode:http-port/hbase hdfs://cdh5-namenode:rpc-port/hbase</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop distcp -p -update -skipcrccheck webhdfs://cdh4-namenode:http-port/hbase hdfs://cdh5-namenode:rpc-port/hbase</span><br></pre></td></tr></table></figure>
 <ul>
 <li>upgrade</li>
 </ul>
 <p>启动CDH5集群，HBase会自动检测并升级HFile</p>
-<div class="note info"><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2></div>
-<p>总体来讲第一种方案耗时更长，因为需要进行三次mapreduce，但更建议用第一种方案，import/export的机制拥有更高的灵活性，你可以定时增量的迁移数据。除非数据量太大导致export和import耗费太长时间才考虑第二种方案。</p>
+<p><div class="note info"><h2>总结</h2></div><br>总体来讲第一种方案耗时更长，因为需要进行三次mapreduce，但更建议用第一种方案，import/export的机制拥有更高的灵活性，你可以定时增量的迁移数据。除非数据量太大导致export和import耗费太长时间才考虑第二种方案。</p>
 <p>———————————- 我是分割线 ——————————————–</p>
 <p>之前说到第二种方案做upgrade时需要重启集群，实际上有办法避免，方法如下</p>
 <ul>
-<li>拷贝.tableinfo.0000000001文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hadoop fs -mkdir -p /hbase/data/default/&lt;tablename&gt;/.tabledesc</span><br><span class="line">hadoop fs -mv /hbase/data/default/&lt;tablename&gt;/.tableinfo.0000000001 /hbase/data/default/&lt;tablename&gt;/.tabledesc</span><br></pre></td></tr></table></figure>
-</li>
+<li>拷贝.tableinfo.0000000001文件</li>
 </ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hadoop fs -mkdir -p /hbase/data/default/&lt;tablename&gt;/.tabledesc</span><br><span class="line">hadoop fs -mv /hbase/data/default/&lt;tablename&gt;/.tableinfo.0000000001 /hbase/data/default/&lt;tablename&gt;/.tabledesc</span><br></pre></td></tr></table></figure>
 <p>注：这一步是因为CDH4的.tableinfo.0000000001文件在根目录下，CDH5的在.tabledesc下</p>
 <ul>
-<li><p>修复meta</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hbck -fixMeta</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>重新分配rs</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hbck -fixAssignments</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>完工</p>
-</li>
+<li>修复meta</li>
 </ul>
-</property=value>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hbck -fixMeta</span><br></pre></td></tr></table></figure>
+<ul>
+<li>重新分配rs</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hbck -fixAssignments</span><br></pre></td></tr></table></figure>
+<ul>
+<li>完工</li>
+</ul>
+
       
     </div>
     
@@ -552,7 +542,7 @@ hbase.import.version指定源集群(CDH4)的HBase版本
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#export-distcp-import"><span class="nav-number">1.</span> <span class="nav-text">export + distcp + import</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拷贝HFile"><span class="nav-number">2.</span> <span class="nav-text">拷贝HFile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">export + distcp + import</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">拷贝HFile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>

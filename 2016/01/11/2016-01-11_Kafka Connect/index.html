@@ -85,7 +85,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理  在大部分K">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.580Z">
+<meta property="og:updated_time" content="2019-02-02T03:13:40.988Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka Connect">
 <meta name="twitter:description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理  在大部分K">
@@ -338,7 +338,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;hello world&quot; &gt;&gt; /tmp/test-src.txt</span><br></pre></td></tr></table></figure>
 <p>我们往/tmp/test-src.txt中写入几个字符，然后我们查看/tmp/test-dest.txt，发现“hello world”已经被写入/tmp/test-dest.txt中。</p>
 <p>多说一句，数据并不是以文本的形式存入Kafka，而是Json。它的格式类似于：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;schema&quot;:&#123;&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false&#125;,&quot;payload&quot;:&quot;hello world&quot;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"schema"</span>:&#123;<span class="attr">"type"</span>:<span class="string">"string"</span>,<span class="attr">"optional"</span>:<span class="literal">false</span>&#125;,<span class="attr">"payload"</span>:<span class="string">"hello world"</span>&#125;</span><br></pre></td></tr></table></figure>
 <p>所以本文中两个connector实际上还做了数据的封装和Json解析的工作。</p>
 
       

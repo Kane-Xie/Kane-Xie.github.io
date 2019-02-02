@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="切换到hdfs用户，否则会报Access denied 1su - hdfs  将Under-replicated Blocks写入临时文件   1hdfs fsck / | grep &amp;apos;Under replicated&amp;apos; | awk -F&amp;apos;:&amp;apos; &amp;apos;&amp;#123;print $1&amp;#125;&amp;apos; &amp;gt;&amp;gt; /tmp/under_re">
+<meta name="description" content="切换到hdfs用户，否则会报Access denied 1su - hdfs  将Under-replicated Blocks写入临时文件 1hdfs fsck / | grep &amp;apos;Under replicated&amp;apos; | awk -F&amp;apos;:&amp;apos; &amp;apos;&amp;#123;print $1&amp;#125;&amp;apos; &amp;gt;&amp;gt; /tmp/under_repl">
 <meta name="keywords" content="hdfs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="手动修复Under-replicated Blocks">
 <meta property="og:url" content="http://kane-xie.github.io/2015/09/19/2015-09-19_手动修复Under-replicated Blocks/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="切换到hdfs用户，否则会报Access denied 1su - hdfs  将Under-replicated Blocks写入临时文件   1hdfs fsck / | grep &amp;apos;Under replicated&amp;apos; | awk -F&amp;apos;:&amp;apos; &amp;apos;&amp;#123;print $1&amp;#125;&amp;apos; &amp;gt;&amp;gt; /tmp/under_re">
+<meta property="og:description" content="切换到hdfs用户，否则会报Access denied 1su - hdfs  将Under-replicated Blocks写入临时文件 1hdfs fsck / | grep &amp;apos;Under replicated&amp;apos; | awk -F&amp;apos;:&amp;apos; &amp;apos;&amp;#123;print $1&amp;#125;&amp;apos; &amp;gt;&amp;gt; /tmp/under_repl">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:14:27.765Z">
+<meta property="og:updated_time" content="2019-02-02T03:14:35.187Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="手动修复Under-replicated Blocks">
-<meta name="twitter:description" content="切换到hdfs用户，否则会报Access denied 1su - hdfs  将Under-replicated Blocks写入临时文件   1hdfs fsck / | grep &amp;apos;Under replicated&amp;apos; | awk -F&amp;apos;:&amp;apos; &amp;apos;&amp;#123;print $1&amp;#125;&amp;apos; &amp;gt;&amp;gt; /tmp/under_re">
+<meta name="twitter:description" content="切换到hdfs用户，否则会报Access denied 1su - hdfs  将Under-replicated Blocks写入临时文件 1hdfs fsck / | grep &amp;apos;Under replicated&amp;apos; | awk -F&amp;apos;:&amp;apos; &amp;apos;&amp;#123;print $1&amp;#125;&amp;apos; &amp;gt;&amp;gt; /tmp/under_repl">
 
 
 
@@ -323,13 +323,12 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su - hdfs</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>将Under-replicated Blocks写入临时文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs fsck / | grep &apos;Under replicated&apos; | awk -F&apos;:&apos; &apos;&#123;print $1&#125;&apos; &gt;&gt; /tmp/under_replicated_files</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改replication factor</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> hdfsfile <span class="keyword">in</span> <span class="string">`cat /tmp/under_replicated_files`</span>; <span class="keyword">do</span> echo <span class="string">"Fixing $hdfsfile :"</span> ;  hadoop fs -setrep <span class="number">3</span> $hdfsfile; done</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs fsck / | grep &apos;Under replicated&apos; | awk -F&apos;:&apos; &apos;&#123;print $1&#125;&apos; &gt;&gt; /tmp/under_replicated_files</span><br></pre></td></tr></table></figure>
-<ul>
-<li>修改replication factor</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> hdfsfile <span class="keyword">in</span> <span class="string">`cat /tmp/under_replicated_files`</span>; <span class="keyword">do</span> echo <span class="string">"Fixing $hdfsfile :"</span> ;  hadoop fs -setrep <span class="number">3</span> $hdfsfile; done</span><br></pre></td></tr></table></figure>
 
       
     </div>

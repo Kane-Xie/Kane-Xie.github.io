@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="问题描述  hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。  问题原因 直接原因是： hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionser">
+<meta name="description" content="问题描述  hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。 问题原因  直接原因是： hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionser">
 <meta name="keywords" content="hbase">
 <meta property="og:type" content="article">
 <meta property="og:title" content="带filter的hbase查询优化">
 <meta property="og:url" content="http://kane-xie.github.io/2015/07/01/2015-07-01_带filter的hbase查询优化/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="问题描述  hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。  问题原因 直接原因是： hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionser">
+<meta property="og:description" content="问题描述  hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。 问题原因  直接原因是： hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionser">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:39:23.531Z">
+<meta property="og:updated_time" content="2019-02-02T02:44:55.809Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="带filter的hbase查询优化">
-<meta name="twitter:description" content="问题描述  hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。  问题原因 直接原因是： hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionser">
+<meta name="twitter:description" content="问题描述  hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。 问题原因  直接原因是： hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionser">
 
 
 
@@ -318,22 +318,25 @@
       
 
       
-        <div class="note info"><h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2></div>
+        <div class="note info"><h2>问题描述</h2></div>
 
-hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。
+<p>hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。</p>
+<div class="note info"><h2>问题原因</h2></div>
 
-<div class="note info"><h2 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因"></a>问题原因</h2></div>
 <p>直接原因是：</p>
 <p>hbase client端每次和regionserver交互的时候，都会在服务器端生成一个Lease,Lease的有效期由参数hbase.regionserver.lease.period确定。如果hbase scan需要的时间超过hbase.regionserver.lease.period所配置的时间，并且客户端没有和regionserver报告其还活着，那么regionserver就会认为Lease已经过期，并从LeaseQueue中删除，当regionserver加载完成后，拿已经被删除的Lease再去取数据的时候，就会出现LeaseException。</p>
 <p>而根本原因在于单个查询请求在server端处理时间过长，经过检查，发现是因为该scan带有一个会把绝大多数数据过滤掉的filter，导致hbase扫描了几百万条数据也没能拿到指定数量（scan的caching）的数据。</p>
 <p>这和全表扫描还不一样。由于有查询缓存，即使是全表扫描，server端在拿到满足缓存需求的数据之后就会返回结果，实际上单个请求并不会扫描整张表。</p>
-<div class="note info"><h2 id="相关影响"><a href="#相关影响" class="headerlink" title="相关影响"></a>相关影响</h2></div>
+<div class="note info"><h2>相关影响</h2></div>
 
- 1. 想象client端发出一个查询请求之后一分多钟没有收到response，用户体验非常的糟糕
+<ol>
+<li><p>想象client端发出一个查询请求之后一分多钟没有收到response，用户体验非常的糟糕</p>
+</li>
+<li><p>一个请求会占用一个hbase的handler，假设handler数量是100，而client端同时发过来100个这样的带filter的查询请求，那么可以预见，所有的handler将会在这些查询进行中被hold住，导致其他请求（包括查询请求和写入请求）不能得到及时的处理，只能等待。实际上在发生这个问题的时候，最先发现的状况就是写入效率异常的慢。</p>
+</li>
+</ol>
+<div class="note info"><h2>解决方案</h2></div>
 
- 2. 一个请求会占用一个hbase的handler，假设handler数量是100，而client端同时发过来100个这样的带filter的查询请求，那么可以预见，所有的handler将会在这些查询进行中被hold住，导致其他请求（包括查询请求和写入请求）不能得到及时的处理，只能等待。实际上在发生这个问题的时候，最先发现的状况就是写入效率异常的慢。
-
-<div class="note info"><h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2></div>
 <p>网上有些朋友给出的意见是增大hbase.regionserver.lease.period以减少LeaseException，这我是同意的。</p>
 <p>还有的意见是减小hbase.rpc.timeout，这样client端就能很快得到反馈。这样用户体验确实好了一点，但并没有实际解决问题。。。server端的查询实际上还在跑啊！handler还是没有释放啊！况且一直抛timeout exception给client也不是办法，这个请求永远没有办法处理。</p>
 <p>我们给出的解决方案是，用RandomRowFilter。</p>
@@ -516,7 +519,7 @@ hbase scan数据缓慢，server端出现LeaseException。hbase写入缓慢。
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题原因"><span class="nav-number">2.</span> <span class="nav-text">问题原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关影响"><span class="nav-number">3.</span> <span class="nav-text">相关影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">4.</span> <span class="nav-text">解决方案</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">问题原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">相关影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">解决方案</span></a></li></ol></div>
             
 
           </div>

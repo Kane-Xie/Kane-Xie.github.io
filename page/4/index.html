@@ -320,7 +320,7 @@
           
             <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log4j:WARN Continuable parsing error 39 and column 23</span><br><span class="line">log4j:WARN The content of element type &quot;log4j:configuration&quot; must match &quot;(renderer*,appender*,plugin*,(category|logger)*,root?,(categoryFactory|loggerFactory)?)&quot;.</span><br></pre></td></tr></table></figure>
 <p>log4j.xml的DTD规定log4j:configuration中的所有元素应该按照如下的顺序排列：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;renderer&gt;&lt;/renderer&gt;</span><br><span class="line"></span><br><span class="line">&lt;appender&gt;&lt;/appender&gt;</span><br><span class="line"></span><br><span class="line">&lt;plugin&gt;&lt;/plugin&gt;</span><br><span class="line"></span><br><span class="line">&lt;logger&gt;&lt;/logger&gt;</span><br><span class="line"></span><br><span class="line">&lt;category&gt;&lt;/category&gt;</span><br><span class="line"></span><br><span class="line">&lt;root&gt;&lt;/root&gt;</span><br><span class="line"></span><br><span class="line">&lt;loggerfactory&gt;&lt;/loggerfactory&gt;</span><br><span class="line"></span><br><span class="line">&lt;categoryfactory&gt;&lt;/categoryfactory&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">renderer</span>&gt;</span><span class="tag">&lt;/<span class="name">renderer</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">appender</span>&gt;</span><span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">logger</span>&gt;</span><span class="tag">&lt;/<span class="name">logger</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">category</span>&gt;</span><span class="tag">&lt;/<span class="name">category</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">root</span>&gt;</span><span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">loggerfactory</span>&gt;</span><span class="tag">&lt;/<span class="name">loggerfactory</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">categoryfactory</span>&gt;</span><span class="tag">&lt;/<span class="name">categoryfactory</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>因此调整log4j.xml中的元素顺序即可避免该warnning</p>
 
           
@@ -727,21 +727,12 @@
         
           
             <p>Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。</p>
-<div class="note info"><h2 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h2></div>
-大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取
-
-<div class="note info"><h2 id="Producers"><a href="#Producers" class="headerlink" title="Producers"></a>Producers</h2></div>
-<p>Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个producer），接受produce request并使用对应的producer来发送</p>
-<div class="note info"><h2 id="Consumers"><a href="#Consumers" class="headerlink" title="Consumers"></a>Consumers</h2></div>
-REST Proxy实现了high-level consumer的consumer-groups功能。Consumers是有状态的，因此需要跟REST Proxy的实例绑定。Offset的提交可以是自动的，也可以由client发送请求来提交。目前每个consumer都是单线程消费，所以如果希望通过多线程来提升吞吐量，那么需要使用多个consumer
-
-<div class="note info"><h2 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h2></div>
-<p>REST Proxy目前支持三种格式：JSON，base64编码二进制和Avro。如果使用Avro，需要在Schema Registry中注册和验证schema</p>
-<div class="note info"><h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2></div>
-REST Proxy可以启动多个实例来分担压力，并可以通过round robin DNS, 发现服务或者其他基于软件或硬件的负载均衡器来进行请求转发。但注意，由于consumer是有状态的，因此必须保证consumer必须跟REST Proxy实例绑定
-
-<div class="note info"><h2 id="Simple-Consumer"><a href="#Simple-Consumer" class="headerlink" title="Simple Consumer"></a>Simple Consumer</h2></div>
-<p>一般来说high-level consumer是推荐使用的，但如果有特殊的需求需要消费特定offset的消息，也可以使用Rest Proxy的low-level consumer</p>
+<p><div class="note info"><h2>Metadata</h2></div><br>大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取</p>
+<p><div class="note info"><h2>Producers</h2></div><br>Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个producer），接受produce request并使用对应的producer来发送</p>
+<p><div class="note info"><h2>Consumers</h2></div><br>REST Proxy实现了high-level consumer的consumer-groups功能。Consumers是有状态的，因此需要跟REST Proxy的实例绑定。Offset的提交可以是自动的，也可以由client发送请求来提交。目前每个consumer都是单线程消费，所以如果希望通过多线程来提升吞吐量，那么需要使用多个consumer</p>
+<p><div class="note info"><h2>数据格式</h2></div><br>REST Proxy目前支持三种格式：JSON，base64编码二进制和Avro。如果使用Avro，需要在Schema Registry中注册和验证schema</p>
+<p><div class="note info"><h2>负载均衡</h2></div><br>REST Proxy可以启动多个实例来分担压力，并可以通过round robin DNS, 发现服务或者其他基于软件或硬件的负载均衡器来进行请求转发。但注意，由于consumer是有状态的，因此必须保证consumer必须跟REST Proxy实例绑定</p>
+<p><div class="note info"><h2>Simple Consumer</h2></div><br>一般来说high-level consumer是推荐使用的，但如果有特殊的需求需要消费特定offset的消息，也可以使用Rest Proxy的low-level consumer</p>
 
           
         
@@ -872,14 +863,12 @@ REST Proxy可以启动多个实例来分担压力，并可以通过round robin D
         
           
             <p>Kafka REST Proxy是Confluent的一个组件，它提供了访问Kafka集群的RESTful接口。对于一些暂不支持Kafka的平台或编程语言来说，可以使用Kafka REST Proxy来发送和消费消息，查看集群状态和执行集群管理命令。</p>
-<div class="note info"><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2></div>
-* 要求Java版本 >= 1.7
+<div class="note info"><h2>安装</h2></div><br><em> 要求Java版本 &gt;= 1.7
 
-* 下载[Confluent Platform安装包](http://www.confluent.io/download#download)并解压
+</em> 下载<a href="http://www.confluent.io/download#download" target="_blank" rel="noopener">Confluent Platform安装包</a>并解压<br><br><div class="note info"><h2>启动</h2></div>
 
-<div class="note info"><h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2></div>
 <ul>
-<li><p>cd confluent-<version>/</version></p>
+<li><p>cd confluent-&lt;version>/</p>
 </li>
 <li><p>配置</p>
 <ul>
@@ -890,12 +879,8 @@ REST Proxy可以启动多个实例来分担压力，并可以通过round robin D
 <li><p>启动，bin/kafka-rest-start etc/kafka-rest/kafka-rest.properties</p>
 </li>
 </ul>
-<div class="note info"><h2 id="发送JSON消息"><a href="#发送JSON消息" class="headerlink" title="发送JSON消息"></a>发送JSON消息</h2></div>
-undefined
+<div class="note info"><h2>发送JSON消息</h2></div><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -H &quot;Content-Type: application/vnd.kafka.json.v1+json&quot; \</span><br><span class="line">      --data &apos;&#123;&quot;records&quot;:[&#123;&quot;value&quot;:&#123;&quot;foo&quot;:&quot;bar&quot;&#125;&#125;]&#125;&apos; &quot;http://localhost:8082/topics/jsontest&quot;</span><br><span class="line">  &#123;&quot;offsets&quot;:[&#123;&quot;partition&quot;:0,&quot;offset&quot;:0,&quot;error_code&quot;:null,&quot;error&quot;:null&#125;],&quot;key_schema_id&quot;:null,&quot;value_schema_id&quot;:null&#125;</span><br></pre></td></tr></table></figure><br><br>发送的消息体必须是key为records的JSON，每个record可以有key和value属性，其中value是必须的<br><br><div class="note info"><h2>消费JSON消息</h2></div>
 
-发送的消息体必须是key为records的JSON，每个record可以有key和value属性，其中value是必须的
-
-<div class="note info"><h2 id="消费JSON消息"><a href="#消费JSON消息" class="headerlink" title="消费JSON消息"></a>消费JSON消息</h2></div>
 <p>创建Consumer实例</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -H &quot;Content-Type: application/vnd.kafka.v1+json&quot; \</span><br><span class="line">      --data &apos;&#123;&quot;name&quot;: &quot;my_consumer_instance&quot;, &quot;format&quot;: &quot;json&quot;, &quot;auto.offset.reset&quot;: &quot;smallest&quot;&#125;&apos; \</span><br><span class="line">      http://localhost:8082/consumers/my_consumer_group</span><br><span class="line">  &#123;&quot;instance_id&quot;:&quot;my_consumer_instance&quot;,</span><br><span class="line"> &quot;base_uri&quot;:&quot;http://localhost:8082/consumers/my_consumer_group/instances/my_consumer_instance&quot;&#125;</span><br></pre></td></tr></table></figure>
 <p>使用已创建的Consumer实例消费消息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -X GET -H &quot;Accept: application/vnd.kafka.json.v1+json&quot; \     http://localhost:8082/consumers/my_consumer_group/instances/my_consumer_instance/topics/jsontest</span><br><span class="line">  [&#123;&quot;key&quot;:null,&quot;value&quot;:&#123;&quot;foo&quot;:&quot;bar&quot;&#125;,&quot;partition&quot;:0,&quot;offset&quot;:0&#125;]</span><br></pre></td></tr></table></figure></p>
@@ -1448,7 +1433,7 @@ undefined
             <p>接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。</p>
 <p>首先在Kafka 0.9上的平均测试结果是8.362秒。</p>
 <p>而升级到Kafka 0.10之后，平均测试结果如下：</p>
-<table><br>    <tr><br>        <th>producer version</th><br><th>log.message. format.version</th><br><th>consumer version</th><br><th>cost</th><br>    </tr><br>  <tr><td>0.9 </td><td>0.10 </td><td>0.9 </td><td>8.966s </td></tr><br>  <tr><td>0.9 </td><td>0.10 </td><td>0.10 </td><td>6.470s</td></tr><br>  <tr><td>0.10</td><td>0.10 </td><td>0.9 </td><td>8.834s</td></tr><br>  <tr><td>0.10</td><td>0.10 </td><td>0.10</td><td>6.604s</td></tr><br><tr><td>0.9</td><td>0.9</td><td>0.9</td><td>8.355s</td></tr><br>  <tr><td>0.9</td><td>0.9</td><td>0.10</td><td>6.242s</td></tr><br>  <tr><td>0.10</td><td>0.9</td><td>0.9</td><td>8.233s</td></tr><br>  <tr><td>0.10</td><td>0.9</td><td>0.10</td><td>6.310s</td></tr><br></table>
+<table><br><tr><th>producer version</th><th>log.message. format.version</th><th>consumer version</th><th>cost</th></tr><tr><td>0.9 </td><td>0.10 </td><td>0.9 </td><td>8.966s </td></tr><tr><td>0.9 </td><td>0.10 </td><td>0.10 </td><td>6.470s</td></tr><tr><td>0.10</td><td>0.10 </td><td>0.9 </td><td>8.834s</td></tr><tr><td>0.10</td><td>0.10 </td><td>0.10</td><td>6.604s</td></tr><tr><td>0.9</td><td>0.9</td><td>0.9</td><td>8.355s</td></tr><tr><td>0.9</td><td>0.9</td><td>0.10</td><td>6.242s</td></tr><tr><td>0.10</td><td>0.9</td><td>0.9</td><td>8.233s</td></tr><tr><td>0.10</td><td>0.9</td><td>0.10</td><td>6.310s</td></tr></table>
 
 <ul>
 <li>对比1-5，2-6，3-7，4-8，使用默认的log.message.format.version=0.10.0会使吞吐量降低，因为消息里增加了8个字节timestamp，虽然原始size是1K，只增加了8‰的大小，但从测试结果看，吞吐量降低远远不止8‰ 。</li>

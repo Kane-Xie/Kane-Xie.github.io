@@ -85,7 +85,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单 bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &amp;lt;group&amp;gt; 输出">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:39:52.333Z">
+<meta property="og:updated_time" content="2019-02-02T03:18:03.154Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka实时监控">
 <meta name="twitter:description" content="在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单 bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &amp;lt;group&amp;gt; 输出">
@@ -321,10 +321,14 @@
         <p>在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单</p>
 <p><code>bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &lt;group&gt;</code></p>
 <p>输出结果类似于</p>
-<p><code>Group Topic Pid Offset logSize Lag Owner</code><br><br><code>Group1 a.topic 0 2 2 0 none</code><br><br><code>Group1 a.topic 1 0 0 0 none</code><br><br><code>Group1 a.topic 2 2 2 0 none</code><br></p>
+<blockquote>
+<p>Group Topic Pid Offset logSize Lag Owner<br>Group1 a.topic 0 2 2 0 none<br>Group1 a.topic 1 0 0 0 none<br>Group1 a.topic 2 2 2 0 none</p>
+</blockquote>
 <p>我们也可以通过kafka web console一类的工具直观地获取kafka信息，但如果我们要构建自己的监控系统，需要抓取这些信息的话，有两种办法：一种是运行ConsumerOffsetChecker然后解析输出的字符串；另一种就是通过SimpleConsumer和Zookeeper实时抓取信息（换句话说就是把ConsumerOffsetChecker翻译一下：）），以下介绍第二种方法的思路。</p>
 <p>首先我们看kafka信息在zookeeper的存储结构</p>
-<p><code>1，/brokers/topics/[topic]/partitions/[partitionId]/state</code><br><code>2，/brokers/ids/[0...N]</code><br><code>3，/consumers/[groupId]/ids/[consumerId]</code><br><code>4，/consumers/[groupId]/owners/[topic]/[partitionId]</code><br><code>5，/consumers/[groupId]/offsets/[topic]/[partitionId]</code></p>
+<blockquote>
+<p>1，/brokers/topics/[topic]/partitions/[partitionId]/state<br>2，/brokers/ids/[0…N]<br>3，/consumers/[groupId]/ids/[consumerId]<br>4，/consumers/[groupId]/owners/[topic]/[partitionId]<br>5，/consumers/[groupId]/offsets/[topic]/[partitionId]</p>
+</blockquote>
 <p>对于指定的topic和groupid，通过(1)可以拿到所有的partition信息（Pid），然后通过(5)可以拿到offset，通过(4)可以拿到owner。就差logsize还没法拿到，事实上logsize在zookeeper中并没有记录，它必须通过kafka consumer的low level的api取得。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Long <span class="title">getLogSize</span><span class="params">(String topicName, String partitionId, <span class="keyword">long</span> offsetRequestTime)</span> </span>&#123;  </span><br><span class="line">    SimpleConsumer consumer = <span class="keyword">new</span> SimpleConsumer(server, port, <span class="number">10000</span>, <span class="number">1024000</span>, <span class="string">"ConsumerOffsetChecker"</span>);  </span><br><span class="line">    Long logSize = <span class="keyword">null</span>;  </span><br><span class="line">    TopicAndPartition topicAndPartition = <span class="keyword">new</span> TopicAndPartition(topicName, Integer.parseInt(partitionId));  </span><br><span class="line">    Map&lt;TopicAndPartition, PartitionOffsetRequestInfo&gt; map = <span class="keyword">new</span> HashMap&lt;TopicAndPartition, PartitionOffsetRequestInfo&gt;();  </span><br><span class="line">    map.put(topicAndPartition, <span class="keyword">new</span> PartitionOffsetRequestInfo(offsetRequestTime, <span class="number">1</span>));  </span><br><span class="line">    OffsetRequest request = <span class="keyword">new</span> OffsetRequest(map, kafka.api.OffsetRequest.CurrentVersion(), kafka.api.OffsetRequest.DefaultClientId());  </span><br><span class="line">    OffsetResponse response = consumer.getOffsetsBefore(request);  </span><br><span class="line">    <span class="keyword">long</span>[] aa = response.offsets(topicName, Integer.parseInt(partitionId));  </span><br><span class="line">    <span class="keyword">if</span> (aa.length != <span class="number">0</span>) &#123;  </span><br><span class="line">        logSize = aa[<span class="number">0</span>];  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> logSize;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>第二行，创建simple consumer</p>

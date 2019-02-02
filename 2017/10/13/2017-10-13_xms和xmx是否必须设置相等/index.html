@@ -85,7 +85,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？ 先了解一下-Xms和-Xmx的含义 -Xms  初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.675Z">
+<meta property="og:updated_time" content="2019-02-02T03:03:16.259Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="xms和xmx是否必须设置相等">
 <meta name="twitter:description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？ 先了解一下-Xms和-Xmx的含义 -Xms  初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64">
@@ -320,21 +320,15 @@
       
         <p>最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了<code>-Xms2G -Xmx2G</code>，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？</p>
 <p>先了解一下-Xms和-Xmx的含义</p>
-<div class="note info"><h2 id="Xms"><a href="#Xms" class="headerlink" title="-Xms"></a>-Xms</h2></div>
+<div class="note info"><h2>-Xms</h2></div>
 
-初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64（且小于1G），默认情况下，当堆中可用内存小于40%（这个值可以用-XX: MinHeapFreeRatio 调整，如-X:MinHeapFreeRatio=30）时，堆内存会开始增加，一直增加到-Xmx的大小
+<p>初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64（且小于1G），默认情况下，当堆中可用内存小于40%（这个值可以用-XX: MinHeapFreeRatio 调整，如-X:MinHeapFreeRatio=30）时，堆内存会开始增加，一直增加到-Xmx的大小</p>
+<div class="note info"><h2>-Xmx</h2></div><br>堆的最大值，默认值是总共的物理内存1/4，如果Xms和Xmx都不设置，则两者大小会相同，默认情况下，当堆中可用内存大于70%（这个值可以用-XX: MaxHeapFreeRatio 调整，如-X:MaxHeapFreeRatio=60）时，堆内存会开始减少，一直减小到-Xms的大小<br><br>可以通过以下命令查看系统默认的InitialHeapSize和MaxHeapSize：<br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -XX:+PrintFlagsFinal -version | grep HeapSize</span><br></pre></td></tr></table></figure><br><br><div class="note info"><h2>-Xms=-Xmx？</h2></div>
 
-<div class="note info"><h2 id="Xmx"><a href="#Xmx" class="headerlink" title="-Xmx"></a>-Xmx</h2></div>
-<p>堆的最大值，默认值是总共的物理内存1/4，如果Xms和Xmx都不设置，则两者大小会相同，默认情况下，当堆中可用内存大于70%（这个值可以用-XX: MaxHeapFreeRatio 调整，如-X:MaxHeapFreeRatio=60）时，堆内存会开始减少，一直减小到-Xms的大小</p>
-<p>可以通过以下命令查看系统默认的InitialHeapSize和MaxHeapSize：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -XX:+PrintFlagsFinal -version | grep HeapSize</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="Xms-Xmx？"><a href="#Xms-Xmx？" class="headerlink" title="-Xms=-Xmx？"></a>-Xms=-Xmx？</h2></div>
+<p>如果设定一个比较小的初始堆大小，并且程序需要的内存大于-Xms时，JVM将会分配更多的堆内存，且有可能需要移动一些objects和记账（book-keeping），这些动作都比较耗时，会使程序响应变慢，极端情况下甚至会导致OOM。假如程序在闲时和忙时的负载差别比较大，堆内存就会不停的伸缩。如果设置-Xms=-Xmx就不会有这样的问题</p>
+<p>但是在测试环境或者开发环境中，Kafka并不会一直有数据（至少我的这个测试环境是这样，非UA），所以大部分时间Kafka Streams程序都是在空跑，所以堆内存会长期处于-Xms的状态。这种情况下设置-Xms=-Xmx是极大的浪费</p>
+<div class="note info"><h2>结论</h2></div>
 
-如果设定一个比较小的初始堆大小，并且程序需要的内存大于-Xms时，JVM将会分配更多的堆内存，且有可能需要移动一些objects和记账（book-keeping），这些动作都比较耗时，会使程序响应变慢，极端情况下甚至会导致OOM。假如程序在闲时和忙时的负载差别比较大，堆内存就会不停的伸缩。如果设置-Xms=-Xmx就不会有这样的问题
-
-但是在测试环境或者开发环境中，Kafka并不会一直有数据（至少我的这个测试环境是这样，非UA），所以大部分时间Kafka Streams程序都是在空跑，所以堆内存会长期处于-Xms的状态。这种情况下设置-Xms=-Xmx是极大的浪费
-
-<div class="note info"><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2></div>
 <p>在生产环境，设置-Xms和-Xmx相等以保证程序稳定。在开发测试环境，设置一个比较小的-Xms，以支撑更多的测试程序运行</p>
 
       
@@ -507,7 +501,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Xms"><span class="nav-number">1.</span> <span class="nav-text">-Xms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Xmx"><span class="nav-number">2.</span> <span class="nav-text">-Xmx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Xms-Xmx？"><span class="nav-number">3.</span> <span class="nav-text">-Xms=-Xmx？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">-Xms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">-Xmx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">-Xms=-Xmx？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>

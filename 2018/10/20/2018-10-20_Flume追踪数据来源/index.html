@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收  流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，">
+<meta name="description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收 流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更">
 <meta name="keywords" content="flume">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Flume追踪数据来源">
 <meta property="og:url" content="http://kane-xie.github.io/2018/10/20/2018-10-20_Flume追踪数据来源/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收  流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，">
+<meta property="og:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收 流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:14:27.832Z">
+<meta property="og:updated_time" content="2019-02-02T02:44:56.022Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume追踪数据来源">
-<meta name="twitter:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收  流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，">
+<meta name="twitter:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收 流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更">
 
 
 
@@ -318,19 +318,19 @@
       
 
       
-        <div class="note info"><h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2></div>
+        <div class="note info"><h2>需求</h2></div>
 
-我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收
+<p>我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收</p>
+<p>流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更坏的情况是收到一些垃圾信息，根本定位不到属于哪个应用或者表，冤无头债无主，一脸懵逼</p>
+<div class="note info"><h2>解决方案1.0</h2></div>
 
-流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更坏的情况是收到一些垃圾信息，根本定位不到属于哪个应用或者表，冤无头债无主，一脸懵逼
-
-<div class="note info"><h2 id="解决方案1-0"><a href="#解决方案1-0" class="headerlink" title="解决方案1.0"></a>解决方案1.0</h2></div>
 <p>改造的思路是，在MultiportSyslogTCPSource中接收数据的同时，将client端的ip写到flume event header中，再把header的信息通过kafka sink带到kafka message的headers中，这样后续流处理发生异常时就可以把client ip打印出来，便于找人背锅</p>
 <p>代码也很简单，在MultiportSyslogTCPSource.java的内部静态类MultiportSyslogHandler的messageReceived函数中，从session中取出RemoteAddress，设置到header中</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (lineSplitter.parseLine(buf, savedBuf, parsedLine)) &#123;</span><br><span class="line">  Event event = parseEvent(parsedLine, decoder);</span><br><span class="line">  <span class="keyword">if</span> (portHeader != <span class="keyword">null</span>) &#123;</span><br><span class="line">    event.getHeaders().put(portHeader, String.valueOf(port));</span><br><span class="line">  &#125;</span><br><span class="line">  event.getHeaders().put(REMOTE_ADDRESS, ((InetSocketAddress) session.getRemoteAddress()).getAddress().getHostAddress());</span><br><span class="line">  events.add(event);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  logger.trace(<span class="string">"Parsed null event"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p> 在KafkaSink.java的process函数中，把flume header的所有entry（或者可以只添加key为REMOTE_ADDRESS的entry）添加到kafka record的headers中</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; headers = event.getHeaders();</span><br><span class="line"><span class="keyword">for</span>(Entry&lt;String, String&gt; entry:  headers.entrySet()) &#123;</span><br><span class="line"> record.headers().add(entry.getKey(), entry.getValue().getBytes());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="解决方案2-0"><a href="#解决方案2-0" class="headerlink" title="解决方案2.0"></a>解决方案2.0</h2></div>
+<div class="note info"><h2>解决方案2.0</h2></div>
+
 <p>问题还没完，由于我们使用nginx来做的HA和负载均衡，后来发现从header里取出来的client ip都是nginx的ip而不是真正客户端的ip。这是因为nginx做反向代理会把request和response转一手，屏蔽掉client和server的信息，如果直接修改request，把nginx的ip改为真正client的ip，server端就会把response发送到真正的client，这样很可能会由于网络不通或者被防火墙拦截掉而响应失败</p>
 <p>这个问题在nginx本身是无解的，所以考虑引入某种机制，在请求体中携带client ip，对比了几种方案之后最终确定用代理协议<a href="https://www.nginx.com/resources/admin-guide/proxy-protocol/" target="_blank" rel="noopener">Proxy Protocol</a></p>
 <p>Nginx开启Proxy Protocol只需要添加配置<code>proxy_protocol on;</code>，例如</p>
@@ -514,7 +514,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求"><span class="nav-number">1.</span> <span class="nav-text">需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案1-0"><span class="nav-number">2.</span> <span class="nav-text">解决方案1.0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案2-0"><span class="nav-number">3.</span> <span class="nav-text">解决方案2.0</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">解决方案1.0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">解决方案2.0</span></a></li></ol></div>
             
 
           </div>

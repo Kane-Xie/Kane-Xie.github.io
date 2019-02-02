@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。 Metadata 大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取  Producers Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个p">
+<meta name="description" content="Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。 Metadata大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取 ProducersProducer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个prod">
 <meta name="keywords" content="kafka,rest">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka REST Proxy主要功能">
 <meta property="og:url" content="http://kane-xie.github.io/2016/08/08/2016-08-08_Kafka REST Proxy主要功能/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。 Metadata 大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取  Producers Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个p">
+<meta property="og:description" content="Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。 Metadata大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取 ProducersProducer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个prod">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.615Z">
+<meta property="og:updated_time" content="2019-02-02T02:44:55.937Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka REST Proxy主要功能">
-<meta name="twitter:description" content="Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。 Metadata 大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取  Producers Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个p">
+<meta name="twitter:description" content="Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。 Metadata大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取 ProducersProducer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个prod">
 
 
 
@@ -319,21 +319,12 @@
 
       
         <p>Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。</p>
-<div class="note info"><h2 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h2></div>
-大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取
-
-<div class="note info"><h2 id="Producers"><a href="#Producers" class="headerlink" title="Producers"></a>Producers</h2></div>
-<p>Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个producer），接受produce request并使用对应的producer来发送</p>
-<div class="note info"><h2 id="Consumers"><a href="#Consumers" class="headerlink" title="Consumers"></a>Consumers</h2></div>
-REST Proxy实现了high-level consumer的consumer-groups功能。Consumers是有状态的，因此需要跟REST Proxy的实例绑定。Offset的提交可以是自动的，也可以由client发送请求来提交。目前每个consumer都是单线程消费，所以如果希望通过多线程来提升吞吐量，那么需要使用多个consumer
-
-<div class="note info"><h2 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h2></div>
-<p>REST Proxy目前支持三种格式：JSON，base64编码二进制和Avro。如果使用Avro，需要在Schema Registry中注册和验证schema</p>
-<div class="note info"><h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2></div>
-REST Proxy可以启动多个实例来分担压力，并可以通过round robin DNS, 发现服务或者其他基于软件或硬件的负载均衡器来进行请求转发。但注意，由于consumer是有状态的，因此必须保证consumer必须跟REST Proxy实例绑定
-
-<div class="note info"><h2 id="Simple-Consumer"><a href="#Simple-Consumer" class="headerlink" title="Simple Consumer"></a>Simple Consumer</h2></div>
-<p>一般来说high-level consumer是推荐使用的，但如果有特殊的需求需要消费特定offset的消息，也可以使用Rest Proxy的low-level consumer</p>
+<p><div class="note info"><h2>Metadata</h2></div><br>大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取</p>
+<p><div class="note info"><h2>Producers</h2></div><br>Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个producer），接受produce request并使用对应的producer来发送</p>
+<p><div class="note info"><h2>Consumers</h2></div><br>REST Proxy实现了high-level consumer的consumer-groups功能。Consumers是有状态的，因此需要跟REST Proxy的实例绑定。Offset的提交可以是自动的，也可以由client发送请求来提交。目前每个consumer都是单线程消费，所以如果希望通过多线程来提升吞吐量，那么需要使用多个consumer</p>
+<p><div class="note info"><h2>数据格式</h2></div><br>REST Proxy目前支持三种格式：JSON，base64编码二进制和Avro。如果使用Avro，需要在Schema Registry中注册和验证schema</p>
+<p><div class="note info"><h2>负载均衡</h2></div><br>REST Proxy可以启动多个实例来分担压力，并可以通过round robin DNS, 发现服务或者其他基于软件或硬件的负载均衡器来进行请求转发。但注意，由于consumer是有状态的，因此必须保证consumer必须跟REST Proxy实例绑定</p>
+<p><div class="note info"><h2>Simple Consumer</h2></div><br>一般来说high-level consumer是推荐使用的，但如果有特殊的需求需要消费特定offset的消息，也可以使用Rest Proxy的low-level consumer</p>
 
       
     </div>
@@ -507,7 +498,7 @@ REST Proxy可以启动多个实例来分担压力，并可以通过round robin D
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Metadata"><span class="nav-number">1.</span> <span class="nav-text">Metadata</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Producers"><span class="nav-number">2.</span> <span class="nav-text">Producers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consumers"><span class="nav-number">3.</span> <span class="nav-text">Consumers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据格式"><span class="nav-number">4.</span> <span class="nav-text">数据格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载均衡"><span class="nav-number">5.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Simple-Consumer"><span class="nav-number">6.</span> <span class="nav-text">Simple Consumer</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">Metadata</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">Producers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">Consumers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">数据格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">Simple Consumer</span></a></li></ol></div>
             
 
           </div>

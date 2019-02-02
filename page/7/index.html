@@ -464,26 +464,23 @@
 <p>Spring 框架作为目前非常流行的一个 Java 应用开发框架，它包含几十个不同的子项目，涵盖应用开发的不同方面。要在这些子项目之间进行选择，并快速搭建一个可以运行的应用是比较困难的事情。Spring Boot 的目的在于快速创建可以独立运行的 Spring 应用，大大提升使用 Spring 框架时的开发效率。</p>
 </blockquote>
 <p>对于我们的web应用来说，springboot相当于把web服务器嵌入发布包内，以少量的配置大大方便了程序的开发和发布。我们可以专注于项目本身，创建独立的Java应用，通过java -jar启动。</p>
-<div class="note info"><h2 id="添加Spring-Boot相关POM配置"><a href="#添加Spring-Boot相关POM配置" class="headerlink" title="添加Spring Boot相关POM配置"></a>添加Spring Boot相关POM配置</h2></div>
+<div class="note info"><h2>添加Spring Boot相关POM配置</h2></div>
 
-undefined
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.5.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>我们只需要将spring-boot-starter-web的依赖加入到pom文件即可，它提供了对web的支持。当然也有很多推荐让其作为parent加载，但这样会引入很多不必要的jar包。</p>
+<div class="note info"><h2>Controller</h2></div>
 
-我们只需要将spring-boot-starter-web的依赖加入到pom文件即可，它提供了对web的支持。当然也有很多推荐让其作为parent加载，但这样会引入很多不必要的jar包。
-
-<div class="note info"><h2 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h2></div>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableAutoConfiguration</span>  </span><br><span class="line"><span class="meta">@RestController</span>  </span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/person"</span>)  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Controller</span> </span>&#123;  </span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/&#123;name&#125;"</span>)  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Properties <span class="title">getPersion</span><span class="params">(@PathVariable(<span class="string">"name"</span>)</span> String name) </span>&#123;  </span><br><span class="line">        Properties p = <span class="keyword">new</span> Properties();  </span><br><span class="line">        p.put(<span class="string">"name"</span>, name);  </span><br><span class="line">        p.put(<span class="string">"age"</span>, <span class="keyword">new</span> Random().nextInt(<span class="number">100</span>));  </span><br><span class="line">        <span class="keyword">return</span> p;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        SpringApplication.run(Controller.class);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>@EnableAutoConfiguration的作用在于让 Spring Boot 根据应用所声明的依赖来对 Spring 框架进行自动配置，这就减少了开发人员的工作量。比如说我们可以加入下面这段代码来制定contextpath和port。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>  </span><br><span class="line"><span class="function"><span class="keyword">public</span> EmbeddedServletContainerFactory <span class="title">servletContainer</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  TomcatEmbeddedServletContainerFactory factory = <span class="keyword">new</span> TomcatEmbeddedServletContainerFactory(<span class="string">"/admin"</span>, <span class="number">8091</span>);  </span><br><span class="line">  <span class="keyword">return</span> factory;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这样一个rest风格的web应用就搭建完成，可以访问<a href="http://localhost:8091/admin/person/kane查看结果。" target="_blank" rel="noopener">http://localhost:8091/admin/person/kane查看结果。</a></p>
-<div class="note info"><h2 id="Package"><a href="#Package" class="headerlink" title="Package"></a>Package</h2></div>
+<div class="note info"><h2>Package</h2></div>
 
-注意如果想到将应用打成一个可执行jar包的话，一定要用spring-boot-maven-plugin而不是其他的类似于maven-shade-plugin的插件。
+<p>注意如果想到将应用打成一个可执行jar包的话，一定要用spring-boot-maven-plugin而不是其他的类似于maven-shade-plugin的插件。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.5.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">executions</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">execution</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">goals</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>repackage<span class="tag">&lt;/<span class="name">goal</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;/<span class="name">goals</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">executions</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span>test.controller.Controller<span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>直接用java -jar &lt;jar_name&gt;即可启动web应用。</p>
+<div class="note info"><h2>Docker安装和运行</h2></div>
 
-undefined
-
-直接用java -jar &lt;jar_name&gt;即可启动web应用。
-
-<div class="note info"><h2 id="Docker安装和运行"><a href="#Docker安装和运行" class="headerlink" title="Docker安装和运行"></a>Docker安装和运行</h2></div>
 <blockquote>
 <p>Docker 是一个构建、部署以及运行应用的开放平台，应用可以在不同的环境（开发、测试、生产）中无差别的运行，为应用的开发提供了很大的灵活性。</p>
 </blockquote>
@@ -637,10 +634,14 @@ undefined
             <p>在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单</p>
 <p><code>bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &lt;group&gt;</code></p>
 <p>输出结果类似于</p>
-<p><code>Group Topic Pid Offset logSize Lag Owner</code><br><br><code>Group1 a.topic 0 2 2 0 none</code><br><br><code>Group1 a.topic 1 0 0 0 none</code><br><br><code>Group1 a.topic 2 2 2 0 none</code><br></p>
+<blockquote>
+<p>Group Topic Pid Offset logSize Lag Owner<br>Group1 a.topic 0 2 2 0 none<br>Group1 a.topic 1 0 0 0 none<br>Group1 a.topic 2 2 2 0 none</p>
+</blockquote>
 <p>我们也可以通过kafka web console一类的工具直观地获取kafka信息，但如果我们要构建自己的监控系统，需要抓取这些信息的话，有两种办法：一种是运行ConsumerOffsetChecker然后解析输出的字符串；另一种就是通过SimpleConsumer和Zookeeper实时抓取信息（换句话说就是把ConsumerOffsetChecker翻译一下：）），以下介绍第二种方法的思路。</p>
 <p>首先我们看kafka信息在zookeeper的存储结构</p>
-<p><code>1，/brokers/topics/[topic]/partitions/[partitionId]/state</code><br><code>2，/brokers/ids/[0...N]</code><br><code>3，/consumers/[groupId]/ids/[consumerId]</code><br><code>4，/consumers/[groupId]/owners/[topic]/[partitionId]</code><br><code>5，/consumers/[groupId]/offsets/[topic]/[partitionId]</code></p>
+<blockquote>
+<p>1，/brokers/topics/[topic]/partitions/[partitionId]/state<br>2，/brokers/ids/[0…N]<br>3，/consumers/[groupId]/ids/[consumerId]<br>4，/consumers/[groupId]/owners/[topic]/[partitionId]<br>5，/consumers/[groupId]/offsets/[topic]/[partitionId]</p>
+</blockquote>
 <p>对于指定的topic和groupid，通过(1)可以拿到所有的partition信息（Pid），然后通过(5)可以拿到offset，通过(4)可以拿到owner。就差logsize还没法拿到，事实上logsize在zookeeper中并没有记录，它必须通过kafka consumer的low level的api取得。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Long <span class="title">getLogSize</span><span class="params">(String topicName, String partitionId, <span class="keyword">long</span> offsetRequestTime)</span> </span>&#123;  </span><br><span class="line">    SimpleConsumer consumer = <span class="keyword">new</span> SimpleConsumer(server, port, <span class="number">10000</span>, <span class="number">1024000</span>, <span class="string">"ConsumerOffsetChecker"</span>);  </span><br><span class="line">    Long logSize = <span class="keyword">null</span>;  </span><br><span class="line">    TopicAndPartition topicAndPartition = <span class="keyword">new</span> TopicAndPartition(topicName, Integer.parseInt(partitionId));  </span><br><span class="line">    Map&lt;TopicAndPartition, PartitionOffsetRequestInfo&gt; map = <span class="keyword">new</span> HashMap&lt;TopicAndPartition, PartitionOffsetRequestInfo&gt;();  </span><br><span class="line">    map.put(topicAndPartition, <span class="keyword">new</span> PartitionOffsetRequestInfo(offsetRequestTime, <span class="number">1</span>));  </span><br><span class="line">    OffsetRequest request = <span class="keyword">new</span> OffsetRequest(map, kafka.api.OffsetRequest.CurrentVersion(), kafka.api.OffsetRequest.DefaultClientId());  </span><br><span class="line">    OffsetResponse response = consumer.getOffsetsBefore(request);  </span><br><span class="line">    <span class="keyword">long</span>[] aa = response.offsets(topicName, Integer.parseInt(partitionId));  </span><br><span class="line">    <span class="keyword">if</span> (aa.length != <span class="number">0</span>) &#123;  </span><br><span class="line">        logSize = aa[<span class="number">0</span>];  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> logSize;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>第二行，创建simple consumer</p>
@@ -777,53 +778,58 @@ undefined
         
           
             <p>在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。</p>
-<div class="note info"><h2 id="查询软件版本"><a href="#查询软件版本" class="headerlink" title="查询软件版本"></a>查询软件版本</h2></div>
+<div class="note info"><h2>查询软件版本</h2></div>
 
-语法：GET /version
- 
-范例：curl http://localhost:8000/version
- 
-输出结果：
-{"@Stargate":"0.0.1","@OS":"Linux 2.6.18-128.1.6.el5.centos.plusxen amd64","@
-JVM":"Sun Microsystems Inc. 1.6.0_13-11.3-b02","@Jetty":"6.1.14","@Jersey":"1
-.1.0-ea"}
- 
-<div class="note info"><h2 id="查询hbase集群版本"><a href="#查询hbase集群版本" class="headerlink" title="查询hbase集群版本"></a>查询hbase集群版本</h2></div>
-<p>语法：GET /version/cluster</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/version/cluster" target="_blank" rel="noopener">http://localhost:8000/version/cluster</a></p>
-<p>输出结果：”0.20.0”</p>
+<p>语法：<code>GET /version</code></p>
+<p>范例：<code>curl http://localhost:8000/version</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>{“@Stargate”:”0.0.1”,”@OS”:”Linux 2.6.18-128.1.6.el5.centos.plusxen amd64”,”@<br>JVM”:”Sun Microsystems Inc. 1.6.0_13-11.3-b02”,”@Jetty”:”6.1.14”,”@Jersey”:”1<br>.1.0-ea”}</p>
+</blockquote>
+<div class="note info"><h2>查询hbase集群版本</h2></div>
+
+<p>语法：<code>GET /version/cluster</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/version/cluster</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>“0.20.0”</p>
+</blockquote>
 <p>相当于HBaseAdmin.getClusterStatus().getHBaseVersion()</p>
-<div class="note info"><h2 id="查询hbase集群状态"><a href="#查询hbase集群状态" class="headerlink" title="查询hbase集群状态"></a>查询hbase集群状态</h2></div>
+<div class="note info"><h2>查询hbase集群状态</h2></div>
 
-语法：GET /status/cluster
- 
-范例：curl -H "Accept: application/json" http://localhost:8000/status/cluster
- 
-相当于HBaseAdmin.getClusterStatus()
+<p>语法：<code>GET /status/cluster</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/status/cluster</code></p>
+<p>相当于HBaseAdmin.getClusterStatus()</p>
+<div class="note info"><h2>列出所有hbase表</h2></div>
 
-<div class="note info"><h2 id="列出所有hbase表"><a href="#列出所有hbase表" class="headerlink" title="列出所有hbase表"></a>列出所有hbase表</h2></div>
-<p>语法：GET /</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/" target="_blank" rel="noopener">http://localhost:8000/</a></p>
-<p>输出结果：{“table”:[{“name”:”table1”},{“name”:”table2”}]}</p>
+<p>语法：<code>GET /</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>{“table”:[{“name”:”table1”},{“name”:”table2”}]}</p>
+</blockquote>
 <p>相当于HBaseAdmin.listTableNames()</p>
-<div class="note info"><h2 id="查询hbase表结构"><a href="#查询hbase表结构" class="headerlink" title="查询hbase表结构"></a>查询hbase表结构</h2></div>
+<div class="note info"><h2>查询hbase表结构</h2></div>
 
-语法：GET /&lt;table&gt;/schema
- 
-范例：curl -H "Accept: application/json" http://localhost:8000/table1/schema
- 
-输出结果：
-{ NAME=&gt; 'table1', IS_META =&gt; 'false', COLUMNS =&gt; [ { NAME =&gt; 'C', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647', KEEP_DELETED_CELLS =&gt; 'FALSE', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', BLOCKCACHE =&gt; 'true' }, { NAME =&gt; 'M', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647', KEEP_DELETED_CELLS =&gt; 'FALSE', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', BLOCKCACHE =&gt; 'true' } ] }
- 
-相当于HBaseAdmin.getTableDescriptor(TableName.valueOf("table1"))
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/schema</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table1/schema</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>{ NAME=&gt; ‘table1’, IS_META =&gt; ‘false’, COLUMNS =&gt; [ { NAME =&gt; ‘C’, DATA_BLOCK_ENCODING =&gt; ‘NONE’, BLOOMFILTER =&gt; ‘ROW’, REPLICATION_SCOPE =&gt; ‘0’, VERSIONS =&gt; ‘1’, COMPRESSION =&gt; ‘NONE’, MIN_VERSIONS =&gt; ‘0’, TTL =&gt; ‘2147483647’, KEEP_DELETED_CELLS =&gt; ‘FALSE’, BLOCKSIZE =&gt; ‘65536’, IN_MEMORY =&gt; ‘false’, BLOCKCACHE =&gt; ‘true’ }, { NAME =&gt; ‘M’, DATA_BLOCK_ENCODING =&gt; ‘NONE’, BLOOMFILTER =&gt; ‘ROW’, REPLICATION_SCOPE =&gt; ‘0’, VERSIONS =&gt; ‘1’, COMPRESSION =&gt; ‘NONE’, MIN_VERSIONS =&gt; ‘0’, TTL =&gt; ‘2147483647’, KEEP_DELETED_CELLS =&gt; ‘FALSE’, BLOCKSIZE =&gt; ‘65536’, IN_MEMORY =&gt; ‘false’, BLOCKCACHE =&gt; ‘true’ } ] }</p>
+</blockquote>
+<p>相当于HBaseAdmin.getTableDescriptor(TableName.valueOf(“table1”))</p>
+<div class="note info"><h2>新建表或者更新表结构</h2></div>
 
-<div class="note info"><h2 id="新建表或者更新表结构"><a href="#新建表或者更新表结构" class="headerlink" title="新建表或者更新表结构"></a>新建表或者更新表结构</h2></div>
-<p>语法:<br>PUT /&lt;table&gt;/schema<br>POST /&lt;table&gt;/schema</p>
+<p>语法:<br><code>PUT /&amp;lt;table&amp;gt;/schema</code><br><code>POST /&amp;lt;table&amp;gt;/schema</code></p>
 <p>PUT完全替换表结构，POST只是更新或者新增column family（跟本次更新无关的cf仍然保留）</p>
-<div class="note info"><h2 id="查询region信息"><a href="#查询region信息" class="headerlink" title="查询region信息"></a>查询region信息</h2></div>
-<p>语法：GET /&lt;table&gt;/regions</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/table1/regions" target="_blank" rel="noopener">http://localhost:8000/table1/regions</a></p>
-<p>输出结果：<br>pf_entity,,1436346991071.fce2165af7b49f1dd0995ddd535d3a6f. [<br>  id=1436346991071<br>  startKey=’’<br>  endKey=’’<br>  location=’bd02:21003’<br>]</p>
+<div class="note info"><h2>查询region信息</h2></div>
+
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/regions</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table1/regions</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>pf_entity,,1436346991071.fce2165af7b49f1dd0995ddd535d3a6f. [<br>  id=1436346991071<br>  startKey=’’<br>  endKey=’’<br>  location=’bd02:21003’<br>]</p>
+</blockquote>
 <p>相当于HBaseAdmin.getTableRegions(TableName.valueOf(“table1”))</p>
 
           
@@ -957,24 +963,26 @@ JVM":"Sun Microsystems Inc. 1.6.0_13-11.3-b02","@Jetty":"6.1.14","@Jersey":"1
             <p>在项目中碰到这样一个需求，对一个服务类的每一个方法，在方法开始和结束的时候分别记录一条日志，内容包括方法名，参数名+参数值以及方法执行的时间。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  </span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">get</span><span class="params">(String key)</span> </span>&#123;  </span><br><span class="line"><span class="comment">//  long start = System.currentTimeMillis();  </span></span><br><span class="line"><span class="comment">//  System.out.println("Begin Method = get, Args = [key=" + key + "]");  </span></span><br><span class="line">    String value = props.getProperty(key);  </span><br><span class="line"><span class="comment">//  System.out.println("End Method = get, Args = [key=" + key + "], Cost=" + (System.currentTimeMillis() - start)+ "ms");  </span></span><br><span class="line">    <span class="keyword">return</span> value;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>以上注释的代码能够满足要求，但是如果类中的方法比较多得时候，会有大量的冗余代码，不利于维护。这个时候可以用AspectJ实现日志代码的嵌入，但是JointPoint只能拿到参数值，无法拿到参数名。因此考虑用Javasist在初始化的时候先把参数名保存到内存中。以下是代码：</p>
-<div class="note info"><h2 id="服务实现类（接口略）："><a href="#服务实现类（接口略）：" class="headerlink" title="服务实现类（接口略）："></a>服务实现类（接口略）：</h2></div>
+<div class="note info"><h2>服务实现类（接口略）：</h2></div>
 
-undefined
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.Properties;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceImpl</span> <span class="keyword">implements</span> <span class="title">Service</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">get</span><span class="params">(String key)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> props.getProperty(key);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(String key, String value)</span> </span>&#123;  </span><br><span class="line">        props.put(key, value);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putAll</span><span class="params">(Properties props)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">this</span>.props.putAll(props);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2>Aspect类：</h2></div>
 
-<div class="note info"><h2 id="Aspect类："><a href="#Aspect类：" class="headerlink" title="Aspect类："></a>Aspect类：</h2></div>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.Map;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> javassist.ClassClassPath;  </span><br><span class="line"><span class="keyword">import</span> javassist.ClassPool;  </span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;  </span><br><span class="line"><span class="keyword">import</span> javassist.CtMethod;  </span><br><span class="line"><span class="keyword">import</span> javassist.Modifier;  </span><br><span class="line"><span class="keyword">import</span> javassist.NotFoundException;  </span><br><span class="line"><span class="keyword">import</span> javassist.bytecode.CodeAttribute;  </span><br><span class="line"><span class="keyword">import</span> javassist.bytecode.LocalVariableAttribute;  </span><br><span class="line"><span class="keyword">import</span> javassist.bytecode.MethodInfo;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> org.apache.log4j.Logger;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Around;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> com.google.common.collect.Maps;  </span><br><span class="line">  </span><br><span class="line"><span class="meta">@Aspect</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LogHelper</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">private</span> Logger logger = Logger.getLogger(ServiceImpl.class);  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String DELIMITER = <span class="string">" | "</span>;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, String[]&gt; paraMap = Maps.newHashMap();  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> NotFoundException </span>&#123;  </span><br><span class="line">        reflectGetParamName(ServiceImpl.class);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Pointcut</span>(<span class="string">"execution(* (test.*+).*(..))"</span>)  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aspectjMethod</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Around</span>(<span class="string">"aspectjMethod()"</span>)  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">around</span><span class="params">(ProceedingJoinPoint call)</span> <span class="keyword">throws</span> Throwable </span>&#123;  </span><br><span class="line">        <span class="keyword">long</span> startTime = System.nanoTime();  </span><br><span class="line">        String methodName = call.getSignature().getName();  </span><br><span class="line">        String className = call.getTarget().getClass().getSimpleName();  </span><br><span class="line">        Object[] args = call.getArgs();  </span><br><span class="line">        StringBuilder begin = <span class="keyword">new</span> StringBuilder(<span class="string">"Begin "</span>).append(<span class="string">"Method="</span>).append(methodName).append(<span class="string">", Args=["</span>)  </span><br><span class="line">                .append(argsToString(className, methodName, args)).append(<span class="string">"]"</span>);  </span><br><span class="line">        logger.info(begin);  </span><br><span class="line">  </span><br><span class="line">        Object result = call.proceed(args);  </span><br><span class="line">        <span class="keyword">long</span> costTime = (System.nanoTime() - startTime) / <span class="number">1000</span>;<span class="comment">// μs  </span></span><br><span class="line">        StringBuilder end = <span class="keyword">new</span> StringBuilder(<span class="string">"End "</span>).append(<span class="string">"Method="</span>).append(methodName).append(<span class="string">", Args=["</span>)  </span><br><span class="line">                .append(argsToString(className, methodName, args)).append(<span class="string">"], Cost="</span>).append(costTime).append(<span class="string">"μs"</span>);  </span><br><span class="line">        logger.info(end);  </span><br><span class="line">        <span class="keyword">return</span> result;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">argsToString</span><span class="params">(String className, String methodName, Object[] args)</span> </span>&#123;  </span><br><span class="line">        String[] paraNames = paraMap.get(className + methodName);  </span><br><span class="line">        <span class="keyword">boolean</span> appendParaName = <span class="keyword">true</span>;  </span><br><span class="line">        <span class="keyword">if</span> (paraNames == <span class="keyword">null</span> || paraNames.length != args.length) &#123;  </span><br><span class="line">            logger.warn(<span class="string">"Fail to get parameter(s)' name. ClassName = "</span> + className + <span class="string">", MethodName = "</span> + methodName  </span><br><span class="line">                    + <span class="string">", Expected ParaNum = "</span> + args.length);  </span><br><span class="line">            appendParaName = <span class="keyword">false</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();  </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; args.length; i++) &#123;  </span><br><span class="line">            Object obj = args[i];  </span><br><span class="line">            String paraName = paraNames[i];  </span><br><span class="line">            <span class="keyword">if</span> (sb.length() != <span class="number">0</span>) &#123;  </span><br><span class="line">                sb.append(DELIMITER);  </span><br><span class="line">            &#125;  </span><br><span class="line">            <span class="keyword">if</span> (appendParaName) &#123;  </span><br><span class="line">                sb.append(paraName).append(<span class="string">"="</span>);  </span><br><span class="line">            &#125;  </span><br><span class="line">            sb.append(String.valueOf(obj));  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> sb.toString();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">reflectGetParamName</span><span class="params">(Class&lt;?&gt; clazz)</span> <span class="keyword">throws</span> NotFoundException </span>&#123;  </span><br><span class="line">        ClassPool pool = ClassPool.getDefault();  </span><br><span class="line">        pool.insertClassPath(<span class="keyword">new</span> ClassClassPath(clazz));  </span><br><span class="line">        CtClass cc = pool.get(clazz.getName());  </span><br><span class="line">        <span class="keyword">for</span> (CtMethod cm : cc.getDeclaredMethods()) &#123;  </span><br><span class="line">            String methodName = cm.getName();  </span><br><span class="line">            <span class="comment">// 使用javaassist的反射方法获取方法的参数名  </span></span><br><span class="line">            MethodInfo methodInfo = cm.getMethodInfo();  </span><br><span class="line">            CodeAttribute codeAttribute = methodInfo.getCodeAttribute();  </span><br><span class="line">            LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute  </span><br><span class="line">                    .getAttribute(LocalVariableAttribute.tag);  </span><br><span class="line">            <span class="keyword">if</span> (attr == <span class="keyword">null</span>) &#123;  </span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> NotFoundException(<span class="string">"CodeAttribute Not Found. ClassName = "</span> + clazz.getName()  </span><br><span class="line">                        + <span class="string">", MethodName = "</span> + methodName);  </span><br><span class="line">            &#125;  </span><br><span class="line">            String[] paramNames = <span class="keyword">new</span> String[cm.getParameterTypes().length];  </span><br><span class="line">            <span class="keyword">int</span> pos = Modifier.isStatic(cm.getModifiers()) ? <span class="number">0</span> : <span class="number">1</span>;  </span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; paramNames.length; i++)  </span><br><span class="line">                paramNames[i] = attr.variableName(i + pos);  </span><br><span class="line">            paraMap.put(clazz.getSimpleName() + methodName, paramNames);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol>
 <li>首先初始化的时候调用reflectGetParamName，运用反射获取所有方法的参数名，并保存到paraMap中。</li>
 <li>在方法执行的前后分别打印日志并计算执行时间，方法名和参数值从JoinPoint中获取，参数名从paraMap中获取</li>
 </ol>
-<div class="note info"><h2 id="配置文件applicationContext-xml："><a href="#配置文件applicationContext-xml：" class="headerlink" title="配置文件applicationContext.xml："></a>配置文件applicationContext.xml：</h2></div>
+<div class="note info"><h2>配置文件applicationContext.xml：</h2></div>
 
-undefined
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>    </span><br><span class="line">    </span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd    </span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd    </span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"</span>&gt;</span>    </span><br><span class="line">               </span><br><span class="line">    <span class="comment">&lt;!-- 启用AspectJ对Annotation的支持 --&gt;</span>           </span><br><span class="line">    <span class="tag">&lt;<span class="name">aop:aspectj-autoproxy</span>/&gt;</span>                    </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"service"</span> <span class="attr">class</span>=<span class="string">"test.ServiceImpl"</span>/&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"aspcejHandler"</span> <span class="attr">class</span>=<span class="string">"test.LogHelper"</span> <span class="attr">init-method</span>=<span class="string">"init"</span>/&gt;</span>    </span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="note info"><h2>测试代码：</h2></div>
 
-<div class="note info"><h2 id="测试代码："><a href="#测试代码：" class="headerlink" title="测试代码："></a>测试代码：</h2></div>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.Properties;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        ApplicationContext context = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"applicationContext.xml"</span>);  </span><br><span class="line">        Service service = (Service) context.getBean(<span class="string">"service"</span>);  </span><br><span class="line">        service.put(<span class="string">"1"</span>, <span class="string">"one"</span>);  </span><br><span class="line">        service.putAll(<span class="keyword">new</span> Properties());  </span><br><span class="line">        System.out.println(service.get(<span class="string">"1"</span>));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="测试结果："><a href="#测试结果：" class="headerlink" title="测试结果："></a>测试结果：</h2></div>
-<p><code>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=put, Args=[key=1 | value=one]</code><br><br><code>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=put, Args=[key=1 | value=one], Cost=1539μs</code><br><br><code>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=putAll, Args=[props={}]</code><br><br><code>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=putAll, Args=[props={}], Cost=148μs</code><br><br><code>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=get, Args=[key=1]</code><br><br><code>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=get, Args=[key=1], Cost=86μs</code></p>
+<p><div class="note info"><h2>测试结果：</h2></div></p>
+<blockquote>
+<p>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=put, Args=[key=1 | value=one]<br>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=put, Args=[key=1 | value=one], Cost=1539μs<br>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=putAll, Args=[props={}]<br>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=putAll, Args=[props={}], Cost=148μs<br>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=get, Args=[key=1]<br>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=get, Args=[key=1], Cost=86μs</p>
+</blockquote>
 
           
         
@@ -1108,31 +1116,26 @@ undefined
 <p>启动命令：./bin/hbase rest start -p &lt;port&gt;</p>
 <p>默认端口8080.</p>
 <p>以下介绍如何使用rest api查询hbase数据。</p>
-<div class="note info"><h2 id="rowkey查询"><a href="#rowkey查询" class="headerlink" title="rowkey查询"></a>rowkey查询</h2></div>
+<div class="note info"><h2>rowkey查询</h2></div>
 
-* 单值查询。
+<ul>
+<li>单值查询。</li>
+</ul>
+<p>只查询单个column family或column。</p>
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/&amp;lt;row&amp;gt;/&amp;lt;column&amp;gt;(:&amp;lt;qualifier&amp;gt; )?(/&amp;lt;timestamp&amp;gt;)?</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table/key/cf:raw</code></p>
+<p>在测试中我发现加入&lt;timestamp&gt;参数之后就找不到数据了，不知道是不是bug</p>
+<ul>
+<li>多值查询。</li>
+</ul>
+<p>查询多个column family或column。</p>
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/&amp;lt;row&amp;gt; ( / ( &amp;lt;column&amp;gt; ( : &amp;lt;qualifier&amp;gt; )? ( , &amp;lt;column&amp;gt; ( : &amp;lt;qualifier&amp;gt; )? )+ )?( / ( &amp;lt;start-timestamp&amp;gt; &#39;,&#39; )? &amp;lt;end-timestamp&amp;gt; )? )?( ?v= &amp;lt;num-versions&amp;gt; )?</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot;  http://localhost:8000/table1/key1/cf1:q1,cf2/1436350580000,1436350590000/3</code></p>
+<p>可以通过timestamp过滤查询结果，也可以通过&lt;num-versions&gt;设定返回的最大版本数</p>
+<div class="note info"><h2>通配符查询</h2></div>
 
-只查询单个column family或column。
-
-语法：GET /&lt;table&gt;/&lt;row&gt;/&lt;column&gt;(:&lt;qualifier&gt; )?(/&lt;timestamp&gt;)?
- 
-范例：curl -H "Accept: application/json" http://localhost:8000/table/key/cf:raw
-
-在测试中我发现加入&lt;timestamp&gt;参数之后就找不到数据了，不知道是不是bug
- 
-* 多值查询。
-
-查询多个column family或column。
- 
-语法：GET /&lt;table&gt;/&lt;row&gt; ( / ( &lt;column&gt; ( : &lt;qualifier&gt; )? ( , &lt;column&gt; ( : &lt;qualifier&gt; )? )+ )?( / ( &lt;start-timestamp&gt; ',' )? &lt;end-timestamp&gt; )? )?( ?v= &lt;num-versions&gt; )?
- 
-范例：curl -H "Accept: application/json"  http://localhost:8000/table1/key1/cf1:q1,cf2/1436350580000,1436350590000/3
- 
-可以通过timestamp过滤查询结果，也可以通过&lt;num-versions&gt;设定返回的最大版本数
-
-<div class="note info"><h2 id="通配符查询"><a href="#通配符查询" class="headerlink" title="通配符查询"></a>通配符查询</h2></div>
 <p>在rowkey后添加*号，可以返回以该rowkey为前缀的所有记录，如果以*号为rowkey来查询，则返回该table中所有的记录。</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/table/keyprefix*/cf" target="_blank" rel="noopener">http://localhost:8000/table/keyprefix*/cf</a></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table/keyprefix*/cf</code></p>
 <ul>
 <li>key list查询</li>
 </ul>
@@ -1142,21 +1145,23 @@ undefined
 </ul>
 <p><strong>有状态scanner</strong></p>
 <p>首先在server端创建scanner:<br>PUT /&lt;table&gt;/scanner</p>
-<p>范例：curl -H “Content-Type: text/xml” -d ‘&lt;Scanner batch=”1”/&gt;’ <a href="http://localhost:8000/table/scanner" target="_blank" rel="noopener">http://localhost:8000/table/scanner</a></p>
+<p>范例：<code>curl -H &quot;Content-Type: text/xml&quot; -d &#39;&amp;lt;Scanner batch=&quot;1&quot;/&amp;gt;&#39; http://localhost:8000/table/scanner</code></p>
 <p>在response中获得scanner id，然后可以使用这个id拿到这个scanner查询到的所有cell的值，</p>
-<p>语法：GET /&lt;table&gt;/scanner/&lt;scanner-id&gt;</p>
-<p>范例：curl -H “Content-Type: application/json” <a href="http://localhost:8000/table/scanner/12447063229213b1937" target="_blank" rel="noopener">http://localhost:8000/table/scanner/12447063229213b1937</a></p>
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/scanner/&amp;lt;scanner-id&amp;gt;</code></p>
+<p>范例：<code>curl -H &quot;Content-Type: application/json&quot; http://localhost:8000/table/scanner/12447063229213b1937</code></p>
 <p>注意每次调用只能返回一个cell的值，而且比较奇怪的是只返回值而没有cf和qualifier，所以使用起来很不方便。</p>
 <p>使用完之后删除scanner:DELETE /&lt;table&gt;/scanner/&lt;scanner-id&gt;</p>
 <p><strong>无状态scanner</strong></p>
 <p>无状态的scanner不保存任何关于查询的状态，它把所有的查询条件作为参数进行一次性的查询。</p>
 <p>查询参数包括：</p>
-<p><code>startrow - 查询起始key。</code><br><br><code>endrow - 查询终止key。</code><br><br><code>columns - 查询的column。</code><br><br><code>starttime, endtime - 通过指定起始时间选择特定的数据版本，starttime和endtime必须同时设置。</code><br><br><code>maxversions - 每个返回的cell的版本数。</code><br><br><code>limit - 返回数据条数。</code><br></p>
+<blockquote>
+<p>startrow - 查询起始key<br>endrow - 查询终止key<br>columns - 查询的column<br>starttime, endtime - 通过指定起始时间选择特定的数据版本，starttime和endtime必须同时设置<br>maxversions - 每个返回的cell的版本数<br>limit - 返回数据条数</p>
+</blockquote>
 <p>范例：</p>
-<p>查询单个column cf:q：<br>curl -H “Content-Type: text/xml” <a href="https://localhost:8080/table/*?columns=cf:q" target="_blank" rel="noopener">https://localhost:8080/table/*?columns=cf:q</a></p>
-<p>查询多个column cf1:q1和cf2:q2：<br>curl -H “Content-Type: text/xml” <a href="https://localhost:8080/table/*?columns=cf1:q1,cf2:q2" target="_blank" rel="noopener">https://localhost:8080/table/*?columns=cf1:q1,cf2:q2</a></p>
-<p>从key1开始查询两条记录：<br>curl -H “Content-Type: text/xml” <a href="https://localhost:8080/table/*?startrow=key1&amp;limit=2" target="_blank" rel="noopener">https://localhost:8080/table/*?startrow=key1&amp;limit=2</a></p>
-<p>查询1389900769772和1389900800000之间的版本：<br>curl -H “Content-Type: text/xml” <a href="https://localhost:8080/table/*？starttime=1389900769772&amp;endtime=1389900800000" target="_blank" rel="noopener">https://localhost:8080/table/*？starttime=1389900769772&amp;endtime=1389900800000</a></p>
+<p>查询单个column cf:q：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*?columns=cf:q</code></p>
+<p>查询多个column cf1:q1和cf2:q2：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*?columns=cf1:q1,cf2:q2</code></p>
+<p>从key1开始查询两条记录：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*?startrow=key1&amp;limit=2</code></p>
+<p>查询1389900769772和1389900800000之间的版本：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*？starttime=1389900769772&amp;endtime=1389900800000</code></p>
 
           
         
@@ -1710,8 +1715,6 @@ undefined
 </blockquote>
 <blockquote>
 <p>主要特点：</p>
-</blockquote>
-<blockquote>
 <ul>
 <li>快速FAST (比其它任何基于Java的解析器和生成器更快，包括jackson）</li>
 <li>强大（支持普通JDK类包括任意Java Bean Class、Collection、Map、Date或enum）</li>
@@ -1722,49 +1725,25 @@ undefined
 <p>Test Case: 对一个User类（空）的对象分别用java和fastjson序列化1000次，再反序列化1000次，计算时间。注： 测试不是非常严谨，只是做个简单的比较。</p>
 <p>Test Result： </p>
 <blockquote>
-<p>Type = java</p>
-</blockquote>
-<blockquote>
-<p>Serialize cost = 27ms</p>
-</blockquote>
-<blockquote>
-<p>Deserialize cost = 75ms</p>
+<p>Type = java<br>Serialize cost = 27ms<br>Deserialize cost = 75ms</p>
 </blockquote>
 <p>
 
 <blockquote>
-<p>Type = fastjson</p>
-</blockquote>
-<blockquote>
-<p>Serialize cost = 385ms</p>
-</blockquote>
-<blockquote>
-<p>Deserialize cost = 84ms</p>
+<p>Type = fastjson<br>Serialize cost = 385ms<br>Deserialize cost = 84ms</p>
 </blockquote>
 </p><p>这是在逗我吗。。。</p>
 <p>经过同事提醒，看了源码发现fastjson在序列化时需要初始化SerializeConfig，反序列化时需要初始化ParserConfig。然后我在测试案例中加入这两句</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> ParserConfig pc = <span class="keyword">new</span> ParserConfig();  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> SerializeConfig sc = <span class="keyword">new</span> SerializeConfig();</span><br></pre></td></tr></table></figure>
 <p>果然快了很多，但仍旧不理想</p>
 <blockquote>
-<p>Type = fastjson</p>
-</blockquote>
-<blockquote>
-<p>Serialize cost = 36ms</p>
-</blockquote>
-<blockquote>
-<p>Deserialize cost = 42ms</p>
+<p>Type = fastjson<br>Serialize cost = 36ms<br>Deserialize cost = 42ms</p>
 </blockquote>
 <p>再继续看，发现还需要初始化writer和parser，所以改成这句</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JSON.parseObject(JSON.toJSONString(<span class="keyword">new</span> User()), User.class);</span><br></pre></td></tr></table></figure>
 <p>结果就很令人满意了</p>
 <blockquote>
-<p>Type = fastjson</p>
-</blockquote>
-<blockquote>
-<p>Serialize cost = 15ms</p>
-</blockquote>
-<blockquote>
-<p>Deserialize cost = 18ms</p>
+<p>Type = fastjson<br>Serialize cost = 15ms<br>Deserialize cost = 18ms</p>
 </blockquote>
 <p>结论： 如果你使用fastjson在一个短进程，换句话说只是少量的进行序列化反序列化，那么fastjson由于初始化需要的时间比较长，总体性能将会很糟糕。如果一定要用，有必要的话可以考虑手动进行初始化。</p>
 <p>另，补上测试代码：</p>

@@ -85,7 +85,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="Kafka Streams默认使用RocksDB来存储状态 In-memory or persistent ?  状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor AP">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:14:27.823Z">
+<meta property="og:updated_time" content="2019-02-02T02:44:55.968Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka Streams State Store">
 <meta name="twitter:description" content="Kafka Streams默认使用RocksDB来存储状态 In-memory or persistent ?  状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor AP">
@@ -319,14 +319,15 @@
 
       
         <p>Kafka Streams默认使用RocksDB来存储状态</p>
-<div class="note info"><h2 id="In-memory-or-persistent"><a href="#In-memory-or-persistent" class="headerlink" title="In-memory or persistent ?"></a>In-memory or persistent ?</h2></div>
+<div class="note info"><h2>In-memory or persistent ?</h2></div>
 
-状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor API（low level）
+<p>状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor API（low level）</p>
+<div class="note info"><h2>持久化</h2></div>
 
-<div class="note info"><h2 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h2></div>
 <p>为了保存状态，RocksDB会把state store的内容flush到StreamsConfig.STATE_DIR_CONFIG指定的磁盘上</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.put(StreamsConfig.STATE_DIR_CONFIG, <span class="string">"my-state-store"</span>)</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h2></div>
+<div class="note info"><h2>Changelog</h2></div>
+
 <p>出于灾备和扩展性的考虑，state store的内容同样会默认保存changelog到kafka的topic中，topic名字为<code>&lt;application_id&gt;-&lt;state_store_name&gt;-changelog</code>，你可以通过enableLogging和disableLogging来开启或关闭该功能</p>
 <p>如果task由于异常或宕机造成中断，在原来的机器或另一台机器重启之后，Kafka Streams能够优先通过重放changelog恢复state store的内容，而不是在新的task中创建新的state store，这是Kafka Streams状态安全性的保证</p>
 <p>如果在task运行过程中删除changelog对应的topic，Kafka Streams会在下一个checkpoint再次写入changelog，但如果在下个checkpoint之前task中断，state store的数据将无法恢复</p>
@@ -501,7 +502,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#In-memory-or-persistent"><span class="nav-number">1.</span> <span class="nav-text">In-memory or persistent ?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持久化"><span class="nav-number">2.</span> <span class="nav-text">持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Changelog"><span class="nav-number">3.</span> <span class="nav-text">Changelog</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">In-memory or persistent ?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">Changelog</span></a></li></ol></div>
             
 
           </div>

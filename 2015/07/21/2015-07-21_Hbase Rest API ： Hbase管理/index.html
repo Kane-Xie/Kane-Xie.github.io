@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。 查询软件版本  语法：GET /version   范例：curl http://localhost:8000/version   输出结果： {&quot;@Stargate&quot;:&quot;0.0.1&quot;,&quot;@OS&quot;:&quot;Linux 2.6.18-128.1.6.el5.centos.plusxen amd6">
+<meta name="description" content="在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。 查询软件版本  语法：GET /version 范例：curl http://localhost:8000/version 输出结果：  {“@Stargate”:”0.0.1”,”@OS”:”Linux 2.6.18-128.1.6.el5.centos.plusxen amd64”,">
 <meta name="keywords" content="hbase">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hbase Rest API ： Hbase管理">
 <meta property="og:url" content="http://kane-xie.github.io/2015/07/21/2015-07-21_Hbase Rest API ： Hbase管理/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。 查询软件版本  语法：GET /version   范例：curl http://localhost:8000/version   输出结果： {&quot;@Stargate&quot;:&quot;0.0.1&quot;,&quot;@OS&quot;:&quot;Linux 2.6.18-128.1.6.el5.centos.plusxen amd6">
+<meta property="og:description" content="在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。 查询软件版本  语法：GET /version 范例：curl http://localhost:8000/version 输出结果：  {“@Stargate”:”0.0.1”,”@OS”:”Linux 2.6.18-128.1.6.el5.centos.plusxen amd64”,">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:39:49.332Z">
+<meta property="og:updated_time" content="2019-02-02T03:22:59.516Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hbase Rest API ： Hbase管理">
-<meta name="twitter:description" content="在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。 查询软件版本  语法：GET /version   范例：curl http://localhost:8000/version   输出结果： {&quot;@Stargate&quot;:&quot;0.0.1&quot;,&quot;@OS&quot;:&quot;Linux 2.6.18-128.1.6.el5.centos.plusxen amd6">
+<meta name="twitter:description" content="在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。 查询软件版本  语法：GET /version 范例：curl http://localhost:8000/version 输出结果：  {“@Stargate”:”0.0.1”,”@OS”:”Linux 2.6.18-128.1.6.el5.centos.plusxen amd64”,">
 
 
 
@@ -319,53 +319,58 @@
 
       
         <p>在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。</p>
-<div class="note info"><h2 id="查询软件版本"><a href="#查询软件版本" class="headerlink" title="查询软件版本"></a>查询软件版本</h2></div>
+<div class="note info"><h2>查询软件版本</h2></div>
 
-语法：GET /version
- 
-范例：curl http://localhost:8000/version
- 
-输出结果：
-{"@Stargate":"0.0.1","@OS":"Linux 2.6.18-128.1.6.el5.centos.plusxen amd64","@
-JVM":"Sun Microsystems Inc. 1.6.0_13-11.3-b02","@Jetty":"6.1.14","@Jersey":"1
-.1.0-ea"}
- 
-<div class="note info"><h2 id="查询hbase集群版本"><a href="#查询hbase集群版本" class="headerlink" title="查询hbase集群版本"></a>查询hbase集群版本</h2></div>
-<p>语法：GET /version/cluster</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/version/cluster" target="_blank" rel="noopener">http://localhost:8000/version/cluster</a></p>
-<p>输出结果：”0.20.0”</p>
+<p>语法：<code>GET /version</code></p>
+<p>范例：<code>curl http://localhost:8000/version</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>{“@Stargate”:”0.0.1”,”@OS”:”Linux 2.6.18-128.1.6.el5.centos.plusxen amd64”,”@<br>JVM”:”Sun Microsystems Inc. 1.6.0_13-11.3-b02”,”@Jetty”:”6.1.14”,”@Jersey”:”1<br>.1.0-ea”}</p>
+</blockquote>
+<div class="note info"><h2>查询hbase集群版本</h2></div>
+
+<p>语法：<code>GET /version/cluster</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/version/cluster</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>“0.20.0”</p>
+</blockquote>
 <p>相当于HBaseAdmin.getClusterStatus().getHBaseVersion()</p>
-<div class="note info"><h2 id="查询hbase集群状态"><a href="#查询hbase集群状态" class="headerlink" title="查询hbase集群状态"></a>查询hbase集群状态</h2></div>
+<div class="note info"><h2>查询hbase集群状态</h2></div>
 
-语法：GET /status/cluster
- 
-范例：curl -H "Accept: application/json" http://localhost:8000/status/cluster
- 
-相当于HBaseAdmin.getClusterStatus()
+<p>语法：<code>GET /status/cluster</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/status/cluster</code></p>
+<p>相当于HBaseAdmin.getClusterStatus()</p>
+<div class="note info"><h2>列出所有hbase表</h2></div>
 
-<div class="note info"><h2 id="列出所有hbase表"><a href="#列出所有hbase表" class="headerlink" title="列出所有hbase表"></a>列出所有hbase表</h2></div>
-<p>语法：GET /</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/" target="_blank" rel="noopener">http://localhost:8000/</a></p>
-<p>输出结果：{“table”:[{“name”:”table1”},{“name”:”table2”}]}</p>
+<p>语法：<code>GET /</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>{“table”:[{“name”:”table1”},{“name”:”table2”}]}</p>
+</blockquote>
 <p>相当于HBaseAdmin.listTableNames()</p>
-<div class="note info"><h2 id="查询hbase表结构"><a href="#查询hbase表结构" class="headerlink" title="查询hbase表结构"></a>查询hbase表结构</h2></div>
+<div class="note info"><h2>查询hbase表结构</h2></div>
 
-语法：GET /&lt;table&gt;/schema
- 
-范例：curl -H "Accept: application/json" http://localhost:8000/table1/schema
- 
-输出结果：
-{ NAME=&gt; 'table1', IS_META =&gt; 'false', COLUMNS =&gt; [ { NAME =&gt; 'C', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647', KEEP_DELETED_CELLS =&gt; 'FALSE', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', BLOCKCACHE =&gt; 'true' }, { NAME =&gt; 'M', DATA_BLOCK_ENCODING =&gt; 'NONE', BLOOMFILTER =&gt; 'ROW', REPLICATION_SCOPE =&gt; '0', VERSIONS =&gt; '1', COMPRESSION =&gt; 'NONE', MIN_VERSIONS =&gt; '0', TTL =&gt; '2147483647', KEEP_DELETED_CELLS =&gt; 'FALSE', BLOCKSIZE =&gt; '65536', IN_MEMORY =&gt; 'false', BLOCKCACHE =&gt; 'true' } ] }
- 
-相当于HBaseAdmin.getTableDescriptor(TableName.valueOf("table1"))
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/schema</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table1/schema</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>{ NAME=&gt; ‘table1’, IS_META =&gt; ‘false’, COLUMNS =&gt; [ { NAME =&gt; ‘C’, DATA_BLOCK_ENCODING =&gt; ‘NONE’, BLOOMFILTER =&gt; ‘ROW’, REPLICATION_SCOPE =&gt; ‘0’, VERSIONS =&gt; ‘1’, COMPRESSION =&gt; ‘NONE’, MIN_VERSIONS =&gt; ‘0’, TTL =&gt; ‘2147483647’, KEEP_DELETED_CELLS =&gt; ‘FALSE’, BLOCKSIZE =&gt; ‘65536’, IN_MEMORY =&gt; ‘false’, BLOCKCACHE =&gt; ‘true’ }, { NAME =&gt; ‘M’, DATA_BLOCK_ENCODING =&gt; ‘NONE’, BLOOMFILTER =&gt; ‘ROW’, REPLICATION_SCOPE =&gt; ‘0’, VERSIONS =&gt; ‘1’, COMPRESSION =&gt; ‘NONE’, MIN_VERSIONS =&gt; ‘0’, TTL =&gt; ‘2147483647’, KEEP_DELETED_CELLS =&gt; ‘FALSE’, BLOCKSIZE =&gt; ‘65536’, IN_MEMORY =&gt; ‘false’, BLOCKCACHE =&gt; ‘true’ } ] }</p>
+</blockquote>
+<p>相当于HBaseAdmin.getTableDescriptor(TableName.valueOf(“table1”))</p>
+<div class="note info"><h2>新建表或者更新表结构</h2></div>
 
-<div class="note info"><h2 id="新建表或者更新表结构"><a href="#新建表或者更新表结构" class="headerlink" title="新建表或者更新表结构"></a>新建表或者更新表结构</h2></div>
-<p>语法:<br>PUT /&lt;table&gt;/schema<br>POST /&lt;table&gt;/schema</p>
+<p>语法:<br><code>PUT /&amp;lt;table&amp;gt;/schema</code><br><code>POST /&amp;lt;table&amp;gt;/schema</code></p>
 <p>PUT完全替换表结构，POST只是更新或者新增column family（跟本次更新无关的cf仍然保留）</p>
-<div class="note info"><h2 id="查询region信息"><a href="#查询region信息" class="headerlink" title="查询region信息"></a>查询region信息</h2></div>
-<p>语法：GET /&lt;table&gt;/regions</p>
-<p>范例：curl -H “Accept: application/json” <a href="http://localhost:8000/table1/regions" target="_blank" rel="noopener">http://localhost:8000/table1/regions</a></p>
-<p>输出结果：<br>pf_entity,,1436346991071.fce2165af7b49f1dd0995ddd535d3a6f. [<br>  id=1436346991071<br>  startKey=’’<br>  endKey=’’<br>  location=’bd02:21003’<br>]</p>
+<div class="note info"><h2>查询region信息</h2></div>
+
+<p>语法：<code>GET /&amp;lt;table&amp;gt;/regions</code></p>
+<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table1/regions</code></p>
+<p>输出结果：</p>
+<blockquote>
+<p>pf_entity,,1436346991071.fce2165af7b49f1dd0995ddd535d3a6f. [<br>  id=1436346991071<br>  startKey=’’<br>  endKey=’’<br>  location=’bd02:21003’<br>]</p>
+</blockquote>
 <p>相当于HBaseAdmin.getTableRegions(TableName.valueOf(“table1”))</p>
 
       
@@ -538,7 +543,7 @@ JVM":"Sun Microsystems Inc. 1.6.0_13-11.3-b02","@Jetty":"6.1.14","@Jersey":"1
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询软件版本"><span class="nav-number">1.</span> <span class="nav-text">查询软件版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询hbase集群版本"><span class="nav-number">2.</span> <span class="nav-text">查询hbase集群版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询hbase集群状态"><span class="nav-number">3.</span> <span class="nav-text">查询hbase集群状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#列出所有hbase表"><span class="nav-number">4.</span> <span class="nav-text">列出所有hbase表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询hbase表结构"><span class="nav-number">5.</span> <span class="nav-text">查询hbase表结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新建表或者更新表结构"><span class="nav-number">6.</span> <span class="nav-text">新建表或者更新表结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询region信息"><span class="nav-number">7.</span> <span class="nav-text">查询region信息</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">查询软件版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">查询hbase集群版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">查询hbase集群状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">列出所有hbase表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">查询hbase表结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">新建表或者更新表结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">查询region信息</span></a></li></ol></div>
             
 
           </div>

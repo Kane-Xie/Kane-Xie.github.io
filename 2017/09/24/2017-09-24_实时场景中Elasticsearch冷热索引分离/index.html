@@ -77,19 +77,19 @@
 
 
 
-<meta name="description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组 首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我">
+<meta name="description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们">
 <meta name="keywords" content="elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="实时场景中Elasticsearch冷热索引分离">
 <meta property="og:url" content="http://kane-xie.github.io/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组 首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我">
+<meta property="og:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.670Z">
+<meta property="og:updated_time" content="2019-02-02T03:05:18.328Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实时场景中Elasticsearch冷热索引分离">
-<meta name="twitter:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组 首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我">
+<meta name="twitter:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们">
 <meta name="twitter:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
 
 
@@ -321,28 +321,18 @@
 
       
         <p>如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用</p>
-<div class="note info"><h2 id="node分组"><a href="#node分组" class="headerlink" title="node分组"></a>node分组</h2></div>
-首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们在分离索引的时候才能知道热索引应该移到哪些高性能节点上去。这可以在启动时通过给每个节点设置属性来实现。例如我们有一台高性能机器，那么在这台机器上启动ES时我们可以通过以下方式声明它是“高性能的”
-undefined
-
-或者在elasticsearch.yml中配置
-undefined
-
-但是注意，这里的声明仅仅只是声明了一个属性键值对“performance=high”了，相当于给节点逻辑上做了分组，但并没有任何实际的作用，你甚至可以声明“a=b”，但为了可维护性考虑，最好还是起有意义的名称
-
-类似的，我们在另外一台低性能的机器上启动ES时声明它是“低性能的”
-undefined
-
-<div class="note info"><h2 id="冷热分离"><a href="#冷热分离" class="headerlink" title="冷热分离"></a>冷热分离</h2></div>
-<p>然后可以通过维护index的settings<code>index.routing.allocation.*</code>来控制该索引分配到指定的“组”中，即移动到该组相应的节点上。例如我们把index1移动到高性能的机器上，把index2移动到低性能的机器上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT index1/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.routing.allocation.include.performance&quot;: &quot;high&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT index2/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.routing.allocation.include.performance&quot;: &quot;low&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><div class="note info"><h2>node分组</h2></div><br>首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们在分离索引的时候才能知道热索引应该移到哪些高性能节点上去。这可以在启动时通过给每个节点设置属性来实现。例如我们有一台高性能机器，那么在这台机器上启动ES时我们可以通过以下方式声明它是“高性能的”<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/elasticsearch -Enode.attr.performance=high</span><br></pre></td></tr></table></figure></p>
+<p>或者在elasticsearch.yml中配置<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">node.attr.performance=high</span></span><br></pre></td></tr></table></figure></p>
+<p>但是注意，这里的声明仅仅只是声明了一个属性键值对“performance=high”了，相当于给节点逻辑上做了分组，但并没有任何实际的作用，你甚至可以声明“a=b”，但为了可维护性考虑，最好还是起有意义的名称</p>
+<p>类似的，我们在另外一台低性能的机器上启动ES时声明它是“低性能的”<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/elasticsearch -Enode.attr.performance=low</span><br></pre></td></tr></table></figure></p>
+<p><div class="note info"><h2>冷热分离</h2></div><br>然后可以通过维护index的settings<code>index.routing.allocation.*</code>来控制该索引分配到指定的“组”中，即移动到该组相应的节点上。例如我们把index1移动到高性能的机器上，把index2移动到低性能的机器上<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT index1/_settings</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"index.routing.allocation.include.performance"</span>: <span class="string">"high"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT index2/_settings</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"index.routing.allocation.include.performance"</span>: <span class="string">"low"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这样就做到了冷热索引的分离，今后无论是集群伸缩还是增减备份数，该索引的所有shards（包括replica）都只会被分配在指定的组内，这里要注意，如果任一组内所有的节点都down掉，则绑定在该组节点的index都会处于unassigned状态</p>
 <p>另一个要考虑的问题是如何定义冷热索引。个人建议是先按照QPS将所有index排序，先将大部分QPS较高的index甚至所有index放到高性能组里，然后从QPS最低的index开始一个个移到低性能组里，直到两组index的读写性能基本均衡</p>
-<div class="note info"><h2 id="index拆分"><a href="#index拆分" class="headerlink" title="index拆分"></a>index拆分</h2></div>
-<p>通常我们认为冷索引是指那些不再新增或更新的数据，但在实时场景中，index一般都会持续更新，那么所有的index都是热索引，就没法做分离了。这种情况下我们就需要先做index拆分，具体做法是每隔一定时间，比如每天新建一个index，归为热索引，旧的index一般就不会再有更新，归为冷索引</p>
+<p><div class="note info"><h2>index拆分</h2></div><br>通常我们认为冷索引是指那些不再新增或更新的数据，但在实时场景中，index一般都会持续更新，那么所有的index都是热索引，就没法做分离了。这种情况下我们就需要先做index拆分，具体做法是每隔一定时间，比如每天新建一个index，归为热索引，旧的index一般就不会再有更新，归为冷索引</p>
 <p>这里有一个问题，新建的index是不能与原来重名的，所以我们加个时间后缀用于区分，例如test_index_20170924。但这个做法会带来一个新的麻烦，index的名称每天都在变，所以每次都需要以日期作为后缀才能找到当前的热索引</p>
 <p>用别名可以解决这个问题</p>
 <p><img src="/attachment/20170924/es_alias.png" alt="alias"></p>
-<p>我们给这个这个index起一个别名叫test_alias，指向当日的index，比如test_index_20170924，第二天创建了一个新的index: test_index_20170925，然后把test_alias跟test_index_20170924的关联解除，然后把test_alias指向test_index_20170925。这样我们如果要读写当前热索引，只需要访问test_alias就可以了，从ES用户的角度来看，感觉不到index做了拆分<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;remove&quot; : &#123; &quot;index&quot; : &quot;test_index_20170924&quot;, &quot;alias&quot; : &quot;test_alias&quot; &#125; &#125;,</span><br><span class="line">        &#123; &quot;add&quot;:  &#123; &quot;index&quot;: &quot;test_index_20170925&quot;, &quot;alias&quot;: &quot;test_alias&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们给这个这个index起一个别名叫test_alias，指向当日的index，比如test_index_20170924，第二天创建了一个新的index: test_index_20170925，然后把test_alias跟test_index_20170924的关联解除，然后把test_alias指向test_index_20170925。这样我们如果要读写当前热索引，只需要访问test_alias就可以了，从ES用户的角度来看，感觉不到index做了拆分<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"actions"</span> : [</span><br><span class="line">        &#123; <span class="attr">"remove"</span> : &#123; <span class="attr">"index"</span> : <span class="string">"test_index_20170924"</span>, <span class="attr">"alias"</span> : <span class="string">"test_alias"</span> &#125; &#125;,</span><br><span class="line">        &#123; <span class="attr">"add"</span>:  &#123; <span class="attr">"index"</span>: <span class="string">"test_index_20170925"</span>, <span class="attr">"alias"</span>: <span class="string">"test_alias"</span> &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>注意这里remove和add两个动作一定要放在一个transaction里完成，否则如果先remove再add，可能会导致alias短暂不可用，如果先add再remove，可能会导致有短暂时间写入异常，因为alias同时指向两个index，ES无法决定应该写入哪一个</p>
 <p>热索引读写的问题解决了，但还是有一些搜索的问题需要考虑，一个是全文搜索，用通配符是可以的，比如test_index_*，但如果刚好有其他index的前缀也是test_index_就麻烦了，可以通过新建一个别名指向所有的index来解决。还有就是幂等性无法保证的问题，如果你需要用id来保证幂等性，并且无法保证相同id的数据会在同一天写入，那么这个冷热索引分离的方案是行不通的，因为即使id在旧的index里存在，但在新的index里找不到，只能当做一条新数据插入</p>
 
@@ -516,7 +506,7 @@ undefined
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#node分组"><span class="nav-number">1.</span> <span class="nav-text">node分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#冷热分离"><span class="nav-number">2.</span> <span class="nav-text">冷热分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#index拆分"><span class="nav-number">3.</span> <span class="nav-text">index拆分</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">node分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">冷热分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">index拆分</span></a></li></ol></div>
             
 
           </div>

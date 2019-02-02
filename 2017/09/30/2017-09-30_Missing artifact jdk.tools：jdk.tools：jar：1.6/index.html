@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6   最近发现只要在Maven项目中引入HBase依赖，就会报错artifact jdk.tools:jdk.tools:jar:1.6```12在网上搜，基本都是说引入jdk.tools依赖就行，比如     jdk.tools    jdk.tools    1.6    system">
+<meta name="description" content="Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6   最近发现只要在Maven项目中引入HBase依赖，就会报错Missing artifact jdk.tools:jdk.tools:jar:1.6 在网上搜，基本都是说引入jdk.tools依赖就行，比如1234567&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;">
 <meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Missing artifact jdk.tools：jdk.tools：jar：1.6">
 <meta property="og:url" content="http://kane-xie.github.io/2017/09/30/2017-09-30_Missing artifact jdk.tools：jdk.tools：jar：1.6/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6   最近发现只要在Maven项目中引入HBase依赖，就会报错artifact jdk.tools:jdk.tools:jar:1.6```12在网上搜，基本都是说引入jdk.tools依赖就行，比如     jdk.tools    jdk.tools    1.6    system">
+<meta property="og:description" content="Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6   最近发现只要在Maven项目中引入HBase依赖，就会报错Missing artifact jdk.tools:jdk.tools:jar:1.6 在网上搜，基本都是说引入jdk.tools依赖就行，比如1234567&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.673Z">
+<meta property="og:updated_time" content="2019-02-02T03:03:57.436Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Missing artifact jdk.tools：jdk.tools：jar：1.6">
-<meta name="twitter:description" content="Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6   最近发现只要在Maven项目中引入HBase依赖，就会报错artifact jdk.tools:jdk.tools:jar:1.6```12在网上搜，基本都是说引入jdk.tools依赖就行，比如     jdk.tools    jdk.tools    1.6    system">
+<meta name="twitter:description" content="Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6   最近发现只要在Maven项目中引入HBase依赖，就会报错Missing artifact jdk.tools:jdk.tools:jar:1.6 在网上搜，基本都是说引入jdk.tools依赖就行，比如1234567&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;">
 
 
 
@@ -319,9 +319,11 @@
 
       
         <p>Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6  </p>
-<p>最近发现只要在Maven项目中引入HBase依赖，就会报错<figure class="highlight plain"><figcaption><span>artifact jdk.tools:jdk.tools:jar:1.6```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在网上搜，基本都是说引入jdk.tools依赖就行，比如</span><br></pre></td></tr></table></figure></p>
-<p><dependency><br>    <groupid>jdk.tools</groupid><br>    <artifactid>jdk.tools</artifactid><br>    <version>1.6</version><br>    <scope>system</scope><br>    <systempath>${JAVA_HOME}/lib/tools.jar</systempath><br></dependency><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">但这个办法治标不治本啊，为什么会jdk.tools找不到呢？比较诡异的是，同事用IDEA就没问题，所以我怀疑问题出在Eclipse上（我老人家还是习惯用Eclipse。。。）</span><br><span class="line"></span><br><span class="line">经过排查发现启动Eclipse使用的JRE（默认在C:\Program Files下）没有tools.jar，这个依赖包是JDK里的JRE才有的，所以需要在Eclipse配置文件（ECLIPSE_HOME/eclipse.ini）里指定启动JRE</span><br></pre></td></tr></table></figure></p>
-<p>-vm<br>C:\Program Files\Java\jdk1.8.0_151\jre\bin\server\jvm.dll<br><code>注意：-vm后面一定要换行，并且这两行配置一定要在</code>-vmargs<code>`</code>前面</p>
+<p>最近发现只要在Maven项目中引入HBase依赖，就会报错<code>Missing artifact jdk.tools:jdk.tools:jar:1.6</code></p>
+<p>在网上搜，基本都是说引入jdk.tools依赖就行，比如<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>jdk.tools<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jdk.tools<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">scope</span>&gt;</span>system<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">systemPath</span>&gt;</span>$&#123;JAVA_HOME&#125;/lib/tools.jar<span class="tag">&lt;/<span class="name">systemPath</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>但这个办法治标不治本啊，为什么会jdk.tools找不到呢？比较诡异的是，同事用IDEA就没问题，所以我怀疑问题出在Eclipse上（我老人家还是习惯用Eclipse。。。）</p>
+<p>经过排查发现启动Eclipse使用的JRE（默认在C:\Program Files下）没有tools.jar，这个依赖包是JDK里的JRE才有的，所以需要在Eclipse配置文件（ECLIPSE_HOME/eclipse.ini）里指定启动JRE<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-vm</span><br><span class="line">C:\Program Files\Java\jdk1.8.0_151\jre\bin\server\jvm.dll</span><br></pre></td></tr></table></figure></p>
+<p>注意：-vm后面一定要换行，并且这两行配置一定要在<code>-vmargs</code>前面</p>
 <p>然后Maven -&gt; Update Project（Alt+F5）就可以了</p>
 
       

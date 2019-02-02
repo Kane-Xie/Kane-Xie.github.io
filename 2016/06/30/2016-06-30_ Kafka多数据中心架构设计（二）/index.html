@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题： 如何提高同步效率？  跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。  * 在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置  * Kafka本身支持GZIP，Snappy和LZ4压缩">
+<meta name="description" content="用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题： 如何提高同步效率？  跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。  在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置  Kafka本身支持GZIP，Snappy和LZ4压缩协议。从">
 <meta name="keywords" content="kafka,mirrormaker">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka多数据中心架构设计（二）">
 <meta property="og:url" content="http://kane-xie.github.io/2016/06/30/2016-06-30_ Kafka多数据中心架构设计（二）/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题： 如何提高同步效率？  跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。  * 在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置  * Kafka本身支持GZIP，Snappy和LZ4压缩">
+<meta property="og:description" content="用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题： 如何提高同步效率？  跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。  在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置  Kafka本身支持GZIP，Snappy和LZ4压缩协议。从">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.600Z">
+<meta property="og:updated_time" content="2019-02-02T02:44:55.920Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka多数据中心架构设计（二）">
-<meta name="twitter:description" content="用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题： 如何提高同步效率？  跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。  * 在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置  * Kafka本身支持GZIP，Snappy和LZ4压缩">
+<meta name="twitter:description" content="用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题： 如何提高同步效率？  跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。  在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置  Kafka本身支持GZIP，Snappy和LZ4压缩协议。从">
 
 
 
@@ -319,15 +319,17 @@
 
       
         <p>用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题：</p>
-<div class="note info"><h2 id="如何提高同步效率？"><a href="#如何提高同步效率？" class="headerlink" title="如何提高同步效率？"></a>如何提高同步效率？</h2></div>
+<div class="note info"><h2>如何提高同步效率？</h2></div>
 
-跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。
+<p>跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。</p>
+<ul>
+<li><p>在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置</p>
+</li>
+<li><p>Kafka本身支持GZIP，Snappy和LZ4压缩协议。从我的测试结果来看，LZ4压缩和解压效率最高，GZIP压缩率最高，具体还是要看数据格式。</p>
+</li>
+</ul>
+<div class="note info"><h2>mirrormaker部署在哪？</h2></div>
 
-* 在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置
-
-* Kafka本身支持GZIP，Snappy和LZ4压缩协议。从我的测试结果来看，LZ4压缩和解压效率最高，GZIP压缩率最高，具体还是要看数据格式。
-
-<div class="note info"><h2 id="mirrormaker部署在哪？"><a href="#mirrormaker部署在哪？" class="headerlink" title="mirrormaker部署在哪？"></a>mirrormaker部署在哪？</h2></div>
 <p>将数据从数据中心A同步到数据中心B，mirrormaker部署在A端（Source端）或者B端（Destination端）都可以，但还是会有点区别。</p>
 <ul>
 <li><p>LinkedIn建议部署在Destination端。对于跨数据中心的数据同步来说，最不稳定的因素就是网络，我们需要保证的，是在网络断开的情况下不丢数据或者丢尽量少的数据。mirrormaker本质上是consumer + cache + producer，offset在放进cache之后就commit，因此mirrormaker部署在Destination端的好处显而易见，假如数据中心间的网络出了问题，mirrormaker根本就收不到数据，也就不存在丢数据的问题；但如果部署在Source端，网络出问题之后，mirrormaker consumer仍然能够从本地Kafka集群获取数据放进cache中，并commit offset，但数据并没有成功的produce到Destination端，mirrormaker也不再有机会重新获取数据。</p>
@@ -335,20 +337,20 @@
 <li><p>我个人建议是部署在Source端。原因很简单，为了压缩。我们压缩的目的是为了数据在producer远程传输的过程中能尽量的减少带宽占用，如果部署在Destination端，mirrormaker consumer消费的是原始数据，并没有节省带宽。</p>
 </li>
 </ul>
-<div class="note info"><h2 id="如果数据本身是压缩过的，mirrormaker怎么处理？"><a href="#如果数据本身是压缩过的，mirrormaker怎么处理？" class="headerlink" title="如果数据本身是压缩过的，mirrormaker怎么处理？"></a>如果数据本身是压缩过的，mirrormaker怎么处理？</h2></div>
+<div class="note info"><h2>如果数据本身是压缩过的，mirrormaker怎么处理？</h2></div>
 
-理想情况下，我们应该直接把压缩的数据传输到远端，但现在mirrormaker内置的consumer会在消费后先把数据解压缩，然后producer发送前再把数据压缩。
+<p>理想情况下，我们应该直接把压缩的数据传输到远端，但现在mirrormaker内置的consumer会在消费后先把数据解压缩，然后producer发送前再把数据压缩。</p>
+<p>这样对CUP的消耗很大且不必要，当至少到现在为止Kafka还没有给出解决办法。</p>
+<div class="note info"><h2>如何保证数据有序？</h2></div>
 
-这样对CUP的消耗很大且不必要，当至少到现在为止Kafka还没有给出解决办法。
-
-<div class="note info"><h2 id="如何保证数据有序？"><a href="#如何保证数据有序？" class="headerlink" title="如何保证数据有序？"></a>如何保证数据有序？</h2></div>
 <p>只有满足以下条件才能保证partition内数据有序：</p>
 <ul>
 <li>同步的数据是keyed的</li>
 <li>mirrormaker和数据原来的producer使用相同的partitioner</li>
 <li>Source topic和Destination topic的partition数目相同</li>
 </ul>
-<div class="note info"><h2 id="双向同步？"><a href="#双向同步？" class="headerlink" title="双向同步？"></a>双向同步？</h2></div>
+<div class="note info"><h2>双向同步？</h2></div>
+
 <p>mirrormaker不支持相同topic的双向同步。如果这么做了，会导致数据在两个Kafka集群之间无限的重复同步，因为mirrormaker并不能判断一条数据是被普通producer发进来的还是之前被它自己从另一个数据中心同步过来的。</p>
 <p>我的建议是，用上一篇文章说的聚合集群。如果不想这么大动干戈，也可以用不同的topic后缀来区分，比如topicA_sh，topicA_bj，保证数据不会被重复同步。</p>
 <p>或者有个更简单但不是很合理的做法。强制在所有的数据的key中划分出一段来专门记录数据被发送到的数据中心名字，然后在MirrorMakerMessageHandler中解析key，判断是否需要同步。比如如果发现一条数据来自shanghai，那么beijing到shanghai的mirrormaker不会对它做同步。这种做法对数据格式有很强的侵入性，所以不是很建议。其实个人认为如果给kafka record本身加上metamap就能解决这个问题。</p>
@@ -525,7 +527,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何提高同步效率？"><span class="nav-number">1.</span> <span class="nav-text">如何提高同步效率？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mirrormaker部署在哪？"><span class="nav-number">2.</span> <span class="nav-text">mirrormaker部署在哪？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果数据本身是压缩过的，mirrormaker怎么处理？"><span class="nav-number">3.</span> <span class="nav-text">如果数据本身是压缩过的，mirrormaker怎么处理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何保证数据有序？"><span class="nav-number">4.</span> <span class="nav-text">如何保证数据有序？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双向同步？"><span class="nav-number">5.</span> <span class="nav-text">双向同步？</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">如何提高同步效率？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">mirrormaker部署在哪？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">如果数据本身是压缩过的，mirrormaker怎么处理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">如何保证数据有序？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">双向同步？</span></a></li></ol></div>
             
 
           </div>

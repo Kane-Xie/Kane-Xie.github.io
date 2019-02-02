@@ -743,7 +743,10 @@
 <p>而producer的缓存刷新的逻辑（RecordAccumulator.ready）如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> exhausted = <span class="keyword">this</span>.free.queued() &gt; <span class="number">0</span>;</span><br><span class="line">……</span><br><span class="line"><span class="keyword">boolean</span> sendable = full || expired || exhausted || closed || flushInProgress();</span><br></pre></td></tr></table></figure></p>
 <p>其中free.queued() 的返回值就是waiters.size()，因此如果抛出本文开头所说的异常，那么之后每发一条数据，sendable都会为true，所以每发一条数据都会刷新一次缓存，相当于是同步发送，效率非常差。</p>
 <p>好在在0.10中已经修复了这个bug，在抛出异常之前，先调用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.waiters.remove(moreMemory);</span><br></pre></td></tr></table></figure></p>
-<p>JIRA<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://issues.apache.org/jira/browse/KAFKA-3651</span><br></pre></td></tr></table></figure></p>
+<p>JIRA</p>
+<blockquote>
+<p><a href="https://issues.apache.org/jira/browse/KAFKA-3651" target="_blank" rel="noopener">https://issues.apache.org/jira/browse/KAFKA-3651</a></p>
+</blockquote>
 
           
         
@@ -1474,7 +1477,7 @@
             <ul>
 <li>准备一台虚拟机作为cm-server</li>
 <li><p>配置ssh免密码登录，在cm-server上执行脚本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NODES=localhost</span><br><span class="line">#replace &apos;,&apos; with space</span><br><span class="line">CLUSTER_NODES=$&#123;CLUSTER_NODES//,/ &#125;</span><br><span class="line"></span><br><span class="line">FILE=~/.ssh/id_rsa.pub</span><br><span class="line">if [ ! -f &quot;$&#123;FILE&#125;&quot; ]; then </span><br><span class="line">    ssh-keygen -t rsa -P &apos;&apos;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">for i in $CLUSTER_NODES</span><br><span class="line">do</span><br><span class="line">	scp ~/.ssh/id_rsa.pub root@$&#123;i&#125;:/tmp</span><br><span class="line">	ssh root@$&#123;i&#125; &quot;cat /tmp/id_rsa.pub &gt;&gt; /root/.ssh/authorized_keys&quot;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NODES=localhost</span><br><span class="line"><span class="comment">#replace ',' with space</span></span><br><span class="line">CLUSTER_NODES=<span class="variable">$&#123;CLUSTER_NODES//,/ &#125;</span></span><br><span class="line"></span><br><span class="line">FILE=~/.ssh/id_rsa.pub</span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">"<span class="variable">$&#123;FILE&#125;</span>"</span> ]; <span class="keyword">then</span> </span><br><span class="line">    ssh-keygen -t rsa -P <span class="string">''</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$CLUSTER_NODES</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	scp ~/.ssh/id_rsa.pub root@<span class="variable">$&#123;i&#125;</span>:/tmp</span><br><span class="line">	ssh root@<span class="variable">$&#123;i&#125;</span> <span class="string">"cat /tmp/id_rsa.pub &gt;&gt; /root/.ssh/authorized_keys"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>安装jdk</p>
 <ul>
@@ -1675,17 +1678,17 @@
       
         
           
-            <div class="note info"><h2 id="timeout"><a href="#timeout" class="headerlink" title="timeout"></a>timeout</h2></div>
+            <div class="note info"><h2>timeout</h2></div>
 
-单次poll最大等待时间，consumer.poll(1000)意味着在缓存中的数据被消费完之后，consumer会到broker中拉取数据，最多等待1000毫秒。很明显，timeout越大，单次poll返回的数据就越多。但前提是有足够多的数据可供消费，如果在1000毫秒内，consumer已经拿完所有能拿的数据，就会立即返回。
+<p>单次poll最大等待时间，consumer.poll(1000)意味着在缓存中的数据被消费完之后，consumer会到broker中拉取数据，最多等待1000毫秒。很明显，timeout越大，单次poll返回的数据就越多。但前提是有足够多的数据可供消费，如果在1000毫秒内，consumer已经拿完所有能拿的数据，就会立即返回。</p>
+<div class="note info"><h2>max.poll.records</h2></div>
 
-<div class="note info"><h2 id="max-poll-records"><a href="#max-poll-records" class="headerlink" title="max.poll.records"></a>max.poll.records</h2></div>
 <p>单次poll最大返回数据条数，默认值2,147,483,647。这应该不需要解释。</p>
-<div class="note info"><h2 id="receive-buffer-bytes"><a href="#receive-buffer-bytes" class="headerlink" title="receive.buffer.bytes"></a>receive.buffer.bytes</h2></div>
+<div class="note info"><h2>receive.buffer.bytes</h2></div>
 
-用于TCP读取数据的缓存（SO_RCVBUF）大小，默认值64k。之前做过小测试，发现消费10万条大小1k的数据，花费5秒左右，设置max.poll.records=1，理论上来说性能应该大大下降才对，但实际测试结果也在5秒左右。后来发现消费端有64k缓存，换句话说每次TCP请求会拿64条数据，因此虽然poll每次只拿一条数据，但也是从缓存中拿，拿64次才会真正发送一次TCP请求。而相对于1k大小数据的消费，TCP请求的开销可以忽略，因此消费时间差不多。当测试数据大小为1个字节时，TCP请求的开销就不能忽略了，而测试结果也证实，max.poll.records=1会使消费性能下降2/3。
+<p>用于TCP读取数据的缓存（SO_RCVBUF）大小，默认值64k。之前做过小测试，发现消费10万条大小1k的数据，花费5秒左右，设置max.poll.records=1，理论上来说性能应该大大下降才对，但实际测试结果也在5秒左右。后来发现消费端有64k缓存，换句话说每次TCP请求会拿64条数据，因此虽然poll每次只拿一条数据，但也是从缓存中拿，拿64次才会真正发送一次TCP请求。而相对于1k大小数据的消费，TCP请求的开销可以忽略，因此消费时间差不多。当测试数据大小为1个字节时，TCP请求的开销就不能忽略了，而测试结果也证实，max.poll.records=1会使消费性能下降2/3。</p>
+<div class="note info"><h2>max.partition.fetch.bytes</h2></div>
 
-<div class="note info"><h2 id="max-partition-fetch-bytes"><a href="#max-partition-fetch-bytes" class="headerlink" title="max.partition.fetch.bytes"></a>max.partition.fetch.bytes</h2></div>
 <p>单次poll对于每个partition最大返回数据量，默认值1M。如果消费的topic有3个partition，那么单次poll最多返回3M数据。但实际上发现单次poll一般都只返回1M的数据，而不是3M。检查数据的分布，也都分散在3个partition中。原因是consumer会启动3个fetcher分别到每个partition抓取数据，而考虑到性能问题，consumer会在fetch一个partition一定时间后才会fetch下一个partition，所以单次poll很可能只是在拿一个partition中的数据，所以返回1M数据。把测试时间延长之后发现，偶尔会有一次poll拿到2M数据，符合刚才的分析。</p>
 
           

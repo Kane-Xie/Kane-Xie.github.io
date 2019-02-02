@@ -332,11 +332,11 @@
 <li><p>Table的使用</p>
 </li>
 </ul>
-<p>以前的使用方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Configuration conf = HBaseConfiguration.create();</span><br><span class="line">HTable t = new HTable(conf, &quot;mytable&quot;);</span><br><span class="line">t.put(new Put(row).add(fam, qual, value));</span><br><span class="line">t.close();</span><br></pre></td></tr></table></figure></p>
-<p>现在的使用方式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Configuration conf = HBaseConfiguration.create();</span><br><span class="line">Connection conn = ConnectionFactory.createConnection(conf)</span><br><span class="line">Table t = conn.getTable(TableName.valueOf(&quot;mytable&quot;));</span><br><span class="line">t.put(new Put(row).add(fam, qual, value));</span><br><span class="line">t.close();</span><br><span class="line">conn.close;</span><br></pre></td></tr></table></figure></p>
+<p>以前的使用方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Configuration conf = HBaseConfiguration.create();</span><br><span class="line">HTable t = <span class="keyword">new</span> HTable(conf, <span class="string">"mytable"</span>);</span><br><span class="line">t.put(<span class="keyword">new</span> Put(row).add(fam, qual, value));</span><br><span class="line">t.close();</span><br></pre></td></tr></table></figure></p>
+<p>现在的使用方式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Configuration conf = HBaseConfiguration.create();</span><br><span class="line">Connection conn = ConnectionFactory.createConnection(conf)</span><br><span class="line">Table t = conn.getTable(TableName.valueOf(<span class="string">"mytable"</span>));</span><br><span class="line">t.put(<span class="keyword">new</span> Put(row).add(fam, qual, value));</span><br><span class="line">t.close();</span><br><span class="line">conn.close;</span><br></pre></td></tr></table></figure></p>
 <ul>
 <li><p>无论是Connection, Table, Admin还是Scanner，用完就关，由于这些接口或多或少的都在client端或server端(Scanner)hold住了一些资源，所以对于性能来讲，及时关掉是非常必要的。另外，由于这些接口都继承了Closeable，所以使用Java的try语法能否非常容易的close掉，而在之前的版本需要在try之外声明，然后在finally中关闭，还要加上null check</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">try (Connection connection = ConnectionFactory.createConnection(conf);        </span><br><span class="line">     Admin admin = connection.getAdmin();</span><br><span class="line">     Table table = connection.getTable(tableName);) &#123;</span><br><span class="line">  	 table.get(new Get(...))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (Connection connection = ConnectionFactory.createConnection(conf);        </span><br><span class="line">     Admin admin = connection.getAdmin();</span><br><span class="line">     Table table = connection.getTable(tableName);) &#123;</span><br><span class="line">  	 table.get(<span class="keyword">new</span> Get(...))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>Connection是线程安全且非常重的对象，因为它包含了zookeeper的连接，socket连接等等，所以最好在一个应用中只创建一个Connection供多线程使用，并且在整个程序退出之前才关闭。与Connection相反，Table，Admin等都是相对比较轻量的组件，并且<code>非</code>线程安全，所以可以针对每个请求创建一个单独的实例，请求处理完就关闭</p>
 </li>
@@ -472,13 +472,9 @@
       
         
           
-            <div class="note info"><h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2></div>
-发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失
-
-<div class="note info"><h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2></div>
-<p>SyslogUDPSource使用AdaptiveReceiveBufferSizePredictorFactory来处理buffer，理想的状况是buffer size会随着数据大小扩容，最大64k，但实际并没有。因为AdaptiveReceiveBufferSizePredictorFactory只针对NioDatagramWorker起作用，但SyslogUDPSource使用OioDatagramChannelFactory，buffer size永远是2k，超过就截断</p>
-<div class="note info"><h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2></div>
-<p>改用FixedReceiveBufferSizePredictorFactory，固定大小64k，解决</p>
+            <p><div class="note info"><h2>问题</h2></div><br>发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失</p>
+<p><div class="note info"><h2>原因</h2></div><br>SyslogUDPSource使用AdaptiveReceiveBufferSizePredictorFactory来处理buffer，理想的状况是buffer size会随着数据大小扩容，最大64k，但实际并没有。因为AdaptiveReceiveBufferSizePredictorFactory只针对NioDatagramWorker起作用，但SyslogUDPSource使用OioDatagramChannelFactory，buffer size永远是2k，超过就截断</p>
+<p><div class="note info"><h2>解决办法</h2></div><br>改用FixedReceiveBufferSizePredictorFactory，固定大小64k，解决</p>
 
           
         
@@ -612,32 +608,26 @@
 <p>Rollover API的原理与之前一篇文章<a href="http://kane-xie.github.io/pages/2017-09-24_0.html">实时场景中Elasticsearch冷热索引分离</a>中提到了<code>index拆分</code>是一样的，即当index的大小或者有效期（当前时间-创建时间）超过一定阈值时，滚动创建一个新的index</p>
 <p>Rollover API接受一个<code>alias name</code>和一个<code>conditions</code>列表作为参数。参数中的alias必须指向且只指向一个index。当index满足参数中指定的conditions中的任意一个时，ES会创建一个新的index并且将alias转而指向它，这里借用一张老图</p>
 <p><img src="/attachment/20170924/es_alias.png" alt="alias"></p>
-<div class="note info"><h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h2></div>
+<div class="note info"><h2>基本语法</h2></div>
 
-undefined
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 创建一个名为logs-0000001的index，并赋予别名logs_write</span><br><span class="line">PUT /logs-000001 </span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"aliases"</span>: &#123;</span><br><span class="line">    <span class="attr">"logs_write"</span>: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 当logs_write指向的index创建时间超过7天，或者documents大于等于1000个，或者包含的数据size超过5GB，则会创建一个新的index logs-0000002并将logs_write指向它，同时移除旧的index logs-0000001的别名</span><br><span class="line">POST /logs_write/_rollover </span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"conditions"</span>: &#123;</span><br><span class="line">    <span class="attr">"max_age"</span>:   <span class="string">"7d"</span>,</span><br><span class="line">    <span class="attr">"max_docs"</span>:  <span class="number">1000</span>,</span><br><span class="line">    <span class="attr">"max_size"</span>:  <span class="string">"5gb"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Response如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"acknowledged"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"shards_acknowledged"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"old_index"</span>: <span class="string">"logs-000001"</span>,</span><br><span class="line">  <span class="attr">"new_index"</span>: <span class="string">"logs-000002"</span>,</span><br><span class="line">  <span class="attr">"rolled_over"</span>: <span class="literal">true</span>, </span><br><span class="line">  <span class="attr">"dry_run"</span>: <span class="literal">false</span>, </span><br><span class="line">  <span class="attr">"conditions"</span>: &#123; </span><br><span class="line">    <span class="attr">"[max_age: 7d]"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"[max_docs: 1000]"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"[max_size: 5gb]"</span>: <span class="literal">false</span>,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>rolled_over</code>：index是否被滚动创建，即滚动条件是否满足<br><code>dry_run</code>：是否是测试演练，即不真正执行<br><code>conditions</code>：每个condition是否满足</p>
+<div class="note info"><h2>命名新index</h2></div>
 
-Response如下：
-
-undefined
-
-`rolled_over`：index是否被滚动创建，即滚动条件是否满足
-`dry_run`：是否是测试演练，即不真正执行
-`conditions`：每个condition是否满足
-
-<div class="note info"><h2 id="命名新index"><a href="#命名新index" class="headerlink" title="命名新index"></a>命名新index</h2></div>
 <p>如果旧的index以<code>-{number}</code>结尾，比如<code>logs-1</code>，那么新的index将会沿袭旧的格式，并将结尾的number加1并自动填充0以保持数字长度为6，例如<code>logs-000002</code>，如果旧的index名字不以<code>-{number}</code>结尾，那么必须手动指定新的index名字</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST /my_alias/_rollover/my_new_index_name</span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot;: &#123;</span><br><span class="line">    &quot;max_age&quot;:   &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;:  1000,</span><br><span class="line">    &quot;max_size&quot;: &quot;5gb&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POST /my_alias/_rollover/my_new_index_name</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"conditions"</span>: &#123;</span><br><span class="line">    <span class="attr">"max_age"</span>:   <span class="string">"7d"</span>,</span><br><span class="line">    <span class="attr">"max_docs"</span>:  <span class="number">1000</span>,</span><br><span class="line">    <span class="attr">"max_size"</span>: <span class="string">"5gb"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>如果希望按日期来滚动生成并且命名index，那么可以使用ES提供的<a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/date-math-index-names.html" target="_blank" rel="noopener">date math</a>。Rollover API支持date math，但要求index必须以<code>.{number}</code>结尾，例如<code>logstash-2016.02.03-1</code>，无论日期是否相同，最后数字总会在滚动之后+1</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 创建index并以当天日期命名，例如logs-2017.11.01-1</span><br><span class="line">PUT /%3Clogs-%7Bnow%2Fd%7D-1%3E </span><br><span class="line">&#123;</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;logs_write&quot;: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 写入一条记录</span><br><span class="line">PUT logs_write/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;message&quot;: &quot;a dummy log&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># refresh以使该条记录立即生效</span><br><span class="line">POST logs_write/_refresh</span><br><span class="line"></span><br><span class="line"># 如果在当天执行以下请求，则滚动生成的新的index名称为logs-2017.11.01-000002，但如果是在第二天执行，则新的index名为logs-2017.11.02-000002</span><br><span class="line">POST /logs_write/_rollover </span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot;: &#123;</span><br><span class="line">    &quot;max_docs&quot;:   &quot;1&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="定义新index"><a href="#定义新index" class="headerlink" title="定义新index"></a>定义新index</h2></div>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 创建index并以当天日期命名，例如logs-2017.11.01-1</span><br><span class="line">PUT /%3Clogs-%7Bnow%2Fd%7D-1%3E </span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"aliases"</span>: &#123;</span><br><span class="line">    <span class="attr">"logs_write"</span>: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 写入一条记录</span><br><span class="line">PUT logs_write/_doc/1</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"message"</span>: <span class="string">"a dummy log"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># refresh以使该条记录立即生效</span><br><span class="line">POST logs_write/_refresh</span><br><span class="line"></span><br><span class="line"># 如果在当天执行以下请求，则滚动生成的新的index名称为logs-2017.11.01-000002，但如果是在第二天执行，则新的index名为logs-2017.11.02-000002</span><br><span class="line">POST /logs_write/_rollover </span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"conditions"</span>: &#123;</span><br><span class="line">    <span class="attr">"max_docs"</span>:   <span class="string">"1"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2>定义新index</h2></div>
 
-我觉得按常理的话，滚动生成的新的index应该继承旧的index的mappings和settings，但实际上并不是，如果不指定的话，新的index会用ES默认的配置。当然你可以使用[index templates](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-templates.html)或者在请求体中自定义配置，就和[create index API](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-create-index.html)一样
+<p>我觉得按常理的话，滚动生成的新的index应该继承旧的index的mappings和settings，但实际上并不是，如果不指定的话，新的index会用ES默认的配置。当然你可以使用<a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-templates.html" target="_blank" rel="noopener">index templates</a>或者在请求体中自定义配置，就和<a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-create-index.html" target="_blank" rel="noopener">create index API</a>一样</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">PUT /logs-000001</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"aliases"</span>: &#123;</span><br><span class="line">    <span class="attr">"logs_write"</span>: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 指定新的index的shards为2</span><br><span class="line">POST /logs_write/_rollover</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"conditions"</span> : &#123;</span><br><span class="line">    <span class="attr">"max_age"</span>: <span class="string">"7d"</span>,</span><br><span class="line">    <span class="attr">"max_docs"</span>: <span class="number">1000</span>,</span><br><span class="line">    <span class="attr">"max_size"</span>: <span class="string">"5gb"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"settings"</span>: &#123;</span><br><span class="line">    <span class="attr">"index.number_of_shards"</span>: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2>调试</h2></div>
 
-undefined
-
-<div class="note info"><h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2></div>
 <p>Rollover API支持<code>dry_run</code>模式，即只是检查条件是否满足，但并不真正执行新建index和重定向alias的操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">PUT /logs-000001</span><br><span class="line">&#123;</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;logs_write&quot;: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POST /logs_write/_rollover?dry_run</span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot; : &#123;</span><br><span class="line">    &quot;max_age&quot;: &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;: 1000,</span><br><span class="line">    &quot;max_size&quot;: &quot;5gb&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">PUT /logs-000001</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"aliases"</span>: &#123;</span><br><span class="line">    <span class="attr">"logs_write"</span>: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POST /logs_write/_rollover?dry_run</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"conditions"</span> : &#123;</span><br><span class="line">    <span class="attr">"max_age"</span>: <span class="string">"7d"</span>,</span><br><span class="line">    <span class="attr">"max_docs"</span>: <span class="number">1000</span>,</span><br><span class="line">    <span class="attr">"max_size"</span>: <span class="string">"5gb"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
           
         
@@ -769,21 +759,15 @@ undefined
           
             <p>最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了<code>-Xms2G -Xmx2G</code>，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？</p>
 <p>先了解一下-Xms和-Xmx的含义</p>
-<div class="note info"><h2 id="Xms"><a href="#Xms" class="headerlink" title="-Xms"></a>-Xms</h2></div>
+<div class="note info"><h2>-Xms</h2></div>
 
-初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64（且小于1G），默认情况下，当堆中可用内存小于40%（这个值可以用-XX: MinHeapFreeRatio 调整，如-X:MinHeapFreeRatio=30）时，堆内存会开始增加，一直增加到-Xmx的大小
+<p>初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64（且小于1G），默认情况下，当堆中可用内存小于40%（这个值可以用-XX: MinHeapFreeRatio 调整，如-X:MinHeapFreeRatio=30）时，堆内存会开始增加，一直增加到-Xmx的大小</p>
+<div class="note info"><h2>-Xmx</h2></div><br>堆的最大值，默认值是总共的物理内存1/4，如果Xms和Xmx都不设置，则两者大小会相同，默认情况下，当堆中可用内存大于70%（这个值可以用-XX: MaxHeapFreeRatio 调整，如-X:MaxHeapFreeRatio=60）时，堆内存会开始减少，一直减小到-Xms的大小<br><br>可以通过以下命令查看系统默认的InitialHeapSize和MaxHeapSize：<br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -XX:+PrintFlagsFinal -version | grep HeapSize</span><br></pre></td></tr></table></figure><br><br><div class="note info"><h2>-Xms=-Xmx？</h2></div>
 
-<div class="note info"><h2 id="Xmx"><a href="#Xmx" class="headerlink" title="-Xmx"></a>-Xmx</h2></div>
-<p>堆的最大值，默认值是总共的物理内存1/4，如果Xms和Xmx都不设置，则两者大小会相同，默认情况下，当堆中可用内存大于70%（这个值可以用-XX: MaxHeapFreeRatio 调整，如-X:MaxHeapFreeRatio=60）时，堆内存会开始减少，一直减小到-Xms的大小</p>
-<p>可以通过以下命令查看系统默认的InitialHeapSize和MaxHeapSize：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -XX:+PrintFlagsFinal -version | grep HeapSize</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="Xms-Xmx？"><a href="#Xms-Xmx？" class="headerlink" title="-Xms=-Xmx？"></a>-Xms=-Xmx？</h2></div>
+<p>如果设定一个比较小的初始堆大小，并且程序需要的内存大于-Xms时，JVM将会分配更多的堆内存，且有可能需要移动一些objects和记账（book-keeping），这些动作都比较耗时，会使程序响应变慢，极端情况下甚至会导致OOM。假如程序在闲时和忙时的负载差别比较大，堆内存就会不停的伸缩。如果设置-Xms=-Xmx就不会有这样的问题</p>
+<p>但是在测试环境或者开发环境中，Kafka并不会一直有数据（至少我的这个测试环境是这样，非UA），所以大部分时间Kafka Streams程序都是在空跑，所以堆内存会长期处于-Xms的状态。这种情况下设置-Xms=-Xmx是极大的浪费</p>
+<div class="note info"><h2>结论</h2></div>
 
-如果设定一个比较小的初始堆大小，并且程序需要的内存大于-Xms时，JVM将会分配更多的堆内存，且有可能需要移动一些objects和记账（book-keeping），这些动作都比较耗时，会使程序响应变慢，极端情况下甚至会导致OOM。假如程序在闲时和忙时的负载差别比较大，堆内存就会不停的伸缩。如果设置-Xms=-Xmx就不会有这样的问题
-
-但是在测试环境或者开发环境中，Kafka并不会一直有数据（至少我的这个测试环境是这样，非UA），所以大部分时间Kafka Streams程序都是在空跑，所以堆内存会长期处于-Xms的状态。这种情况下设置-Xms=-Xmx是极大的浪费
-
-<div class="note info"><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2></div>
 <p>在生产环境，设置-Xms和-Xmx相等以保证程序稳定。在开发测试环境，设置一个比较小的-Xms，以支撑更多的测试程序运行</p>
 
           
@@ -915,9 +899,11 @@ undefined
         
           
             <p>Maven错误信息：Missing artifact jdk.tools:jdk.tools:jar:1.6  </p>
-<p>最近发现只要在Maven项目中引入HBase依赖，就会报错<figure class="highlight plain"><figcaption><span>artifact jdk.tools:jdk.tools:jar:1.6```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在网上搜，基本都是说引入jdk.tools依赖就行，比如</span><br></pre></td></tr></table></figure></p>
-<p><dependency><br>    <groupid>jdk.tools</groupid><br>    <artifactid>jdk.tools</artifactid><br>    <version>1.6</version><br>    <scope>system</scope><br>    <systempath>${JAVA_HOME}/lib/tools.jar</systempath><br></dependency><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">但这个办法治标不治本啊，为什么会jdk.tools找不到呢？比较诡异的是，同事用IDEA就没问题，所以我怀疑问题出在Eclipse上（我老人家还是习惯用Eclipse。。。）</span><br><span class="line"></span><br><span class="line">经过排查发现启动Eclipse使用的JRE（默认在C:\Program Files下）没有tools.jar，这个依赖包是JDK里的JRE才有的，所以需要在Eclipse配置文件（ECLIPSE_HOME/eclipse.ini）里指定启动JRE</span><br></pre></td></tr></table></figure></p>
-<p>-vm<br>C:\Program Files\Java\jdk1.8.0_151\jre\bin\server\jvm.dll<br><code>注意：-vm后面一定要换行，并且这两行配置一定要在</code>-vmargs<code>`</code>前面</p>
+<p>最近发现只要在Maven项目中引入HBase依赖，就会报错<code>Missing artifact jdk.tools:jdk.tools:jar:1.6</code></p>
+<p>在网上搜，基本都是说引入jdk.tools依赖就行，比如<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>jdk.tools<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jdk.tools<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">scope</span>&gt;</span>system<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">systemPath</span>&gt;</span>$&#123;JAVA_HOME&#125;/lib/tools.jar<span class="tag">&lt;/<span class="name">systemPath</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>但这个办法治标不治本啊，为什么会jdk.tools找不到呢？比较诡异的是，同事用IDEA就没问题，所以我怀疑问题出在Eclipse上（我老人家还是习惯用Eclipse。。。）</p>
+<p>经过排查发现启动Eclipse使用的JRE（默认在C:\Program Files下）没有tools.jar，这个依赖包是JDK里的JRE才有的，所以需要在Eclipse配置文件（ECLIPSE_HOME/eclipse.ini）里指定启动JRE<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-vm</span><br><span class="line">C:\Program Files\Java\jdk1.8.0_151\jre\bin\server\jvm.dll</span><br></pre></td></tr></table></figure></p>
+<p>注意：-vm后面一定要换行，并且这两行配置一定要在<code>-vmargs</code>前面</p>
 <p>然后Maven -&gt; Update Project（Alt+F5）就可以了</p>
 
           
@@ -1049,28 +1035,18 @@ undefined
         
           
             <p>如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用</p>
-<div class="note info"><h2 id="node分组"><a href="#node分组" class="headerlink" title="node分组"></a>node分组</h2></div>
-首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们在分离索引的时候才能知道热索引应该移到哪些高性能节点上去。这可以在启动时通过给每个节点设置属性来实现。例如我们有一台高性能机器，那么在这台机器上启动ES时我们可以通过以下方式声明它是“高性能的”
-undefined
-
-或者在elasticsearch.yml中配置
-undefined
-
-但是注意，这里的声明仅仅只是声明了一个属性键值对“performance=high”了，相当于给节点逻辑上做了分组，但并没有任何实际的作用，你甚至可以声明“a=b”，但为了可维护性考虑，最好还是起有意义的名称
-
-类似的，我们在另外一台低性能的机器上启动ES时声明它是“低性能的”
-undefined
-
-<div class="note info"><h2 id="冷热分离"><a href="#冷热分离" class="headerlink" title="冷热分离"></a>冷热分离</h2></div>
-<p>然后可以通过维护index的settings<code>index.routing.allocation.*</code>来控制该索引分配到指定的“组”中，即移动到该组相应的节点上。例如我们把index1移动到高性能的机器上，把index2移动到低性能的机器上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT index1/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.routing.allocation.include.performance&quot;: &quot;high&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT index2/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.routing.allocation.include.performance&quot;: &quot;low&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><div class="note info"><h2>node分组</h2></div><br>首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们在分离索引的时候才能知道热索引应该移到哪些高性能节点上去。这可以在启动时通过给每个节点设置属性来实现。例如我们有一台高性能机器，那么在这台机器上启动ES时我们可以通过以下方式声明它是“高性能的”<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/elasticsearch -Enode.attr.performance=high</span><br></pre></td></tr></table></figure></p>
+<p>或者在elasticsearch.yml中配置<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">node.attr.performance=high</span></span><br></pre></td></tr></table></figure></p>
+<p>但是注意，这里的声明仅仅只是声明了一个属性键值对“performance=high”了，相当于给节点逻辑上做了分组，但并没有任何实际的作用，你甚至可以声明“a=b”，但为了可维护性考虑，最好还是起有意义的名称</p>
+<p>类似的，我们在另外一台低性能的机器上启动ES时声明它是“低性能的”<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/elasticsearch -Enode.attr.performance=low</span><br></pre></td></tr></table></figure></p>
+<p><div class="note info"><h2>冷热分离</h2></div><br>然后可以通过维护index的settings<code>index.routing.allocation.*</code>来控制该索引分配到指定的“组”中，即移动到该组相应的节点上。例如我们把index1移动到高性能的机器上，把index2移动到低性能的机器上<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT index1/_settings</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"index.routing.allocation.include.performance"</span>: <span class="string">"high"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT index2/_settings</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"index.routing.allocation.include.performance"</span>: <span class="string">"low"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>这样就做到了冷热索引的分离，今后无论是集群伸缩还是增减备份数，该索引的所有shards（包括replica）都只会被分配在指定的组内，这里要注意，如果任一组内所有的节点都down掉，则绑定在该组节点的index都会处于unassigned状态</p>
 <p>另一个要考虑的问题是如何定义冷热索引。个人建议是先按照QPS将所有index排序，先将大部分QPS较高的index甚至所有index放到高性能组里，然后从QPS最低的index开始一个个移到低性能组里，直到两组index的读写性能基本均衡</p>
-<div class="note info"><h2 id="index拆分"><a href="#index拆分" class="headerlink" title="index拆分"></a>index拆分</h2></div>
-<p>通常我们认为冷索引是指那些不再新增或更新的数据，但在实时场景中，index一般都会持续更新，那么所有的index都是热索引，就没法做分离了。这种情况下我们就需要先做index拆分，具体做法是每隔一定时间，比如每天新建一个index，归为热索引，旧的index一般就不会再有更新，归为冷索引</p>
+<p><div class="note info"><h2>index拆分</h2></div><br>通常我们认为冷索引是指那些不再新增或更新的数据，但在实时场景中，index一般都会持续更新，那么所有的index都是热索引，就没法做分离了。这种情况下我们就需要先做index拆分，具体做法是每隔一定时间，比如每天新建一个index，归为热索引，旧的index一般就不会再有更新，归为冷索引</p>
 <p>这里有一个问题，新建的index是不能与原来重名的，所以我们加个时间后缀用于区分，例如test_index_20170924。但这个做法会带来一个新的麻烦，index的名称每天都在变，所以每次都需要以日期作为后缀才能找到当前的热索引</p>
 <p>用别名可以解决这个问题</p>
 <p><img src="/attachment/20170924/es_alias.png" alt="alias"></p>
-<p>我们给这个这个index起一个别名叫test_alias，指向当日的index，比如test_index_20170924，第二天创建了一个新的index: test_index_20170925，然后把test_alias跟test_index_20170924的关联解除，然后把test_alias指向test_index_20170925。这样我们如果要读写当前热索引，只需要访问test_alias就可以了，从ES用户的角度来看，感觉不到index做了拆分<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases</span><br><span class="line">&#123;</span><br><span class="line">    &quot;actions&quot; : [</span><br><span class="line">        &#123; &quot;remove&quot; : &#123; &quot;index&quot; : &quot;test_index_20170924&quot;, &quot;alias&quot; : &quot;test_alias&quot; &#125; &#125;,</span><br><span class="line">        &#123; &quot;add&quot;:  &#123; &quot;index&quot;: &quot;test_index_20170925&quot;, &quot;alias&quot;: &quot;test_alias&quot; &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们给这个这个index起一个别名叫test_alias，指向当日的index，比如test_index_20170924，第二天创建了一个新的index: test_index_20170925，然后把test_alias跟test_index_20170924的关联解除，然后把test_alias指向test_index_20170925。这样我们如果要读写当前热索引，只需要访问test_alias就可以了，从ES用户的角度来看，感觉不到index做了拆分<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /_aliases</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"actions"</span> : [</span><br><span class="line">        &#123; <span class="attr">"remove"</span> : &#123; <span class="attr">"index"</span> : <span class="string">"test_index_20170924"</span>, <span class="attr">"alias"</span> : <span class="string">"test_alias"</span> &#125; &#125;,</span><br><span class="line">        &#123; <span class="attr">"add"</span>:  &#123; <span class="attr">"index"</span>: <span class="string">"test_index_20170925"</span>, <span class="attr">"alias"</span>: <span class="string">"test_alias"</span> &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>注意这里remove和add两个动作一定要放在一个transaction里完成，否则如果先remove再add，可能会导致alias短暂不可用，如果先add再remove，可能会导致有短暂时间写入异常，因为alias同时指向两个index，ES无法决定应该写入哪一个</p>
 <p>热索引读写的问题解决了，但还是有一些搜索的问题需要考虑，一个是全文搜索，用通配符是可以的，比如test_index_*，但如果刚好有其他index的前缀也是test_index_就麻烦了，可以通过新建一个别名指向所有的index来解决。还有就是幂等性无法保证的问题，如果你需要用id来保证幂等性，并且无法保证相同id的数据会在同一天写入，那么这个冷热索引分离的方案是行不通的，因为即使id在旧的index里存在，但在新的index里找不到，只能当做一条新数据插入</p>
 
@@ -1202,36 +1178,22 @@ undefined
       
         
           
-            <div class="note info"><h2 id="批量操作"><a href="#批量操作" class="headerlink" title="批量操作"></a>批量操作</h2></div>
+            <div class="note info"><h2>批量操作</h2></div>
 
-批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M
-
-<div class="note info"><h2 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h2></div>
-<p>单线程批量发送数据无法达到最大效率。使用多线程或者多进程能够更充分地利用集群资源，同时也能减少fsync的开销，因为数据的集中发送可以减少磁盘交互</p>
+<p>批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M</p>
+<p><div class="note info"><h2>多线程</h2></div><br>单线程批量发送数据无法达到最大效率。使用多线程或者多进程能够更充分地利用集群资源，同时也能减少fsync的开销，因为数据的集中发送可以减少磁盘交互</p>
 <p>但要注意响应码TOO_MANY_REQUESTS (429)，在Java Client中会返回EsRejectedExecutionException异常，这说明数据总发送速度已经超过了ES集群的处理能力，这时就需要发送端限流，比如加入时间补偿机制。或者也可以调大ES的bulk queue size，通常并不建议这么做，但某些版本的bulk queue size确实过于小，比如5.1的默认值是50,而5.5是200，所以如果你使用的是5.1版本，则可以在elasticsearch.yml加入以下配置<code>thread_pool.bulk.queue_size: 200</code></p>
-<div class="note info"><h2 id="增大refresh-interval"><a href="#增大refresh-interval" class="headerlink" title="增大refresh interval"></a>增大refresh interval</h2></div>
-默认的index.refresh\_interval是1秒，使用默认配置的index会每隔一秒钟创建一个新的segment，这会给ES带来比较大的merge压力，因此如果对延迟没有特别高的要求，可以适当调大index.refresh\_interval，比如10秒
-
-<div class="note info"><h2 id="离线批量导入时关闭refresh和replica"><a href="#离线批量导入时关闭refresh和replica" class="headerlink" title="离线批量导入时关闭refresh和replica"></a>离线批量导入时关闭refresh和replica</h2></div>
-<p>如果你需要一次性从外部系统导入数据到ES，你可以通过设置index.refresh_interval为-1来关掉refresh，设置index.number_of_replicas为0来去掉备份，这样可以大大提升数据的导入速度。refresh关掉能够极大的减少segments，也减少了merge，而去掉备份之后数据只需要写入一次。导入完成之后可以再把refresh和replica打开。值得一提的是，增加备份只是简单的数据传输，这个过程很快，但如果是向一个有备份的index写入数据，实际上在primary shard和replica上都需要进行索引，因此开销会大很多</p>
+<p><div class="note info"><h2>增大refresh interval</h2></div><br>默认的index.refresh_interval是1秒，使用默认配置的index会每隔一秒钟创建一个新的segment，这会给ES带来比较大的merge压力，因此如果对延迟没有特别高的要求，可以适当调大index.refresh_interval，比如10秒</p>
+<p><div class="note info"><h2>离线批量导入时关闭refresh和replica</h2></div><br>如果你需要一次性从外部系统导入数据到ES，你可以通过设置index.refresh_interval为-1来关掉refresh，设置index.number_of_replicas为0来去掉备份，这样可以大大提升数据的导入速度。refresh关掉能够极大的减少segments，也减少了merge，而去掉备份之后数据只需要写入一次。导入完成之后可以再把refresh和replica打开。值得一提的是，增加备份只是简单的数据传输，这个过程很快，但如果是向一个有备份的index写入数据，实际上在primary shard和replica上都需要进行索引，因此开销会大很多</p>
 <p>但要注意，虽然这可以提升导入性能，但风险也提高了，因为导入过程中如果有节点挂掉，那么这个节点上的shards就不可用了，但如果是离线导入就还好，大不了重新导入就行</p>
-<div class="note info"><h2 id="关闭swap"><a href="#关闭swap" class="headerlink" title="关闭swap"></a>关闭swap</h2></div>
-稍微了解一下操作系统就知道swap对ES简直就是灾难，性能低还是其次，最重要的是会很容易把机器给爆掉，可以使用以下方法关闭swap
-undefined
-
-<div class="note info"><h2 id="给pagecache预留memory"><a href="#给pagecache预留memory" class="headerlink" title="给pagecache预留memory"></a>给pagecache预留memory</h2></div>
-<p>官方说了，一半内存给ES，另外一半内存给lucene，也就是文件系统缓存。这很好理解，在缓存中的操作肯定比磁盘IO要快得多</p>
-<div class="note info"><h2 id="使用自动分配的id"><a href="#使用自动分配的id" class="headerlink" title="使用自动分配的id"></a>使用自动分配的id</h2></div>
-如果你在index request中指定了id，那么ES会先去检查这个id是否存在，如果不存在，就新增一条记录，如果存在，则覆盖，检查id的动作是非常耗时的，特别是数据量特别大的情况下。如果index request中不指定id，ES会自动分配一个唯一的id，省去了id检查的过程，写入速度就得到提高
-
-但如果你希望使用es的id来保证幂等性的话就没别的选择了，只能自己指定id
-
-<div class="note info"><h2 id="使用更好的硬件"><a href="#使用更好的硬件" class="headerlink" title="使用更好的硬件"></a>使用更好的硬件</h2></div>
-<p>主要是磁盘，ES是重度依赖磁盘IO的软件</p>
+<p><div class="note info"><h2>关闭swap</h2></div><br>稍微了解一下操作系统就知道swap对ES简直就是灾难，性能低还是其次，最重要的是会很容易把机器给爆掉，可以使用以下方法关闭swap<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. 临时生效</span><br><span class="line">      swapoff -a</span><br><span class="line">2. 重启生效</span><br><span class="line">      vi /etc/sysctl.conf</span><br><span class="line">      添加或修改vm.swappiness = 0</span><br><span class="line">3. 在elasticsearch.yml中配置</span><br><span class="line">      bootstrap.memory_lock: true</span><br></pre></td></tr></table></figure></p>
+<p><div class="note info"><h2>给pagecache预留memory</h2></div><br>官方说了，一半内存给ES，另外一半内存给lucene，也就是文件系统缓存。这很好理解，在缓存中的操作肯定比磁盘IO要快得多</p>
+<p><div class="note info"><h2>使用自动分配的id</h2></div><br>如果你在index request中指定了id，那么ES会先去检查这个id是否存在，如果不存在，就新增一条记录，如果存在，则覆盖，检查id的动作是非常耗时的，特别是数据量特别大的情况下。如果index request中不指定id，ES会自动分配一个唯一的id，省去了id检查的过程，写入速度就得到提高</p>
+<p>但如果你希望使用es的id来保证幂等性的话就没别的选择了，只能自己指定id</p>
+<p><div class="note info"><h2>使用更好的硬件</h2></div><br>主要是磁盘，ES是重度依赖磁盘IO的软件</p>
 <p>最好是SSD，这没什么好说的，就是快</p>
 <p>然后是多块盘做raid0，由于数据是分散在多块盘上，所以如果一块盘坏掉可能会导致所有index不能用，但可以通过replica来规避风险</p>
-<div class="note info"><h2 id="index-buffer-size"><a href="#index-buffer-size" class="headerlink" title="index buffer size"></a>index buffer size</h2></div>
-<p>如果你有重度写入需求，那么最好保证在一个节点上indices.memory.index_buffer_size / shards_count &gt; 512MB（超过这个值索引性能并不会有太明显提高）。indices.memory.index_buffer_size的默认值是10%，也就是说如果机器内存是64G，你把一半32G分配给了ES，那么buffer size为3.2G，能够支撑6.4个疯狂写入的shards</p>
+<p><div class="note info"><h2>index buffer size</h2></div><br>如果你有重度写入需求，那么最好保证在一个节点上indices.memory.index_buffer_size / shards_count &gt; 512MB（超过这个值索引性能并不会有太明显提高）。indices.memory.index_buffer_size的默认值是10%，也就是说如果机器内存是64G，你把一半32G分配给了ES，那么buffer size为3.2G，能够支撑6.4个疯狂写入的shards</p>
 
           
         
@@ -1361,16 +1323,15 @@ undefined
       
         
           
-            <h1 id="评判标准"><a href="#评判标准" class="headerlink" title="评判标准"></a>评判标准</h1><div class="note info"><h2 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h2></div>
-故障转移就是在某一个应用服务器不能服务用户请求的时候，通过一定的技术实现用户请求转移到其他应用服务器上来进行业务逻辑处理。例如使用nginx实现多个无状态实例的负载均衡，当其中一个或多个实例失效时，仍能通过其他实例提供服务
-<div class="note info"><h2 id="冗余备份"><a href="#冗余备份" class="headerlink" title="冗余备份"></a>冗余备份</h2></div>
-<p>冗余备份就是针对某一个服务通过服务器集群或多机房部署来达到服务器冗余和相互备份的目的。例如Kafka和HDFS的备份机制<br><div class="note info"><h2 id="超时设置"><a href="#超时设置" class="headerlink" title="超时设置"></a>超时设置</h2></div>
-超时设置就是主调服务在调用被调服务的时候设置一个超时等待时间Timeout，主调服务发现超时后，主动进入超时处理流程。超时设置的好处在于当某个服务不可用时，不至于整个系统发生连锁反应
-<div class="note info"><h2 id="异步调用"><a href="#异步调用" class="headerlink" title="异步调用"></a>异步调用</h2></div><br>采用异步调用的方式调用被调服务，有利于将主调服务和被调服务进行解耦，同时提高系统的处理性能<br><div class="note info"><h2 id="服务分级和降级"><a href="#服务分级和降级" class="headerlink" title="服务分级和降级"></a>服务分级和降级</h2></div>
-对于不同的服务可以采用不同的处理方案，出现故障时应该优先保证核心服务的运行。
-<div class="note info"><h2 id="监控告警"><a href="#监控告警" class="headerlink" title="监控告警"></a>监控告警</h2></div><br>服务一旦出现问题能够及时发现，通过自动化处理，或者人工介入处理，从而达到缩短系统的不可用时间，提高可用性。常见的监控指标有：CPU、带宽、内存使用率、网络连接状态，系统调用错误，成功率，PV，UV等<br><div class="note info"><h2 id="防雪崩机制"><a href="#防雪崩机制" class="headerlink" title="防雪崩机制"></a>防雪崩机制</h2></div>
-对于设计的任何一个系统，都需要进行容量的预估和最大容量设置，当外部请求量超过最大容量时，应该启动防雪崩机制，以避免大量外部请求把服务压跨而不能对外提供服务
-<div class="note info"><h2 id="流量缓冲机制"><a href="#流量缓冲机制" class="headerlink" title="流量缓冲机制"></a>流量缓冲机制</h2></div><br>在服务内可以建立队列，当流量过大时，储存一定的用户请求到队列，当流量偏小时再拿出来快速处理，从而达到削峰填谷的作用。例如在大数据存储中Kafka作为缓冲队列的应用<br><div class="note info"><h2 id="自动化测试"><a href="#自动化测试" class="headerlink" title="自动化测试"></a>自动化测试</h2></div><br>对于每一次代码的提交，都能通过自动测试程序对整个服务进行整体的回归测试，这样可以快速地避免代码修改引入新的问题，而导致服务不稳定</p>
+            <h1 id="评判标准"><a href="#评判标准" class="headerlink" title="评判标准"></a>评判标准</h1><p><div class="note info"><h2>故障转移</h2></div><br>故障转移就是在某一个应用服务器不能服务用户请求的时候，通过一定的技术实现用户请求转移到其他应用服务器上来进行业务逻辑处理。例如使用nginx实现多个无状态实例的负载均衡，当其中一个或多个实例失效时，仍能通过其他实例提供服务</p>
+<p><div class="note info"><h2>冗余备份</h2></div><br>冗余备份就是针对某一个服务通过服务器集群或多机房部署来达到服务器冗余和相互备份的目的。例如Kafka和HDFS的备份机制</p>
+<p><div class="note info"><h2>超时设置</h2></div><br>超时设置就是主调服务在调用被调服务的时候设置一个超时等待时间Timeout，主调服务发现超时后，主动进入超时处理流程。超时设置的好处在于当某个服务不可用时，不至于整个系统发生连锁反应</p>
+<p><div class="note info"><h2>异步调用</h2></div><br>采用异步调用的方式调用被调服务，有利于将主调服务和被调服务进行解耦，同时提高系统的处理性能</p>
+<p><div class="note info"><h2>服务分级和降级</h2></div><br>对于不同的服务可以采用不同的处理方案，出现故障时应该优先保证核心服务的运行。</p>
+<p><div class="note info"><h2>监控告警</h2></div><br>服务一旦出现问题能够及时发现，通过自动化处理，或者人工介入处理，从而达到缩短系统的不可用时间，提高可用性。常见的监控指标有：CPU、带宽、内存使用率、网络连接状态，系统调用错误，成功率，PV，UV等</p>
+<p><div class="note info"><h2>防雪崩机制</h2></div><br>对于设计的任何一个系统，都需要进行容量的预估和最大容量设置，当外部请求量超过最大容量时，应该启动防雪崩机制，以避免大量外部请求把服务压跨而不能对外提供服务</p>
+<p><div class="note info"><h2>流量缓冲机制</h2></div><br>在服务内可以建立队列，当流量过大时，储存一定的用户请求到队列，当流量偏小时再拿出来快速处理，从而达到削峰填谷的作用。例如在大数据存储中Kafka作为缓冲队列的应用</p>
+<p><div class="note info"><h2>自动化测试</h2></div><br>对于每一次代码的提交，都能通过自动测试程序对整个服务进行整体的回归测试，这样可以快速地避免代码修改引入新的问题，而导致服务不稳定</p>
 <h1 id="关键指标"><a href="#关键指标" class="headerlink" title="关键指标"></a>关键指标</h1><p><div class="note info"><h2>正常运行时间百分比</h2></div></p>
 <table><thead><tr><th>描述</th><th>通俗叫法</th><th>可用百分比</th><th>年停机时间</th></tr></thead><tbody><tr><td>基本可用性</td><td>2个9</td><td>99%</td><td>87.6小时</td></tr><tr><td>较高可用性</td><td>3个9</td><td>99.9%</td><td>8.8小时</td></tr><tr><td>具有故障自动恢复能力的可用性</td><td>4个9</td><td>99.99%</td><td>53分钟</td></tr><tr><td>极高可用性</td><td>5个9</td><td>99.999%</td><td>5分钟</td></tr></tbody></table>
 
@@ -1671,14 +1632,15 @@ undefined
         
           
             <p>Kafka Streams默认使用RocksDB来存储状态</p>
-<div class="note info"><h2 id="In-memory-or-persistent"><a href="#In-memory-or-persistent" class="headerlink" title="In-memory or persistent ?"></a>In-memory or persistent ?</h2></div>
+<div class="note info"><h2>In-memory or persistent ?</h2></div>
 
-状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor API（low level）
+<p>状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor API（low level）</p>
+<div class="note info"><h2>持久化</h2></div>
 
-<div class="note info"><h2 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h2></div>
 <p>为了保存状态，RocksDB会把state store的内容flush到StreamsConfig.STATE_DIR_CONFIG指定的磁盘上</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.put(StreamsConfig.STATE_DIR_CONFIG, <span class="string">"my-state-store"</span>)</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h2></div>
+<div class="note info"><h2>Changelog</h2></div>
+
 <p>出于灾备和扩展性的考虑，state store的内容同样会默认保存changelog到kafka的topic中，topic名字为<code>&lt;application_id&gt;-&lt;state_store_name&gt;-changelog</code>，你可以通过enableLogging和disableLogging来开启或关闭该功能</p>
 <p>如果task由于异常或宕机造成中断，在原来的机器或另一台机器重启之后，Kafka Streams能够优先通过重放changelog恢复state store的内容，而不是在新的task中创建新的state store，这是Kafka Streams状态安全性的保证</p>
 <p>如果在task运行过程中删除changelog对应的topic，Kafka Streams会在下一个checkpoint再次写入changelog，但如果在下个checkpoint之前task中断，state store的数据将无法恢复</p>

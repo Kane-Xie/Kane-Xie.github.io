@@ -85,7 +85,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook 1234567891011121314public static void addShutdownHook(final Closeable closeable, final Boolean i">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T08:14:27.787Z">
+<meta property="og:updated_time" content="2019-02-02T02:44:55.954Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ShutdownHook没有移除导致内存泄漏">
 <meta name="twitter:description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook 1234567891011121314public static void addShutdownHook(final Closeable closeable, final Boolean i">

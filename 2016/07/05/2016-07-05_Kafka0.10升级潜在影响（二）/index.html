@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。 首先在Kafka 0.9上的平均测试结果是8.362秒。 而升级到Kafka 0.10之后，平均测试结果如下：             producer versionlog.message. format.versioncons">
+<meta name="description" content="接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。 首先在Kafka 0.9上的平均测试结果是8.362秒。 而升级到Kafka 0.10之后，平均测试结果如下： producer versionlog.message. format.versionconsumer version">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka0.10升级潜在影响（二）">
 <meta property="og:url" content="http://kane-xie.github.io/2016/07/05/2016-07-05_Kafka0.10升级潜在影响（二）/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。 首先在Kafka 0.9上的平均测试结果是8.362秒。 而升级到Kafka 0.10之后，平均测试结果如下：             producer versionlog.message. format.versioncons">
+<meta property="og:description" content="接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。 首先在Kafka 0.9上的平均测试结果是8.362秒。 而升级到Kafka 0.10之后，平均测试结果如下： producer versionlog.message. format.versionconsumer version">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.607Z">
+<meta property="og:updated_time" content="2019-02-02T03:11:53.169Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka0.10升级潜在影响（二）">
-<meta name="twitter:description" content="接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。 首先在Kafka 0.9上的平均测试结果是8.362秒。 而升级到Kafka 0.10之后，平均测试结果如下：             producer versionlog.message. format.versioncons">
+<meta name="twitter:description" content="接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。 首先在Kafka 0.9上的平均测试结果是8.362秒。 而升级到Kafka 0.10之后，平均测试结果如下： producer versionlog.message. format.versionconsumer version">
 
 
 
@@ -321,7 +321,7 @@
         <p>接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。</p>
 <p>首先在Kafka 0.9上的平均测试结果是8.362秒。</p>
 <p>而升级到Kafka 0.10之后，平均测试结果如下：</p>
-<table><br>    <tr><br>        <th>producer version</th><br><th>log.message. format.version</th><br><th>consumer version</th><br><th>cost</th><br>    </tr><br>  <tr><td>0.9 </td><td>0.10 </td><td>0.9 </td><td>8.966s </td></tr><br>  <tr><td>0.9 </td><td>0.10 </td><td>0.10 </td><td>6.470s</td></tr><br>  <tr><td>0.10</td><td>0.10 </td><td>0.9 </td><td>8.834s</td></tr><br>  <tr><td>0.10</td><td>0.10 </td><td>0.10</td><td>6.604s</td></tr><br><tr><td>0.9</td><td>0.9</td><td>0.9</td><td>8.355s</td></tr><br>  <tr><td>0.9</td><td>0.9</td><td>0.10</td><td>6.242s</td></tr><br>  <tr><td>0.10</td><td>0.9</td><td>0.9</td><td>8.233s</td></tr><br>  <tr><td>0.10</td><td>0.9</td><td>0.10</td><td>6.310s</td></tr><br></table>
+<table><br><tr><th>producer version</th><th>log.message. format.version</th><th>consumer version</th><th>cost</th></tr><tr><td>0.9 </td><td>0.10 </td><td>0.9 </td><td>8.966s </td></tr><tr><td>0.9 </td><td>0.10 </td><td>0.10 </td><td>6.470s</td></tr><tr><td>0.10</td><td>0.10 </td><td>0.9 </td><td>8.834s</td></tr><tr><td>0.10</td><td>0.10 </td><td>0.10</td><td>6.604s</td></tr><tr><td>0.9</td><td>0.9</td><td>0.9</td><td>8.355s</td></tr><tr><td>0.9</td><td>0.9</td><td>0.10</td><td>6.242s</td></tr><tr><td>0.10</td><td>0.9</td><td>0.9</td><td>8.233s</td></tr><tr><td>0.10</td><td>0.9</td><td>0.10</td><td>6.310s</td></tr></table>
 
 <ul>
 <li>对比1-5，2-6，3-7，4-8，使用默认的log.message.format.version=0.10.0会使吞吐量降低，因为消息里增加了8个字节timestamp，虽然原始size是1K，只增加了8‰的大小，但从测试结果看，吞吐量降低远远不止8‰ 。</li>

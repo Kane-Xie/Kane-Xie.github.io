@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="准备一台虚拟机作为cm-server 配置ssh免密码登录，在cm-server上执行脚本 1234567891011121314CLUSTER_NODES=localhost#replace &amp;apos;,&amp;apos; with spaceCLUSTER_NODES=$&amp;#123;CLUSTER_NODES//,/ &amp;#125;FILE=~/.ssh/id_rsa.pubif [ ! -f &amp;">
+<meta name="description" content="准备一台虚拟机作为cm-server 配置ssh免密码登录，在cm-server上执行脚本 1234567891011121314CLUSTER_NODES=localhost#replace &apos;,&apos; with spaceCLUSTER_NODES=$&amp;#123;CLUSTER_NODES//,/ &amp;#125;FILE=~/.ssh/id_rsa.pubif [ ! -f &quot;$&amp;#123;FIL">
 <meta name="keywords" content="cloudera,cdh">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Cloudera Manager安装">
 <meta property="og:url" content="http://kane-xie.github.io/2016/09/07/2016-09-07_Cloudera Manager安装/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="准备一台虚拟机作为cm-server 配置ssh免密码登录，在cm-server上执行脚本 1234567891011121314CLUSTER_NODES=localhost#replace &amp;apos;,&amp;apos; with spaceCLUSTER_NODES=$&amp;#123;CLUSTER_NODES//,/ &amp;#125;FILE=~/.ssh/id_rsa.pubif [ ! -f &amp;">
+<meta property="og:description" content="准备一台虚拟机作为cm-server 配置ssh免密码登录，在cm-server上执行脚本 1234567891011121314CLUSTER_NODES=localhost#replace &apos;,&apos; with spaceCLUSTER_NODES=$&amp;#123;CLUSTER_NODES//,/ &amp;#125;FILE=~/.ssh/id_rsa.pubif [ ! -f &quot;$&amp;#123;FIL">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-01T07:59:28.644Z">
+<meta property="og:updated_time" content="2019-02-02T03:07:49.017Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Cloudera Manager安装">
-<meta name="twitter:description" content="准备一台虚拟机作为cm-server 配置ssh免密码登录，在cm-server上执行脚本 1234567891011121314CLUSTER_NODES=localhost#replace &amp;apos;,&amp;apos; with spaceCLUSTER_NODES=$&amp;#123;CLUSTER_NODES//,/ &amp;#125;FILE=~/.ssh/id_rsa.pubif [ ! -f &amp;">
+<meta name="twitter:description" content="准备一台虚拟机作为cm-server 配置ssh免密码登录，在cm-server上执行脚本 1234567891011121314CLUSTER_NODES=localhost#replace &apos;,&apos; with spaceCLUSTER_NODES=$&amp;#123;CLUSTER_NODES//,/ &amp;#125;FILE=~/.ssh/id_rsa.pubif [ ! -f &quot;$&amp;#123;FIL">
 
 
 
@@ -321,7 +321,7 @@
         <ul>
 <li>准备一台虚拟机作为cm-server</li>
 <li><p>配置ssh免密码登录，在cm-server上执行脚本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NODES=localhost</span><br><span class="line">#replace &apos;,&apos; with space</span><br><span class="line">CLUSTER_NODES=$&#123;CLUSTER_NODES//,/ &#125;</span><br><span class="line"></span><br><span class="line">FILE=~/.ssh/id_rsa.pub</span><br><span class="line">if [ ! -f &quot;$&#123;FILE&#125;&quot; ]; then </span><br><span class="line">    ssh-keygen -t rsa -P &apos;&apos;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">for i in $CLUSTER_NODES</span><br><span class="line">do</span><br><span class="line">	scp ~/.ssh/id_rsa.pub root@$&#123;i&#125;:/tmp</span><br><span class="line">	ssh root@$&#123;i&#125; &quot;cat /tmp/id_rsa.pub &gt;&gt; /root/.ssh/authorized_keys&quot;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NODES=localhost</span><br><span class="line"><span class="comment">#replace ',' with space</span></span><br><span class="line">CLUSTER_NODES=<span class="variable">$&#123;CLUSTER_NODES//,/ &#125;</span></span><br><span class="line"></span><br><span class="line">FILE=~/.ssh/id_rsa.pub</span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">"<span class="variable">$&#123;FILE&#125;</span>"</span> ]; <span class="keyword">then</span> </span><br><span class="line">    ssh-keygen -t rsa -P <span class="string">''</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$CLUSTER_NODES</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	scp ~/.ssh/id_rsa.pub root@<span class="variable">$&#123;i&#125;</span>:/tmp</span><br><span class="line">	ssh root@<span class="variable">$&#123;i&#125;</span> <span class="string">"cat /tmp/id_rsa.pub &gt;&gt; /root/.ssh/authorized_keys"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>安装jdk</p>
 <ul>
