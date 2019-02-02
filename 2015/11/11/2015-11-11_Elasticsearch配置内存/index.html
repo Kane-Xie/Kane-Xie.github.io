@@ -66,7 +66,7 @@
 
 
 
-  <meta name="keywords" content="scala,">
+  <meta name="keywords" content="elasticsearch,">
 
 
 
@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="最近在做一个spark项目，顺便分享一下我的scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍scala的函数定义。  国际惯例，先来一段HelloWorld 123456789object TestScala1 &amp;#123;    def main(args: Array[String]): Unit = &amp;#123;      val s =">
-<meta name="keywords" content="scala">
+<meta name="description" content="原生ES，只需要在启动时加上-Xmx1g -Xms1g Elasticsearch Docker，参数为 -eES_MIN_MEM=1g-eES_MAX_MEM=1g  注意：  mx和ms最好设为一样，避免GC 为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。">
+<meta name="keywords" content="elasticsearch">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Scala入门（一）：函数定义">
-<meta property="og:url" content="http://kane-xie.github.io/2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /index.html">
+<meta property="og:title" content="Elasticsearch配置内存">
+<meta property="og:url" content="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="最近在做一个spark项目，顺便分享一下我的scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍scala的函数定义。  国际惯例，先来一段HelloWorld 123456789object TestScala1 &amp;#123;    def main(args: Array[String]): Unit = &amp;#123;      val s =">
+<meta property="og:description" content="原生ES，只需要在启动时加上-Xmx1g -Xms1g Elasticsearch Docker，参数为 -eES_MIN_MEM=1g-eES_MAX_MEM=1g  注意：  mx和ms最好设为一样，避免GC 为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:15:57.711Z">
+<meta property="og:updated_time" content="2019-02-02T03:46:36.930Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Scala入门（一）：函数定义">
-<meta name="twitter:description" content="最近在做一个spark项目，顺便分享一下我的scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍scala的函数定义。  国际惯例，先来一段HelloWorld 123456789object TestScala1 &amp;#123;    def main(args: Array[String]): Unit = &amp;#123;      val s =">
+<meta name="twitter:title" content="Elasticsearch配置内存">
+<meta name="twitter:description" content="原生ES，只需要在启动时加上-Xmx1g -Xms1g Elasticsearch Docker，参数为 -eES_MIN_MEM=1g-eES_MAX_MEM=1g  注意：  mx和ms最好设为一样，避免GC 为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。">
 
 
 
@@ -118,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="http://kane-xie.github.io/2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /">
+  <link rel="canonical" href="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存/">
 
 
 
 
 
-  <title>Scala入门（一）：函数定义 | Kane Xie</title>
+  <title>Elasticsearch配置内存 | Kane Xie</title>
   
 
 
@@ -241,7 +241,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kane Xie">
@@ -258,7 +258,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Scala入门（一）：函数定义</h1>
+          <h1 class="post-title" itemprop="name headline">Elasticsearch配置内存</h1>
         
 
         <div class="post-meta">
@@ -270,8 +270,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-08-26T00:00:00+08:00">
-                2015-08-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-11-11T00:00:00+08:00">
+                2015-11-11
               </time>
             
 
@@ -289,8 +289,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /" itemprop="commentCount"></span>
+                <a href="/2015/11/11/2015-11-11_Elasticsearch配置内存/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/11/2015-11-11_Elasticsearch配置内存/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -318,16 +318,15 @@
       
 
       
-        <blockquote>
-<p>最近在做一个spark项目，顺便分享一下我的scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍scala的函数定义。</p>
-</blockquote>
-<p>国际惯例，先来一段HelloWorld</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">TestScala1</span> </span>&#123;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    <span class="keyword">val</span> s = <span class="string">"Hello World!"</span>;  </span><br><span class="line">    show(s);  </span><br><span class="line">  &#125;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">show</span></span>(s: <span class="type">String</span>): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    println(s)  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>函数的定义需要关键字def，组成部分有函数名（main），参数名称(args)， 参数类型(Array[String])，返回类型(Unit)，大括号内是函数体。</p>
-<p>函数一般都会有返回内容，Unit为空返回值。Unit可以省略。实际上在接触scala时间长了之后你会发现，Scala是一门“能省则省”的语言。比如说每行语句末尾的分号，其实是可写可不写，或者准确的说，Scala是不推荐写分号的，因为没有意义，只是凭空增加了多敲一个键的负担（仁者见仁智者见智）。</p>
-<p>和Java一样，main函数是程序的主入口，但不同的是，Java的main函数是一个类中的静态函数，但Scala的类中并没有静态函数，所以引入object来持有静态函数。所以请注意我们定义的TestScala1是一个object而不是class。</p>
-<p>在main函数中我们首先声明一个变量s，val代表常量，var代表变量。由于Scala实现了类型推导，因此不需要声明对象的类型。</p>
-<p>然后把s传递给函数show，函数的调用与Java类似，但如果函数没有参数的话，调用时可以省略括号（能省则省。。）</p>
+        <ul>
+<li>原生ES，只需要在启动时加上<code>-Xmx1g -Xms1g</code></li>
+<li>Elasticsearch Docker，参数为 <code>-eES_MIN_MEM=1g-eES_MAX_MEM=1g</code></li>
+</ul>
+<p>注意：</p>
+<ol>
+<li>mx和ms最好设为一样，避免GC</li>
+<li>为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。</li>
+</ol>
 
       
     </div>
@@ -345,7 +344,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/scala/" rel="tag"># scala</a>
+            <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
           
         </div>
       
@@ -358,8 +357,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/08/06/2015-08-06_spark WARN TaskSchedulerImpl： Initial job has not accepted any resources/" rel="next" title="spark WARN TaskSchedulerImpl： Initial job has not accepted any resources">
-                <i class="fa fa-chevron-left"></i> spark WARN TaskSchedulerImpl： Initial job has not accepted any resources
+              <a href="/2015/11/10/2015-11-10_Elasticsearch删除所有数据/" rel="next" title="Elasticsearch删除所有数据">
+                <i class="fa fa-chevron-left"></i> Elasticsearch删除所有数据
               </a>
             
           </div>
@@ -368,8 +367,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/" rel="prev" title="Scala入门（二）：流程控制">
-                Scala入门（二）：流程控制 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/01/11/2016-01-11_Kafka Connect/" rel="prev" title="Kafka Connect">
+                Kafka Connect <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -401,7 +400,7 @@
 
   
     <div class="comments" id="comments">
-      <div class="ds-thread" data-thread-key="2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /" data-title="Scala入门（一）：函数定义" data-url="http://kane-xie.github.io/2015/08/26/2015-08-26_Scala入门（一） - 函数定义 /">
+      <div class="ds-thread" data-thread-key="2015/11/11/2015-11-11_Elasticsearch配置内存/" data-title="Elasticsearch配置内存" data-url="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存/">
       </div>
     </div>
 

@@ -66,7 +66,7 @@
 
 
 
-  <meta name="keywords" content="elasticsearch,">
+  <meta name="keywords" content="kafka,">
 
 
 
@@ -77,18 +77,18 @@
 
 
 
-<meta name="description" content="原生ES，只需要在启动时加上-Xmx1g -Xms1g Elasticsearch Docker，参数为 -eES_MIN_MEM=1g-eES_MAX_MEM=1g  注意：  mx和ms最好设为一样，避免GC 为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。">
-<meta name="keywords" content="elasticsearch">
+<meta name="description" content="先看一个简单的KafkaConsumer例子： 12345678910111213141516Properties props = new Properties();  props.put(&quot;bootstrap.servers&quot;, &quot;localhost:9092&quot;);  props.put(&quot;group.id&quot;, &quot;test_group&quot;);  props.put(&quot;enable.auto.com">
+<meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Elasticsearch配置内存">
-<meta property="og:url" content="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存 /index.html">
+<meta property="og:title" content="KafkaConsumer0.9（二）">
+<meta property="og:url" content="http://kane-xie.github.io/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="原生ES，只需要在启动时加上-Xmx1g -Xms1g Elasticsearch Docker，参数为 -eES_MIN_MEM=1g-eES_MAX_MEM=1g  注意：  mx和ms最好设为一样，避免GC 为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。">
+<meta property="og:description" content="先看一个简单的KafkaConsumer例子： 12345678910111213141516Properties props = new Properties();  props.put(&quot;bootstrap.servers&quot;, &quot;localhost:9092&quot;);  props.put(&quot;group.id&quot;, &quot;test_group&quot;);  props.put(&quot;enable.auto.com">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T02:44:55.881Z">
+<meta property="og:updated_time" content="2019-02-02T03:46:36.936Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Elasticsearch配置内存">
-<meta name="twitter:description" content="原生ES，只需要在启动时加上-Xmx1g -Xms1g Elasticsearch Docker，参数为 -eES_MIN_MEM=1g-eES_MAX_MEM=1g  注意：  mx和ms最好设为一样，避免GC 为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。">
+<meta name="twitter:title" content="KafkaConsumer0.9（二）">
+<meta name="twitter:description" content="先看一个简单的KafkaConsumer例子： 12345678910111213141516Properties props = new Properties();  props.put(&quot;bootstrap.servers&quot;, &quot;localhost:9092&quot;);  props.put(&quot;group.id&quot;, &quot;test_group&quot;);  props.put(&quot;enable.auto.com">
 
 
 
@@ -118,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存 /">
+  <link rel="canonical" href="http://kane-xie.github.io/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/">
 
 
 
 
 
-  <title>Elasticsearch配置内存 | Kane Xie</title>
+  <title>KafkaConsumer0.9（二） | Kane Xie</title>
   
 
 
@@ -241,7 +241,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存 /">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kane Xie">
@@ -258,7 +258,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Elasticsearch配置内存</h1>
+          <h1 class="post-title" itemprop="name headline">KafkaConsumer0.9（二）</h1>
         
 
         <div class="post-meta">
@@ -270,8 +270,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-11-11T00:00:00+08:00">
-                2015-11-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-13T00:00:00+08:00">
+                2016-01-13
               </time>
             
 
@@ -289,8 +289,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2015/11/11/2015-11-11_Elasticsearch配置内存 /#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/11/2015-11-11_Elasticsearch配置内存 /" itemprop="commentCount"></span>
+                <a href="/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/2016-01-13_KafkaConsumer0.9（二）/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -318,15 +318,18 @@
       
 
       
-        <ul>
-<li>原生ES，只需要在启动时加上<code>-Xmx1g -Xms1g</code></li>
-<li>Elasticsearch Docker，参数为 <code>-eES_MIN_MEM=1g-eES_MAX_MEM=1g</code></li>
+        <p>先看一个简单的KafkaConsumer例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>);  </span><br><span class="line">props.put(<span class="string">"group.id"</span>, <span class="string">"test_group"</span>);  </span><br><span class="line">props.put(<span class="string">"enable.auto.commit"</span>, <span class="string">"true"</span>);  </span><br><span class="line">props.put(<span class="string">"auto.commit.interval.ms"</span>, <span class="string">"1000"</span>);  </span><br><span class="line">props.put(<span class="string">"session.timeout.ms"</span>, <span class="string">"30000"</span>);  </span><br><span class="line">props.put(<span class="string">"key.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">props.put(<span class="string">"value.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="keyword">new</span> KafkaConsumer&lt;String, String&gt;(props);  </span><br><span class="line">consumer.subscribe(Arrays.asList(<span class="string">"test_topic"</span>));  </span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;  </span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);  </span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records)&#123;  </span><br><span class="line">        System.out.printf(<span class="string">"offset = %d, key = %s, value = %s"</span>, record.offset(), record.key(), record.value());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们看到0.9的consumer最大的变化是：</p>
+<ul>
+<li>通过consumer.subscribe(Arrays.asList(“test_topic”))来声明要订阅的topic，而之前的版本是用Whitelist声明。</li>
+<li>通过consumer.poll(100)直接抓取消息，而之前需要遍历KafkaStream的迭代器。（这个比之前方便太多了。。。）。</li>
+<li>MessageAndMetadata变成了ConsumerRecords</li>
 </ul>
-<p>注意：</p>
-<ol>
-<li>mx和ms最好设为一样，避免GC</li>
-<li>为了保证最大效率，ES内存设为预留内存的一半，另外一半留给Lucene。</li>
-</ol>
+<p>enable.auto.commit表示已一个固定的时间间隔自动提交offsets，时间间隔由auto.commit.interval.ms控制。</p>
+<p>bootstrap.servers表示kafka集群的broker列表。客户端会连接到这个列表中的任意一台机器，获取到整个集群的信息，因此理论上只需要在bootstrap.servers列出一台机器就够了，但是考虑到灾备，建议在bootstrap.servers中包含所有broker。</p>
+<p>key.deserializer和value.deserializer指定了如何解析记录的key和value，在本例中我们认定key和value都是字符串。</p>
+<p>在本例中，client端启动了一个从属于test_group的consumer来订阅test_topic。当其中一个consumer process断开之后，kafka broker会通过心跳机制自动检测到，因此集群始终能够知道哪些consumer是活着的。只要被认为是活着，这个consumer就能够从分配给它的partition中获取数据；一旦心跳丢失超过session.timeout.ms，consumer会被认为死掉，它所占有的partition将会被分配给别的process。</p>
 
       
     </div>
@@ -344,7 +347,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+            <a href="/tags/kafka/" rel="tag"># kafka</a>
           
         </div>
       
@@ -357,8 +360,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/10/2015-11-10_Elasticsearch删除所有数据 /" rel="next" title="Elasticsearch删除所有数据">
-                <i class="fa fa-chevron-left"></i> Elasticsearch删除所有数据
+              <a href="/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/" rel="next" title="KafkaConsumer0.9（一）">
+                <i class="fa fa-chevron-left"></i> KafkaConsumer0.9（一）
               </a>
             
           </div>
@@ -367,8 +370,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/01/11/2016-01-11_Kafka Connect/" rel="prev" title="Kafka Connect">
-                Kafka Connect <i class="fa fa-chevron-right"></i>
+              <a href="/2016/01/18/2016-01-18_KafkaConsumer0.9（三）/" rel="prev" title="KafkaConsumer0.9（三）">
+                KafkaConsumer0.9（三） <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -400,7 +403,7 @@
 
   
     <div class="comments" id="comments">
-      <div class="ds-thread" data-thread-key="2015/11/11/2015-11-11_Elasticsearch配置内存 /" data-title="Elasticsearch配置内存" data-url="http://kane-xie.github.io/2015/11/11/2015-11-11_Elasticsearch配置内存 /">
+      <div class="ds-thread" data-thread-key="2016/01/13/2016-01-13_KafkaConsumer0.9（二）/" data-title="KafkaConsumer0.9（二）" data-url="http://kane-xie.github.io/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/">
       </div>
     </div>
 
