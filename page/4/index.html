@@ -274,6 +274,158 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/" itemprop="url">影响单次poll返回最大数据量的几个因素</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-25T00:00:00+08:00">
+                2016-08-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/" class="leancloud_visitors" data-flag-title="影响单次poll返回最大数据量的几个因素">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <div class="note info"><h2>timeout</h2></div>
+
+<p>单次poll最大等待时间，consumer.poll(1000)意味着在缓存中的数据被消费完之后，consumer会到broker中拉取数据，最多等待1000毫秒。很明显，timeout越大，单次poll返回的数据就越多。但前提是有足够多的数据可供消费，如果在1000毫秒内，consumer已经拿完所有能拿的数据，就会立即返回。</p>
+<div class="note info"><h2>max.poll.records</h2></div>
+
+<p>单次poll最大返回数据条数，默认值2,147,483,647。这应该不需要解释。</p>
+<div class="note info"><h2>receive.buffer.bytes</h2></div>
+
+<p>用于TCP读取数据的缓存（SO_RCVBUF）大小，默认值64k。之前做过小测试，发现消费10万条大小1k的数据，花费5秒左右，设置max.poll.records=1，理论上来说性能应该大大下降才对，但实际测试结果也在5秒左右。后来发现消费端有64k缓存，换句话说每次TCP请求会拿64条数据，因此虽然poll每次只拿一条数据，但也是从缓存中拿，拿64次才会真正发送一次TCP请求。而相对于1k大小数据的消费，TCP请求的开销可以忽略，因此消费时间差不多。当测试数据大小为1个字节时，TCP请求的开销就不能忽略了，而测试结果也证实，max.poll.records=1会使消费性能下降2/3。</p>
+<div class="note info"><h2>max.partition.fetch.bytes</h2></div>
+
+<p>单次poll对于每个partition最大返回数据量，默认值1M。如果消费的topic有3个partition，那么单次poll最多返回3M数据。但实际上发现单次poll一般都只返回1M的数据，而不是3M。检查数据的分布，也都分散在3个partition中。原因是consumer会启动3个fetcher分别到每个partition抓取数据，而考虑到性能问题，consumer会在fetch一个partition一定时间后才会fetch下一个partition，所以单次poll很可能只是在拿一个partition中的数据，所以返回1M数据。把测试时间延长之后发现，偶尔会有一次poll拿到2M数据，符合刚才的分析。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/23/2016-08-23_log4j warnning/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1617,157 +1769,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Xie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Xie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/" itemprop="url">Kafka0.10升级潜在影响（一）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-04T00:00:00+08:00">
-                2016-07-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/" class="leancloud_visitors" data-flag-title="Kafka0.10升级潜在影响（一）">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。</p>
-<p>如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本格式。但同时broker将不能使用zero-copy传输，因为数据必须读到application cache中进行数据格式转换。为了避免这种转换开销，我们可以在broker升级到0.10之后，将数据声明为更低版本的格式，比如0.9.0.1。这样，当老版本的consumer尝试获取数据时，broker能够使用zero-copy直接将数据传输给consumer。当大多数consumer都升级到最新版本之后，我们可以将消息格式重新声明称0.10（默认值）。而对于已经升级到0.10的client来说则不受影响。</p>
-<p>另外有一些需要注意的是：</p>
-<ul>
-<li><p>在设置log.message.format.version时，必须保证所有的存量数据必须是不高于设置的消息格式。否则低版本的consumer会中断。尤其需要注意在消息格式在设置为0.10之后，不能再设置回低于0.10的版本。</p>
-</li>
-<li><p>由于timestamp字段被加入消息中，消息本身的开销会增加，因此producer的吞吐量会降低。如果消息本身的size很小，那么新字段对于开销的增加会很明显，吞吐量会明显降低；而相对来说如果消息的size比较大，性能影响就不那么大。同样的，消息的replication也同样会增加8个字节的开销。如果Kafka已经快要把网络压榨到极限，那么这个改动可能会成为最后一根稻草，你可能会遇到一些报错和性能问题。</p>
-</li>
-<li><p>如果已经在producer中使用了压缩机制，那么你可能会感觉到性能相比之前有所降低，又或者是数据压缩率降低。在0.10中，当broker收到压缩的消息时，它会避免再将消息压缩，一般来说这可以降低延迟和提高吞吐量。但在特定情况下，这可能反而会降低producer的batch size，从而使吞吐量进一步降低。如果碰到这种情况，可以调整producer的linger.ms和batch.size。</p>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1820,7 +1821,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -274,6 +274,157 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/" itemprop="url">Kafka0.10升级潜在影响（一）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-04T00:00:00+08:00">
+                2016-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/" class="leancloud_visitors" data-flag-title="Kafka0.10升级潜在影响（一）">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。</p>
+<p>如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本格式。但同时broker将不能使用zero-copy传输，因为数据必须读到application cache中进行数据格式转换。为了避免这种转换开销，我们可以在broker升级到0.10之后，将数据声明为更低版本的格式，比如0.9.0.1。这样，当老版本的consumer尝试获取数据时，broker能够使用zero-copy直接将数据传输给consumer。当大多数consumer都升级到最新版本之后，我们可以将消息格式重新声明称0.10（默认值）。而对于已经升级到0.10的client来说则不受影响。</p>
+<p>另外有一些需要注意的是：</p>
+<ul>
+<li><p>在设置log.message.format.version时，必须保证所有的存量数据必须是不高于设置的消息格式。否则低版本的consumer会中断。尤其需要注意在消息格式在设置为0.10之后，不能再设置回低于0.10的版本。</p>
+</li>
+<li><p>由于timestamp字段被加入消息中，消息本身的开销会增加，因此producer的吞吐量会降低。如果消息本身的size很小，那么新字段对于开销的增加会很明显，吞吐量会明显降低；而相对来说如果消息的size比较大，性能影响就不那么大。同样的，消息的replication也同样会增加8个字节的开销。如果Kafka已经快要把网络压榨到极限，那么这个改动可能会成为最后一根稻草，你可能会遇到一些报错和性能问题。</p>
+</li>
+<li><p>如果已经在producer中使用了压缩机制，那么你可能会感觉到性能相比之前有所降低，又或者是数据压缩率降低。在0.10中，当broker收到压缩的消息时，它会避免再将消息压缩，一般来说这可以降低延迟和提高吞吐量。但在特定情况下，这可能反而会降低producer的batch size，从而使吞吐量进一步降低。如果碰到这种情况，可以调整producer的linger.ms和batch.size。</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/07/02/2016-07-02_Kafka安全认证-SASL/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1684,150 +1835,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Xie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Xie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/" itemprop="url">KafkaConsumer0.9（一）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-12T00:00:00+08:00">
-                2016-01-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/12/2016-01-12_KafkaConsumer0.9（一）/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/" class="leancloud_visitors" data-flag-title="KafkaConsumer0.9（一）">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。</p>
-<p>新的consumer实现了一套新的group管理机制，它使得consumer clients变得更简洁（真的比以前简洁很多。。。），并且获得更快的rebalancing。同时这个版本也完全解除了consumer client对zookeeper的依赖，直接访问kafka server使得consumer变得简单，并且能够使用到kafka server提供的安全（security）和配额机制(quota)。</p>
-<p>这里多说一句，consumer不依赖zookeeper是对的，由于zookeeper本质上是一个cp而不是ap系统，它更适于用于服务协调而不是服务发现，因为对于后者来说，信息中可能包含错误总比没有信息要好。</p>
-<p>为了让用户平滑地升级，0.8的consumer依然可以连接到0.9的kafka cluster。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1880,7 +1887,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -274,6 +274,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/08/26/2015-08-26_Scala入门（一） - 函数定义/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2015/08/26/2015-08-26_Scala入门（一） - 函数定义/" itemprop="url">Scala入门（一）：函数定义</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-08-26T00:00:00+08:00">
+                2015-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/08/26/2015-08-26_Scala入门（一） - 函数定义/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/26/2015-08-26_Scala入门（一） - 函数定义/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2015/08/26/2015-08-26_Scala入门（一） - 函数定义/" class="leancloud_visitors" data-flag-title="Scala入门（一）：函数定义">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>最近在做一个spark项目，顺便分享一下我的scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍scala的函数定义。</p>
+</blockquote>
+<p>国际惯例，先来一段HelloWorld</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">TestScala1</span> </span>&#123;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    <span class="keyword">val</span> s = <span class="string">"Hello World!"</span>;  </span><br><span class="line">    show(s);  </span><br><span class="line">  &#125;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">show</span></span>(s: <span class="type">String</span>): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    println(s)  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数的定义需要关键字def，组成部分有函数名（main），参数名称(args)， 参数类型(Array[String])，返回类型(Unit)，大括号内是函数体。</p>
+<p>函数一般都会有返回内容，Unit为空返回值。Unit可以省略。实际上在接触scala时间长了之后你会发现，Scala是一门“能省则省”的语言。比如说每行语句末尾的分号，其实是可写可不写，或者准确的说，Scala是不推荐写分号的，因为没有意义，只是凭空增加了多敲一个键的负担（仁者见仁智者见智）。</p>
+<p>和Java一样，main函数是程序的主入口，但不同的是，Java的main函数是一个类中的静态函数，但Scala的类中并没有静态函数，所以引入object来持有静态函数。所以请注意我们定义的TestScala1是一个object而不是class。</p>
+<p>在main函数中我们首先声明一个变量s，val代表常量，var代表变量。由于Scala实现了类型推导，因此不需要声明对象的类型。</p>
+<p>然后把s传递给函数show，函数的调用与Java类似，但如果函数没有参数的话，调用时可以省略括号（能省则省。。）</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/08/06/2015-08-06_spark WARN TaskSchedulerImpl： Initial job has not accepted any resources/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1750,186 +1900,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/07/04/2015-07-04_fastjson初始化对性能的影响/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Xie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Xie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2015/07/04/2015-07-04_fastjson初始化对性能的影响/" itemprop="url">fastjson初始化对性能的影响</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-07-04T00:00:00+08:00">
-                2015-07-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2015/07/04/2015-07-04_fastjson初始化对性能的影响/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/04/2015-07-04_fastjson初始化对性能的影响/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2015/07/04/2015-07-04_fastjson初始化对性能的影响/" class="leancloud_visitors" data-flag-title="fastjson初始化对性能的影响">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>之前在项目中序列化是用thrift，性能一般，而且需要用编译器生成新的类，在序列化和反序列化的时候感觉很繁琐，因此想转到json阵营。对比了jackson，gson等框架之后，决定用fastjson，为什么呢，因为看名字感觉很快。。。</p>
-<p>网上的说法：</p>
-<blockquote>
-<p>fastjson 是一个性能很好的 Java 语言实现的 JSON 解析器和生成器，来自阿里巴巴的工程师开发。</p>
-</blockquote>
-<blockquote>
-<p>主要特点：</p>
-<ul>
-<li>快速FAST (比其它任何基于Java的解析器和生成器更快，包括jackson）</li>
-<li>强大（支持普通JDK类包括任意Java Bean Class、Collection、Map、Date或enum）</li>
-<li>零依赖（没有依赖其它任何类库除了JDK）</li>
-</ul>
-</blockquote>
-<p>但是测试的结果让我大跌眼镜。</p>
-<p>Test Case: 对一个User类（空）的对象分别用java和fastjson序列化1000次，再反序列化1000次，计算时间。注： 测试不是非常严谨，只是做个简单的比较。</p>
-<p>Test Result： </p>
-<blockquote>
-<p>Type = java<br>Serialize cost = 27ms<br>Deserialize cost = 75ms</p>
-</blockquote>
-<p>
-
-<blockquote>
-<p>Type = fastjson<br>Serialize cost = 385ms<br>Deserialize cost = 84ms</p>
-</blockquote>
-</p><p>这是在逗我吗。。。</p>
-<p>经过同事提醒，看了源码发现fastjson在序列化时需要初始化SerializeConfig，反序列化时需要初始化ParserConfig。然后我在测试案例中加入这两句</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> ParserConfig pc = <span class="keyword">new</span> ParserConfig();  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> SerializeConfig sc = <span class="keyword">new</span> SerializeConfig();</span><br></pre></td></tr></table></figure>
-<p>果然快了很多，但仍旧不理想</p>
-<blockquote>
-<p>Type = fastjson<br>Serialize cost = 36ms<br>Deserialize cost = 42ms</p>
-</blockquote>
-<p>再继续看，发现还需要初始化writer和parser，所以改成这句</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JSON.parseObject(JSON.toJSONString(<span class="keyword">new</span> User()), User.class);</span><br></pre></td></tr></table></figure>
-<p>结果就很令人满意了</p>
-<blockquote>
-<p>Type = fastjson<br>Serialize cost = 15ms<br>Deserialize cost = 18ms</p>
-</blockquote>
-<p>结论： 如果你使用fastjson在一个短进程，换句话说只是少量的进行序列化反序列化，那么fastjson由于初始化需要的时间比较长，总体性能将会很糟糕。如果一定要用，有必要的话可以考虑手动进行初始化。</p>
-<p>另，补上测试代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">2513747641863637392L</span>;  </span><br><span class="line">  </span><br><span class="line">    User() &#123;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </span><br><span class="line"><span class="comment">//  public static ParserConfig pc = new ParserConfig();  </span></span><br><span class="line"><span class="comment">//  public static SerializeConfig sc = new SerializeConfig();  </span></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> UnknownHostException </span>&#123;  </span><br><span class="line"><span class="comment">//      JSON.parseObject(JSON.toJSONString(new User()), User.class);  </span></span><br><span class="line">        String type = <span class="string">"json"</span>;  </span><br><span class="line">        System.out.println(<span class="string">"Type = "</span> + type);  </span><br><span class="line">        <span class="keyword">long</span> start = <span class="keyword">new</span> Date().getTime();  </span><br><span class="line">        <span class="keyword">byte</span>[] b = serialize(<span class="keyword">new</span> User(), type);  </span><br><span class="line">        <span class="keyword">long</span> mid = <span class="keyword">new</span> Date().getTime();  </span><br><span class="line">        System.out.println(<span class="string">"Serialize cost = "</span> + (mid - start));  </span><br><span class="line">        deserialize(b, type);  </span><br><span class="line">        System.out.println(<span class="string">"Deserialize cost = "</span> + (<span class="keyword">new</span> Date().getTime() - mid));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] serialize(User user, String type) &#123;  </span><br><span class="line">        <span class="keyword">byte</span>[] b = <span class="keyword">null</span>;  </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) &#123;  </span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"java"</span>.equalsIgnoreCase(type)) &#123;  </span><br><span class="line">                b = javaSerialize(user);  </span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"json"</span>.equalsIgnoreCase(type)) &#123;  </span><br><span class="line">                b = jsonSerialize(user);  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> b;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> User <span class="title">deserialize</span><span class="params">(<span class="keyword">byte</span>[] b, String type)</span> </span>&#123;  </span><br><span class="line">        User user = <span class="keyword">null</span>;  </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) &#123;  </span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"java"</span>.equalsIgnoreCase(type)) &#123;  </span><br><span class="line">                user = javaDeserialize(b);  </span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"json"</span>.equalsIgnoreCase(type)) &#123;  </span><br><span class="line">                user = jsonDeserialize(b);  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> user;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] jsonSerialize(User user) &#123;  </span><br><span class="line">        <span class="keyword">return</span> JSON.toJSONString(user).getBytes();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> User <span class="title">jsonDeserialize</span><span class="params">(<span class="keyword">byte</span>[] b)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> JSON.parseObject(<span class="keyword">new</span> String(b), User.class);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] javaSerialize(User user) &#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            ByteArrayOutputStream out = <span class="keyword">new</span> ByteArrayOutputStream();  </span><br><span class="line">            ObjectOutputStream os = <span class="keyword">new</span> ObjectOutputStream(out);  </span><br><span class="line">            os.writeObject(user);  </span><br><span class="line">            <span class="keyword">return</span> out.toByteArray();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> SerializationException(e);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> User <span class="title">javaDeserialize</span><span class="params">(<span class="keyword">byte</span>[] b)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            ByteArrayInputStream in = <span class="keyword">new</span> ByteArrayInputStream(b);  </span><br><span class="line">            ObjectInputStream is = <span class="keyword">new</span> ObjectInputStream(in);  </span><br><span class="line">            <span class="keyword">return</span> (User) is.readObject();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> SerializationException(e);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1982,7 +1952,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

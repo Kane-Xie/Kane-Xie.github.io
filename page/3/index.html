@@ -274,6 +274,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2017/07/25/2017-07-25_Kafka Streams State Store/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Xie">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Xie">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/25/2017-07-25_Kafka Streams State Store/" itemprop="url">Kafka Streams State Store</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-25T00:00:00+08:00">
+                2017-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/25/2017-07-25_Kafka Streams State Store/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/25/2017-07-25_Kafka Streams State Store/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/07/25/2017-07-25_Kafka Streams State Store/" class="leancloud_visitors" data-flag-title="Kafka Streams State Store">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Kafka Streams默认使用RocksDB来存储状态</p>
+<div class="note info"><h2>In-memory or persistent ?</h2></div>
+
+<p>状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor API（low level）</p>
+<div class="note info"><h2>持久化</h2></div>
+
+<p>为了保存状态，RocksDB会把state store的内容flush到StreamsConfig.STATE_DIR_CONFIG指定的磁盘上</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.put(StreamsConfig.STATE_DIR_CONFIG, <span class="string">"my-state-store"</span>)</span><br></pre></td></tr></table></figure>
+<div class="note info"><h2>Changelog</h2></div>
+
+<p>出于灾备和扩展性的考虑，state store的内容同样会默认保存changelog到kafka的topic中，topic名字为<code>&lt;application_id&gt;-&lt;state_store_name&gt;-changelog</code>，你可以通过enableLogging和disableLogging来开启或关闭该功能</p>
+<p>如果task由于异常或宕机造成中断，在原来的机器或另一台机器重启之后，Kafka Streams能够优先通过重放changelog恢复state store的内容，而不是在新的task中创建新的state store，这是Kafka Streams状态安全性的保证</p>
+<p>如果在task运行过程中删除changelog对应的topic，Kafka Streams会在下一个checkpoint再次写入changelog，但如果在下个checkpoint之前task中断，state store的数据将无法恢复</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2017/07/23/2017-07-23_实时计算平台架构/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1720,158 +1873,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Xie">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Xie">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/" itemprop="url">影响单次poll返回最大数据量的几个因素</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-25T00:00:00+08:00">
-                2016-08-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/" class="leancloud_visitors" data-flag-title="影响单次poll返回最大数据量的几个因素">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <div class="note info"><h2>timeout</h2></div>
-
-<p>单次poll最大等待时间，consumer.poll(1000)意味着在缓存中的数据被消费完之后，consumer会到broker中拉取数据，最多等待1000毫秒。很明显，timeout越大，单次poll返回的数据就越多。但前提是有足够多的数据可供消费，如果在1000毫秒内，consumer已经拿完所有能拿的数据，就会立即返回。</p>
-<div class="note info"><h2>max.poll.records</h2></div>
-
-<p>单次poll最大返回数据条数，默认值2,147,483,647。这应该不需要解释。</p>
-<div class="note info"><h2>receive.buffer.bytes</h2></div>
-
-<p>用于TCP读取数据的缓存（SO_RCVBUF）大小，默认值64k。之前做过小测试，发现消费10万条大小1k的数据，花费5秒左右，设置max.poll.records=1，理论上来说性能应该大大下降才对，但实际测试结果也在5秒左右。后来发现消费端有64k缓存，换句话说每次TCP请求会拿64条数据，因此虽然poll每次只拿一条数据，但也是从缓存中拿，拿64次才会真正发送一次TCP请求。而相对于1k大小数据的消费，TCP请求的开销可以忽略，因此消费时间差不多。当测试数据大小为1个字节时，TCP请求的开销就不能忽略了，而测试结果也证实，max.poll.records=1会使消费性能下降2/3。</p>
-<div class="note info"><h2>max.partition.fetch.bytes</h2></div>
-
-<p>单次poll对于每个partition最大返回数据量，默认值1M。如果消费的topic有3个partition，那么单次poll最多返回3M数据。但实际上发现单次poll一般都只返回1M的数据，而不是3M。检查数据的分布，也都分散在3个partition中。原因是consumer会启动3个fetcher分别到每个partition抓取数据，而考虑到性能问题，consumer会在fetch一个partition一定时间后才会fetch下一个partition，所以单次poll很可能只是在拿一个partition中的数据，所以返回1M数据。把测试时间延长之后发现，偶尔会有一次poll拿到2M数据，符合刚才的分析。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1924,7 +1925,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
