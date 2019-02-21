@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook 1234567891011121314public static void addShutdownHook(final Closeable closeable, final Boolean i">
+<meta name="description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook">
 <meta name="keywords" content="java,OOM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ShutdownHook没有移除导致内存泄漏">
 <meta property="og:url" content="http://kane-xie.github.io/2016/09/21/2016-09-21_ShutdownHook没有移除导致内存泄漏/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook 1234567891011121314public static void addShutdownHook(final Closeable closeable, final Boolean i">
+<meta property="og:description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.977Z">
+<meta property="og:updated_time" content="2019-02-21T03:18:46.167Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ShutdownHook没有移除导致内存泄漏">
-<meta name="twitter:description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook 1234567891011121314public static void addShutdownHook(final Closeable closeable, final Boolean i">
+<meta name="twitter:description" content="今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：  为了确保线程producer的connection断开，在线程里加了ShutdownHook">
 
 
 
@@ -365,9 +365,11 @@
       
         <p>今天做kafka高并发测试的时候发生内存泄漏，直接原因是producer关闭之后内存没有得到释放。根本原因是：</p>
 <ul>
-<li><p>为了确保线程producer的connection断开，在线程里加了ShutdownHook</p>
+<li>为了确保线程producer的connection断开，在线程里加了ShutdownHook</li>
+</ul>
+<a id="more"></a>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">addShutdownHook</span><span class="params">(<span class="keyword">final</span> Closeable closeable, <span class="keyword">final</span> Boolean isClosed)</span> </span>&#123;</span><br><span class="line">	Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread() &#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">if</span> (!isClosed.booleanValue()) &#123;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					closeable.close();</span><br><span class="line">				&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
+<ul>
 <li><p>在producer close之后，由于ShutdownHook里保存着producer的句柄（closeable），导致producer的内存没有办法被JVM回收，线程多了之后，导致OOM</p>
 </li>
 <li><p>解决办法是，在producer.close()之后，调用<code>Runtime.getRuntime().removeShutdownHook(shutdownHook);</code></p>

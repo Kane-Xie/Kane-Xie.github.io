@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="Kafka整个消息管道的默认口径是1M，换句话说，默认Producer只能向Kafka发送大小不超过1M的消息，Kafka内部也只能处理大小不超过1M的消息，Consumer也只能消费大小不超过1M的消息。 如果发送2M（为了方便计算，以下1M=1000K）大小的数据，client会报异常 1Exception in thread &amp;quot;main&amp;quot; java.util.concur">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.981Z">
+<meta property="og:updated_time" content="2019-02-21T03:18:22.259Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka收发oversize数据">
 <meta name="twitter:description" content="Kafka整个消息管道的默认口径是1M，换句话说，默认Producer只能向Kafka发送大小不超过1M的消息，Kafka内部也只能处理大小不超过1M的消息，Consumer也只能消费大小不超过1M的消息。 如果发送2M（为了方便计算，以下1M=1000K）大小的数据，client会报异常 1Exception in thread &amp;quot;main&amp;quot; java.util.concur">
@@ -366,6 +366,7 @@
         <p>Kafka整个消息管道的默认口径是1M，换句话说，默认Producer只能向Kafka发送大小不超过1M的消息，Kafka内部也只能处理大小不超过1M的消息，Consumer也只能消费大小不超过1M的消息。</p>
 <p>如果发送2M（为了方便计算，以下1M=1000K）大小的数据，client会报异常</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.util.concurrent.ExecutionException: org.apache.kafka.common.errors.RecordTooLargeException: The message is 2000037 bytes when serialized which is larger than the maximum request size you have configured with the max.request.size configuration.</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>根据提示，在Producer config中设置max.request.size为2M+（注意必须大于2M，因为消息本身的metadata也会占用空间，比如上文日志中，一条包含2M数据的消息的大小是2M+37 byte），但服务器返回异常</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.util.concurrent.ExecutionException: org.apache.kafka.common.errors.RecordTooLargeException: The request included a message larger than the max message size the server will accept.</span><br></pre></td></tr></table></figure>
 <p>服务器无法接收这么大的消息。那么修改Kafka的server.properties，添加message.max.bytes=2M，然后重启Kafka集群。发送成功。</p>

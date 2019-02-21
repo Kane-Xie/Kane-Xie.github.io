@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。 配置Kafka Brokers   创建kafka_server_jaas.conf，1234567KafkaServer &amp;#123;    org.apache.kafka.common.security.plain.PlainLoginModule required    username=&amp;quot;ad">
+<meta name="description" content="Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。 配置Kafka Brokers   创建kafka_server_jaas.conf">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka安全认证-SASL">
 <meta property="og:url" content="http://kane-xie.github.io/2016/07/02/2016-07-02_Kafka安全认证-SASL/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。 配置Kafka Brokers   创建kafka_server_jaas.conf，1234567KafkaServer &amp;#123;    org.apache.kafka.common.security.plain.PlainLoginModule required    username=&amp;quot;ad">
+<meta property="og:description" content="Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。 配置Kafka Brokers   创建kafka_server_jaas.conf">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.950Z">
+<meta property="og:updated_time" content="2019-02-21T03:20:38.215Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka安全认证-SASL">
-<meta name="twitter:description" content="Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。 配置Kafka Brokers   创建kafka_server_jaas.conf，1234567KafkaServer &amp;#123;    org.apache.kafka.common.security.plain.PlainLoginModule required    username=&amp;quot;ad">
+<meta name="twitter:description" content="Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。 配置Kafka Brokers   创建kafka_server_jaas.conf">
 
 
 
@@ -367,9 +367,10 @@
 <div class="note info"><h2>配置Kafka Brokers</h2></div>
 
 <ul>
-<li>创建kafka_server_jaas.conf，<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">KafkaServer &#123;</span><br><span class="line">    org.apache.kafka.common.security.plain.PlainLoginModule required</span><br><span class="line">    username=&quot;admin&quot;</span><br><span class="line">    password=&quot;admin-secret&quot;</span><br><span class="line">    user_admin=&quot;admin-secret&quot;</span><br><span class="line">    user_alice=&quot;alice-secret&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-</li>
+<li>创建kafka_server_jaas.conf</li>
 </ul>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">KafkaServer &#123;</span><br><span class="line">    org.apache.kafka.common.security.plain.PlainLoginModule required</span><br><span class="line">    username=&quot;admin&quot;</span><br><span class="line">    password=&quot;admin-secret&quot;</span><br><span class="line">    user_admin=&quot;admin-secret&quot;</span><br><span class="line">    user_alice=&quot;alice-secret&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>这里定义了两个用户，admin和alice。username和password用于集群内部通讯，即当前broker使用admin/admin-secret去连接别的broker。而user_userName=”password”定义了能够访问这个broker的用户及其密码。</p>
 <p>将kafka_server_jaas.conf拷贝到Kafka的所有broker上</p>
 <ul>

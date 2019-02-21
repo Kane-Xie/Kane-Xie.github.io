@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="问题发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失 原因SyslogUDPSource使用AdaptiveReceiveBufferSizePredictorFactory来处理buffer，理想的状况是buffer size会随着数据大小扩容，最大64k，但实际并没有。因为AdaptiveReceiveBufferSizePredictor">
+<meta name="description" content="问题发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失">
 <meta name="keywords" content="flume">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Flume数据截断问题">
 <meta property="og:url" content="http://kane-xie.github.io/2017/12/08/2017-12-08_Flume数据截断问题/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="问题发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失 原因SyslogUDPSource使用AdaptiveReceiveBufferSizePredictorFactory来处理buffer，理想的状况是buffer size会随着数据大小扩容，最大64k，但实际并没有。因为AdaptiveReceiveBufferSizePredictor">
+<meta property="og:description" content="问题发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.003Z">
+<meta property="og:updated_time" content="2019-02-21T03:16:11.671Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume数据截断问题">
-<meta name="twitter:description" content="问题发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失 原因SyslogUDPSource使用AdaptiveReceiveBufferSizePredictorFactory来处理buffer，理想的状况是buffer size会随着数据大小扩容，最大64k，但实际并没有。因为AdaptiveReceiveBufferSizePredictor">
+<meta name="twitter:description" content="问题发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失">
 
 
 
@@ -364,6 +364,7 @@
 
       
         <p><div class="note info"><h2>问题</h2></div><br>发送到SyslogUDPSource的单个请求数据大小超过2k的话会被截断，即只保留2k，其他数据丢失</p>
+<a id="more"></a>
 <p><div class="note info"><h2>原因</h2></div><br>SyslogUDPSource使用AdaptiveReceiveBufferSizePredictorFactory来处理buffer，理想的状况是buffer size会随着数据大小扩容，最大64k，但实际并没有。因为AdaptiveReceiveBufferSizePredictorFactory只针对NioDatagramWorker起作用，但SyslogUDPSource使用OioDatagramChannelFactory，buffer size永远是2k，超过就截断</p>
 <p><div class="note info"><h2>解决办法</h2></div><br>改用FixedReceiveBufferSizePredictorFactory，固定大小64k，解决</p>
 

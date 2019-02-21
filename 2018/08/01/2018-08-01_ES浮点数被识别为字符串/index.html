@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用IndexRequest.source(String source)来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内） 12IndexRe">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.016Z">
+<meta property="og:updated_time" content="2019-02-21T03:15:02.936Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES浮点数被识别为字符串">
 <meta name="twitter:description" content="最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用IndexRequest.source(String source)来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内） 12IndexRe">
@@ -365,6 +365,7 @@
       
         <p>最近准备把ES的版本从5.1.2升到6.2.4，将Kafka的数据写入ES的工具类ESPersistor需要进行相应api的调整。在5.1.2的java api中，使用<code>IndexRequest.source(String source)</code>来设置要写入的json字符串，但在6.2.4中这个函数已经被移除，可选的替代者有以下几种（source的重载函数还有很多，但这里不在讨论范围内）</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IndexRequest.source(String source, XContentType xContentType)</span><br><span class="line">IndexRequest.source(Map source, XContentType contentType)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>第一种写法没有问题，指定XContentType.JSON就和之前版本的写入效果完全一样</p>
 <p>第二种写法就发生了比较诡异的现象，假如json字符串中有值为浮点数，比如{“value”: 0.1}，写入ES之后类型并不是float，而是text。假如字段value之前并不存在，那么ES会自动创建类型为text的字段value，后续就没办法对value做数值类型的计算了。那么为什么浮点类型会被认为是字符串呢？看代码</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> IndexRequest <span class="title">source</span><span class="params">(Map source, XContentType contentType)</span> <span class="keyword">throws</span> ElasticsearchGenerationException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        XContentBuilder builder = XContentFactory.contentBuilder(contentType);</span><br><span class="line">        builder.map(source);</span><br><span class="line">        <span class="keyword">return</span> source(builder);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ElasticsearchGenerationException(<span class="string">"Failed to generate ["</span> + source + <span class="string">"]"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="最近尝试用Proguard来混淆代码，以增加发布出去的代码安全性。今天运行混淆后的jar包发生如下异常 12345Caused by: org.springframework.beans.factory.BeanCreationException: Could not autowire field: public abc.service.Service test.rest.controller.C">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.923Z">
+<meta property="og:updated_time" content="2019-02-21T03:23:00.651Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Proguard混淆代码导致Spring自动装配失败">
 <meta name="twitter:description" content="最近尝试用Proguard来混淆代码，以增加发布出去的代码安全性。今天运行混淆后的jar包发生如下异常 12345Caused by: org.springframework.beans.factory.BeanCreationException: Could not autowire field: public abc.service.Service test.rest.controller.C">
@@ -365,6 +365,7 @@
       
         <p>最近尝试用Proguard来混淆代码，以增加发布出去的代码安全性。今天运行混淆后的jar包发生如下异常</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Could not autowire field: public abc.service.Service test.rest.controller.Controller.service; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [abc.service.Service] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: &#123;@org.springframework.beans.factory.annotation.Autowired(required=true)&#125;</span><br><span class="line">at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:561)</span><br><span class="line">at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88)</span><br><span class="line">at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:331)</span><br><span class="line">... 26 more</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>程序很简单，接口</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Service</span> </span>&#123;  </span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>实现类使用@Component标签实例化到spring容器中</p>

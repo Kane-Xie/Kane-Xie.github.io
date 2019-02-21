@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:  安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作  更新Kafka 1.0">
+<meta name="description" content="最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:  安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka从0.10.1升级到1.0.0">
 <meta property="og:url" content="http://kane-xie.github.io/2018/01/30/2018-01-30_Kafka从0.10.1升级到1.0.0/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:  安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作  更新Kafka 1.0">
+<meta property="og:description" content="最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:  安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.008Z">
+<meta property="og:updated_time" content="2019-02-21T03:15:56.315Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka从0.10.1升级到1.0.0">
-<meta name="twitter:description" content="最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:  安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作  更新Kafka 1.0">
+<meta name="twitter:description" content="最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:  安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作">
 
 
 
@@ -365,10 +365,11 @@
       
         <p>最近要把Kafka集群从0.10.1.1升级到1.0.0，主要是为了使用新的ProducerRecord和ConsumerRecord中的Header来保存和传输一些metadata，要求升级过程中不能服务不能中断，所以不考虑整体停机升级的方案，升级过程如下:</p>
 <ul>
-<li><p>安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作</p>
-</li>
-<li><p>更新Kafka 1.0的server.properties，添加以下配置</p>
-</li>
+<li>安装Kafka1.0，安装方法略，注意这里只是安装新版本Kafka，但并不启动，旧版本的Kafka保持正常工作</li>
+</ul>
+<a id="more"></a>
+<ul>
+<li>更新Kafka 1.0的server.properties，添加以下配置</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">inter.broker.protocol.version=0.10.1</span><br><span class="line">log.message.format.version=0.10.1</span><br></pre></td></tr></table></figure>
 <p><code>inter.broker.protocol.version</code>用于指定broker之间的通信协议版本，默认是和当前Kafka版本一致，即新版本中inter.broker.protocol.version为1.0。如果使用默认值，在轮询重启过程中，先重启的Broker将尝试使用1.0的协议与其他未重启的broker通信，由于未重启的broker仍旧是0.10.1版本，并不支持1.0的协议，会导致server.log中频繁报错，新版本broker上的partition无法被加回到ISR中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[2018-01-30 11:19:14,020] INFO [ReplicaFetcher replicaId=81, leaderId=83, fetcherId=0] Retrying leaderEpoch request for partition test_kane-2 as the leader reported an error: UNKNOWN_SERVER_ERROR (kafka.server.ReplicaFetcherThread)</span><br></pre></td></tr></table></figure></p>

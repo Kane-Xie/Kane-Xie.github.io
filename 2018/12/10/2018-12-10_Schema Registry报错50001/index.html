@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}  今天被这个异常搞得很头大，创建/更新/删除schema的时候都报50001错误，官方文档上是这么写的Error code 50001 – Error in the backend datastore">
+<meta name="description" content="{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}">
 <meta name="keywords" content="kafka,schemaregistry">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Schema Registry报错50001">
 <meta property="og:url" content="http://kane-xie.github.io/2018/12/10/2018-12-10_Schema Registry报错50001/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}  今天被这个异常搞得很头大，创建/更新/删除schema的时候都报50001错误，官方文档上是这么写的Error code 50001 – Error in the backend datastore">
+<meta property="og:description" content="{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.024Z">
+<meta property="og:updated_time" content="2019-02-21T03:14:08.143Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Schema Registry报错50001">
-<meta name="twitter:description" content="{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}  今天被这个异常搞得很头大，创建/更新/删除schema的时候都报50001错误，官方文档上是这么写的Error code 50001 – Error in the backend datastore">
+<meta name="twitter:description" content="{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}">
 
 
 
@@ -366,6 +366,7 @@
         <blockquote>
 <p>{“error_code”:50001,”message”:”Register schema operation failed while writing to the Kafka store”}</p>
 </blockquote>
+<a id="more"></a>
 <p>今天被这个异常搞得很头大，创建/更新/删除schema的时候都报50001错误，官方文档上是这么写的<code>Error code 50001 – Error in the backend datastore</code>，应该是访问后端存储，也就是kafka的_schema这个topic失败，具体失败的原因不清楚，所以看看schema registry的日志，然后。。日志里没有错误。。。再看下kafka日志。。也没有错误。。。</p>
 <p>搜了一下，github有人提了个issue说是message size过大，调整producer的max.request.size和topic level的message.max.bytes和replica.fetch.max.bytes就好了，但理论上我们应该没有哪个schema会超过1M，一般都不会超过100个字段，但还是调整参数试了一下，没用。。。</p>
 <p>没办法只能看源码了，然后发现源码里不！打！印！错！误！日！志！只是封装了Exception的基本信息（Error in the backend datastore。。。）和Error Code返回给客户端，然后详细错误信息。。吞了。。。牛X。。</p>

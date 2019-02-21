@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法 Rollover API的原理与之前一篇文章实时场景中Elasticsearch冷热索引分离中提到了index拆分是一样的，即">
+<meta name="description" content="Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法">
 <meta name="keywords" content="elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES Rollover Index">
 <meta property="og:url" content="http://kane-xie.github.io/2017/11/01/2017-11-01_ES Rollover Index/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法 Rollover API的原理与之前一篇文章实时场景中Elasticsearch冷热索引分离中提到了index拆分是一样的，即">
+<meta property="og:description" content="Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.002Z">
+<meta property="og:updated_time" content="2019-02-21T03:16:15.800Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES Rollover Index">
-<meta name="twitter:description" content="Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法 Rollover API的原理与之前一篇文章实时场景中Elasticsearch冷热索引分离中提到了index拆分是一样的，即">
+<meta name="twitter:description" content="Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法">
 <meta name="twitter:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
 
 
@@ -366,6 +366,7 @@
 
       
         <p>Elasticsearch的TTL已经在5.0之后废除，它的原理是定时标记过期数据，然后从index中删除并执行merge，这个操作的开销是很大的，这就是TTL被废除的原因。作为替代，5.0之后加入了Rollover API，我们可以基于这个功能在某种程度上实现TTL语法</p>
+<a id="more"></a>
 <p>Rollover API的原理与之前一篇文章<a href="http://kane-xie.github.io/pages/2017-09-24_0.html">实时场景中Elasticsearch冷热索引分离</a>中提到了<code>index拆分</code>是一样的，即当index的大小或者有效期（当前时间-创建时间）超过一定阈值时，滚动创建一个新的index</p>
 <p>Rollover API接受一个<code>alias name</code>和一个<code>conditions</code>列表作为参数。参数中的alias必须指向且只指向一个index。当index满足参数中指定的conditions中的任意一个时，ES会创建一个新的index并且将alias转而指向它，这里借用一张老图</p>
 <p><img src="/attachment/20170924/es_alias.png" alt="alias"></p>

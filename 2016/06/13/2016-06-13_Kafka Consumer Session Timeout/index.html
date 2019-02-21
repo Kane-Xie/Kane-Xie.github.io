@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="在kafka client（consumer）的log中看到这样的异常： 12[13/06/16 16:01:26:153 PM CST] 550 ERROR ConsumerCoordinator: Error ILLEGAL_GENERATION occurred while committing offsets for group group7`[13/06/16 16:01:26:154">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.943Z">
+<meta property="og:updated_time" content="2019-02-21T03:21:07.479Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka Consumer Session Timeout">
 <meta name="twitter:description" content="在kafka client（consumer）的log中看到这样的异常： 12[13/06/16 16:01:26:153 PM CST] 550 ERROR ConsumerCoordinator: Error ILLEGAL_GENERATION occurred while committing offsets for group group7`[13/06/16 16:01:26:154">
@@ -365,6 +365,7 @@
       
         <p>在kafka client（consumer）的log中看到这样的异常：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[13/06/16 16:01:26:153 PM CST] 550 ERROR ConsumerCoordinator: Error ILLEGAL_GENERATION occurred while committing offsets for group group7</span><br><span class="line">`[13/06/16 16:01:26:154 PM CST] 424  WARN ConsumerCoordinator: Auto offset commit failed: Commit cannot be completed due to group rebalance</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>检查server端的log</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2016-06-13 04:01:16,458] INFO [GroupCoordinator 1]: Preparing to restabilize group group7 with old generation 0 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:16,458] INFO [GroupCoordinator 1]: Stabilized group group7 generation 1 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:16,462] INFO [GroupCoordinator 1]: Assignment received from leader for group group7 for generation 1 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:46,469] INFO [GroupCoordinator 1]: Preparing to restabilize group group7 with old generation 1 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:46,470] INFO [GroupCoordinator 1]: Group group7 generation 1 is dead and removed (kafka.coordinator.GroupCoordinator)</span><br></pre></td></tr></table></figure>
 <p>Kafka consumer group有generation（代）的概念，一个group开始消费之后，被标记为G代，由于一些原因，G代过期，该group被标记为G+1代，这时如果G代的group尝试commit offset，就会发生本文开头出现的错误。</p>

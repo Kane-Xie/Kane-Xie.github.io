@@ -365,19 +365,18 @@
 
       
         
-          
-            <blockquote>
+          <blockquote>
 <p>最近在做一个spark项目，顺便分享一下我的scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍scala的函数定义。</p>
 </blockquote>
-<p>国际惯例，先来一段HelloWorld</p>
+<p>按惯例，先来一段HelloWorld</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">TestScala1</span> </span>&#123;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    <span class="keyword">val</span> s = <span class="string">"Hello World!"</span>;  </span><br><span class="line">    show(s);  </span><br><span class="line">  &#125;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">show</span></span>(s: <span class="type">String</span>): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    println(s)  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>函数的定义需要关键字def，组成部分有函数名（main），参数名称(args)， 参数类型(Array[String])，返回类型(Unit)，大括号内是函数体。</p>
-<p>函数一般都会有返回内容，Unit为空返回值。Unit可以省略。实际上在接触scala时间长了之后你会发现，Scala是一门“能省则省”的语言。比如说每行语句末尾的分号，其实是可写可不写，或者准确的说，Scala是不推荐写分号的，因为没有意义，只是凭空增加了多敲一个键的负担（仁者见仁智者见智）。</p>
-<p>和Java一样，main函数是程序的主入口，但不同的是，Java的main函数是一个类中的静态函数，但Scala的类中并没有静态函数，所以引入object来持有静态函数。所以请注意我们定义的TestScala1是一个object而不是class。</p>
-<p>在main函数中我们首先声明一个变量s，val代表常量，var代表变量。由于Scala实现了类型推导，因此不需要声明对象的类型。</p>
-<p>然后把s传递给函数show，函数的调用与Java类似，但如果函数没有参数的话，调用时可以省略括号（能省则省。。）</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/08/26/2015-08-26_Scala入门（一） - 函数定义/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -515,21 +514,15 @@
 
       
         
-          
-            <p>在本地提交一个spark job，出现如下错误</p>
+          <p>在本地提交一个spark job，出现如下错误</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WARN TaskSchedulerImpl: Initial job has not accepted any resources; check your cluster UI to ensure that workers are registered and have sufficient memory</span><br></pre></td></tr></table></figure>
-<p>在网上搜了一下，出现这种错误一般有两种原因，</p>
-<ol>
-<li>内存不足。</li>
-<li>主机名和IP配置不正确。</li>
-</ol>
-<p>检查了一下，我只是跑一个简单的测试程序，内存是完全够用的，我也在spark web console上确认了内存是足够的。</p>
-<p>为了确认主机名和IP的问题，我把SparkContext的内容打印了出来</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spark.app.id=app-20150806145030-0003</span><br><span class="line">spark.app.name=Simple Application</span><br><span class="line">spark.cores.max=5</span><br><span class="line">spark.driver.host=192.168.56.1</span><br><span class="line">spark.driver.port=61685</span><br><span class="line">……</span><br></pre></td></tr></table></figure>
-<p>这里显示我的IP是192.168.56.1，但实际上这是我的windows虚拟机的IP地址，而我本机的IP地址是192.168.100.151.</p>
-<p>在提交spark job之后，server端需要反馈进度给driver host，所以反馈消息被发送到了虚拟机上而本机并没有收到，导致这个异常的发生。所以如果你的机器上装有虚拟机，在运行spark程序之前，最好用ifconfig <interface> down把虚拟机网卡关掉。</interface></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/08/06/2015-08-06_spark WARN TaskSchedulerImpl： Initial job has not accepted any resources/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -667,52 +660,14 @@
 
       
         
-          
-            <p>开发 -&gt; 测试 -&gt; 部署，这是软件开发一般的简化流程，作为开发者我们总是希望能专注于开发，但往往会被一些开发之外的问题所折磨，比如繁多的spring依赖和不同的环境配置。带着这个问题，本文介绍运用springboot和docker开发和构建一个rest风格的web应用。</p>
-<blockquote>
-<p>Spring 框架作为目前非常流行的一个 Java 应用开发框架，它包含几十个不同的子项目，涵盖应用开发的不同方面。要在这些子项目之间进行选择，并快速搭建一个可以运行的应用是比较困难的事情。Spring Boot 的目的在于快速创建可以独立运行的 Spring 应用，大大提升使用 Spring 框架时的开发效率。</p>
-</blockquote>
-<p>对于我们的web应用来说，springboot相当于把web服务器嵌入发布包内，以少量的配置大大方便了程序的开发和发布。我们可以专注于项目本身，创建独立的Java应用，通过java -jar启动。</p>
-<div class="note info"><h2>添加Spring Boot相关POM配置</h2></div>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.5.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>我们只需要将spring-boot-starter-web的依赖加入到pom文件即可，它提供了对web的支持。当然也有很多推荐让其作为parent加载，但这样会引入很多不必要的jar包。</p>
-<div class="note info"><h2>Controller</h2></div>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableAutoConfiguration</span>  </span><br><span class="line"><span class="meta">@RestController</span>  </span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/person"</span>)  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Controller</span> </span>&#123;  </span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/&#123;name&#125;"</span>)  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Properties <span class="title">getPersion</span><span class="params">(@PathVariable(<span class="string">"name"</span>)</span> String name) </span>&#123;  </span><br><span class="line">        Properties p = <span class="keyword">new</span> Properties();  </span><br><span class="line">        p.put(<span class="string">"name"</span>, name);  </span><br><span class="line">        p.put(<span class="string">"age"</span>, <span class="keyword">new</span> Random().nextInt(<span class="number">100</span>));  </span><br><span class="line">        <span class="keyword">return</span> p;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        SpringApplication.run(Controller.class);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>@EnableAutoConfiguration的作用在于让 Spring Boot 根据应用所声明的依赖来对 Spring 框架进行自动配置，这就减少了开发人员的工作量。比如说我们可以加入下面这段代码来制定contextpath和port。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>  </span><br><span class="line"><span class="function"><span class="keyword">public</span> EmbeddedServletContainerFactory <span class="title">servletContainer</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  TomcatEmbeddedServletContainerFactory factory = <span class="keyword">new</span> TomcatEmbeddedServletContainerFactory(<span class="string">"/admin"</span>, <span class="number">8091</span>);  </span><br><span class="line">  <span class="keyword">return</span> factory;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这样一个rest风格的web应用就搭建完成，可以访问<a href="http://localhost:8091/admin/person/kane查看结果。" target="_blank" rel="noopener">http://localhost:8091/admin/person/kane查看结果。</a></p>
-<div class="note info"><h2>Package</h2></div>
-
-<p>注意如果想到将应用打成一个可执行jar包的话，一定要用spring-boot-maven-plugin而不是其他的类似于maven-shade-plugin的插件。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.5.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">executions</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">execution</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">goals</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>repackage<span class="tag">&lt;/<span class="name">goal</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;/<span class="name">goals</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">executions</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span>test.controller.Controller<span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>直接用java -jar &lt;jar_name&gt;即可启动web应用。</p>
-<div class="note info"><h2>Docker安装和运行</h2></div>
-
-<blockquote>
-<p>Docker 是一个构建、部署以及运行应用的开放平台，应用可以在不同的环境（开发、测试、生产）中无差别的运行，为应用的开发提供了很大的灵活性。</p>
-</blockquote>
-<p>把可执行的jar包放入docker容器中，我们可以忽略所要部署的环境的差异性，而不需要关心环境配置。</p>
-<p>Docker的安装和入门教程，推荐<a href="http://www.widuu.com/chinese_docker/userguide/dockerrepos.html" target="_blank" rel="noopener">http://www.widuu.com/chinese_docker/userguide/dockerrepos.html</a>，这里只是介绍最简单的流程。</p>
-<ul>
-<li>对于ubuntu，可以用以下命令安装</li>
-</ul>
-<p><code>$ sudo apt-get update</code><br><br><code>$ sudo apt-get install docker.io</code><br><br><code>$ sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker</code><br><br><code>$ sudo sed -i &#39;$acomplete -F _docker docker&#39; /etc/bash_completion.d/docker.io</code><br></p>
-<ul>
-<li>选择一个java docker image，我使用java：7</li>
-</ul>
-<p><code>sudo docker pull java:7</code></p>
-<ul>
-<li>假设我们的可运行jar包放在/tmp目录下，那么可以通过以下命令在docker容器中运行。</li>
-</ul>
-<p><code>sudo docker run -d -v /tmp:/tmp java:7 java -jar /tmp/&amp;lt;jar_name&amp;gt;</code></p>
-<p>这个命令使用java:7这个镜像创建一个container，并在后台执行java -jar &lt;jar_name&gt;。-d表示后台运行，-v表示目录映射，可以简单理解为ln -s。</p>
-<ul>
-<li>docker container启动起来之后,可以使用sudo docker ps命令查看该进程的端口映射，比如0.0.0.0:49155-&gt;8091/tcp，它表示将docker容器8091端口映射到容器宿主的49155端口，所以我们可以通过http://&lt;hostname&gt;:49155/admin/person/kane访问前文中的web应用。</li>
-</ul>
-
-          
+          <p>开发 -&gt; 测试 -&gt; 部署，这是软件开发一般的简化流程，作为开发者我们总是希望能专注于开发，但往往会被一些开发之外的问题所折磨，比如繁多的spring依赖和不同的环境配置。带着这个问题，本文介绍运用springboot和docker开发和构建一个rest风格的web应用。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/08/05/2015-08-05_rest service + spring boot + docker/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -850,26 +805,19 @@
 
       
         
-          
-            <p>在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单</p>
+          <p>在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单</p>
 <p><code>bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &lt;group&gt;</code></p>
 <p>输出结果类似于</p>
 <blockquote>
 <p>Group Topic Pid Offset logSize Lag Owner<br>Group1 a.topic 0 2 2 0 none<br>Group1 a.topic 1 0 0 0 none<br>Group1 a.topic 2 2 2 0 none</p>
 </blockquote>
-<p>我们也可以通过kafka web console一类的工具直观地获取kafka信息，但如果我们要构建自己的监控系统，需要抓取这些信息的话，有两种办法：一种是运行ConsumerOffsetChecker然后解析输出的字符串；另一种就是通过SimpleConsumer和Zookeeper实时抓取信息（换句话说就是把ConsumerOffsetChecker翻译一下：）），以下介绍第二种方法的思路。</p>
-<p>首先我们看kafka信息在zookeeper的存储结构</p>
-<blockquote>
-<p>1，/brokers/topics/[topic]/partitions/[partitionId]/state<br>2，/brokers/ids/[0…N]<br>3，/consumers/[groupId]/ids/[consumerId]<br>4，/consumers/[groupId]/owners/[topic]/[partitionId]<br>5，/consumers/[groupId]/offsets/[topic]/[partitionId]</p>
-</blockquote>
-<p>对于指定的topic和groupid，通过(1)可以拿到所有的partition信息（Pid），然后通过(5)可以拿到offset，通过(4)可以拿到owner。就差logsize还没法拿到，事实上logsize在zookeeper中并没有记录，它必须通过kafka consumer的low level的api取得。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Long <span class="title">getLogSize</span><span class="params">(String topicName, String partitionId, <span class="keyword">long</span> offsetRequestTime)</span> </span>&#123;  </span><br><span class="line">    SimpleConsumer consumer = <span class="keyword">new</span> SimpleConsumer(server, port, <span class="number">10000</span>, <span class="number">1024000</span>, <span class="string">"ConsumerOffsetChecker"</span>);  </span><br><span class="line">    Long logSize = <span class="keyword">null</span>;  </span><br><span class="line">    TopicAndPartition topicAndPartition = <span class="keyword">new</span> TopicAndPartition(topicName, Integer.parseInt(partitionId));  </span><br><span class="line">    Map&lt;TopicAndPartition, PartitionOffsetRequestInfo&gt; map = <span class="keyword">new</span> HashMap&lt;TopicAndPartition, PartitionOffsetRequestInfo&gt;();  </span><br><span class="line">    map.put(topicAndPartition, <span class="keyword">new</span> PartitionOffsetRequestInfo(offsetRequestTime, <span class="number">1</span>));  </span><br><span class="line">    OffsetRequest request = <span class="keyword">new</span> OffsetRequest(map, kafka.api.OffsetRequest.CurrentVersion(), kafka.api.OffsetRequest.DefaultClientId());  </span><br><span class="line">    OffsetResponse response = consumer.getOffsetsBefore(request);  </span><br><span class="line">    <span class="keyword">long</span>[] aa = response.offsets(topicName, Integer.parseInt(partitionId));  </span><br><span class="line">    <span class="keyword">if</span> (aa.length != <span class="number">0</span>) &#123;  </span><br><span class="line">        logSize = aa[<span class="number">0</span>];  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> logSize;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>第二行，创建simple consumer</p>
-<p>第四行，创建topic和partition对象</p>
-<p>第六行，创建offset request，第一个参数是记录写入的时间，如果是kafka.api.OffsetRequest.EarliestTime()，则代表当前最早的一条记录，也就是当前最小offset；如果是kafka.api.OffsetRequest.LatestTime()，则代表最新的一条记录，也就是当前最大offset。第二个参数是获取offset的个数。</p>
-<p>由max offset和current offset，我们可以获得当前还有多少消息没有被消费（lag），由（lag/（maxoffset-minoffset）），我们可以算出当前还没有被消费的消息占的百分比，如果这个百分比接近100%，那么接下来很可能会导致offset out of range exception而丢失数据。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/28/2015-07-28_kafka实时监控/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1007,8 +955,7 @@
 
       
         
-          
-            <p>在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。</p>
+          <p>在上一篇关于Hbase Rest API的文章中介绍了如何查询数据，本章将介绍其Hbase Admin的功能。</p>
 <div class="note info"><h2>查询软件版本</h2></div>
 
 <p>语法：<code>GET /version</code></p>
@@ -1017,53 +964,13 @@
 <blockquote>
 <p>{“@Stargate”:”0.0.1”,”@OS”:”Linux 2.6.18-128.1.6.el5.centos.plusxen amd64”,”@<br>JVM”:”Sun Microsystems Inc. 1.6.0_13-11.3-b02”,”@Jetty”:”6.1.14”,”@Jersey”:”1<br>.1.0-ea”}</p>
 </blockquote>
-<div class="note info"><h2>查询hbase集群版本</h2></div>
-
-<p>语法：<code>GET /version/cluster</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/version/cluster</code></p>
-<p>输出结果：</p>
-<blockquote>
-<p>“0.20.0”</p>
-</blockquote>
-<p>相当于HBaseAdmin.getClusterStatus().getHBaseVersion()</p>
-<div class="note info"><h2>查询hbase集群状态</h2></div>
-
-<p>语法：<code>GET /status/cluster</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/status/cluster</code></p>
-<p>相当于HBaseAdmin.getClusterStatus()</p>
-<div class="note info"><h2>列出所有hbase表</h2></div>
-
-<p>语法：<code>GET /</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/</code></p>
-<p>输出结果：</p>
-<blockquote>
-<p>{“table”:[{“name”:”table1”},{“name”:”table2”}]}</p>
-</blockquote>
-<p>相当于HBaseAdmin.listTableNames()</p>
-<div class="note info"><h2>查询hbase表结构</h2></div>
-
-<p>语法：<code>GET /&amp;lt;table&amp;gt;/schema</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table1/schema</code></p>
-<p>输出结果：</p>
-<blockquote>
-<p>{ NAME=&gt; ‘table1’, IS_META =&gt; ‘false’, COLUMNS =&gt; [ { NAME =&gt; ‘C’, DATA_BLOCK_ENCODING =&gt; ‘NONE’, BLOOMFILTER =&gt; ‘ROW’, REPLICATION_SCOPE =&gt; ‘0’, VERSIONS =&gt; ‘1’, COMPRESSION =&gt; ‘NONE’, MIN_VERSIONS =&gt; ‘0’, TTL =&gt; ‘2147483647’, KEEP_DELETED_CELLS =&gt; ‘FALSE’, BLOCKSIZE =&gt; ‘65536’, IN_MEMORY =&gt; ‘false’, BLOCKCACHE =&gt; ‘true’ }, { NAME =&gt; ‘M’, DATA_BLOCK_ENCODING =&gt; ‘NONE’, BLOOMFILTER =&gt; ‘ROW’, REPLICATION_SCOPE =&gt; ‘0’, VERSIONS =&gt; ‘1’, COMPRESSION =&gt; ‘NONE’, MIN_VERSIONS =&gt; ‘0’, TTL =&gt; ‘2147483647’, KEEP_DELETED_CELLS =&gt; ‘FALSE’, BLOCKSIZE =&gt; ‘65536’, IN_MEMORY =&gt; ‘false’, BLOCKCACHE =&gt; ‘true’ } ] }</p>
-</blockquote>
-<p>相当于HBaseAdmin.getTableDescriptor(TableName.valueOf(“table1”))</p>
-<div class="note info"><h2>新建表或者更新表结构</h2></div>
-
-<p>语法:<br><code>PUT /&amp;lt;table&amp;gt;/schema</code><br><code>POST /&amp;lt;table&amp;gt;/schema</code></p>
-<p>PUT完全替换表结构，POST只是更新或者新增column family（跟本次更新无关的cf仍然保留）</p>
-<div class="note info"><h2>查询region信息</h2></div>
-
-<p>语法：<code>GET /&amp;lt;table&amp;gt;/regions</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table1/regions</code></p>
-<p>输出结果：</p>
-<blockquote>
-<p>pf_entity,,1436346991071.fce2165af7b49f1dd0995ddd535d3a6f. [<br>  id=1436346991071<br>  startKey=’’<br>  endKey=’’<br>  location=’bd02:21003’<br>]</p>
-</blockquote>
-<p>相当于HBaseAdmin.getTableRegions(TableName.valueOf(“table1”))</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/21/2015-07-21_Hbase Rest API ： Hbase管理/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1201,32 +1108,15 @@
 
       
         
-          
-            <p>在项目中碰到这样一个需求，对一个服务类的每一个方法，在方法开始和结束的时候分别记录一条日志，内容包括方法名，参数名+参数值以及方法执行的时间。</p>
+          <p>在项目中碰到这样一个需求，对一个服务类的每一个方法，在方法开始和结束的时候分别记录一条日志，内容包括方法名，参数名+参数值以及方法执行的时间。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  </span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">get</span><span class="params">(String key)</span> </span>&#123;  </span><br><span class="line"><span class="comment">//  long start = System.currentTimeMillis();  </span></span><br><span class="line"><span class="comment">//  System.out.println("Begin Method = get, Args = [key=" + key + "]");  </span></span><br><span class="line">    String value = props.getProperty(key);  </span><br><span class="line"><span class="comment">//  System.out.println("End Method = get, Args = [key=" + key + "], Cost=" + (System.currentTimeMillis() - start)+ "ms");  </span></span><br><span class="line">    <span class="keyword">return</span> value;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>以上注释的代码能够满足要求，但是如果类中的方法比较多得时候，会有大量的冗余代码，不利于维护。这个时候可以用AspectJ实现日志代码的嵌入，但是JointPoint只能拿到参数值，无法拿到参数名。因此考虑用Javasist在初始化的时候先把参数名保存到内存中。以下是代码：</p>
-<div class="note info"><h2>服务实现类（接口略）：</h2></div>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.Properties;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceImpl</span> <span class="keyword">implements</span> <span class="title">Service</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">get</span><span class="params">(String key)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> props.getProperty(key);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(String key, String value)</span> </span>&#123;  </span><br><span class="line">        props.put(key, value);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putAll</span><span class="params">(Properties props)</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">this</span>.props.putAll(props);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<div class="note info"><h2>Aspect类：</h2></div>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.Map;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> javassist.ClassClassPath;  </span><br><span class="line"><span class="keyword">import</span> javassist.ClassPool;  </span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;  </span><br><span class="line"><span class="keyword">import</span> javassist.CtMethod;  </span><br><span class="line"><span class="keyword">import</span> javassist.Modifier;  </span><br><span class="line"><span class="keyword">import</span> javassist.NotFoundException;  </span><br><span class="line"><span class="keyword">import</span> javassist.bytecode.CodeAttribute;  </span><br><span class="line"><span class="keyword">import</span> javassist.bytecode.LocalVariableAttribute;  </span><br><span class="line"><span class="keyword">import</span> javassist.bytecode.MethodInfo;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> org.apache.log4j.Logger;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Around;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;  </span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> com.google.common.collect.Maps;  </span><br><span class="line">  </span><br><span class="line"><span class="meta">@Aspect</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LogHelper</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">private</span> Logger logger = Logger.getLogger(ServiceImpl.class);  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String DELIMITER = <span class="string">" | "</span>;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, String[]&gt; paraMap = Maps.newHashMap();  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> NotFoundException </span>&#123;  </span><br><span class="line">        reflectGetParamName(ServiceImpl.class);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Pointcut</span>(<span class="string">"execution(* (test.*+).*(..))"</span>)  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aspectjMethod</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Around</span>(<span class="string">"aspectjMethod()"</span>)  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">around</span><span class="params">(ProceedingJoinPoint call)</span> <span class="keyword">throws</span> Throwable </span>&#123;  </span><br><span class="line">        <span class="keyword">long</span> startTime = System.nanoTime();  </span><br><span class="line">        String methodName = call.getSignature().getName();  </span><br><span class="line">        String className = call.getTarget().getClass().getSimpleName();  </span><br><span class="line">        Object[] args = call.getArgs();  </span><br><span class="line">        StringBuilder begin = <span class="keyword">new</span> StringBuilder(<span class="string">"Begin "</span>).append(<span class="string">"Method="</span>).append(methodName).append(<span class="string">", Args=["</span>)  </span><br><span class="line">                .append(argsToString(className, methodName, args)).append(<span class="string">"]"</span>);  </span><br><span class="line">        logger.info(begin);  </span><br><span class="line">  </span><br><span class="line">        Object result = call.proceed(args);  </span><br><span class="line">        <span class="keyword">long</span> costTime = (System.nanoTime() - startTime) / <span class="number">1000</span>;<span class="comment">// μs  </span></span><br><span class="line">        StringBuilder end = <span class="keyword">new</span> StringBuilder(<span class="string">"End "</span>).append(<span class="string">"Method="</span>).append(methodName).append(<span class="string">", Args=["</span>)  </span><br><span class="line">                .append(argsToString(className, methodName, args)).append(<span class="string">"], Cost="</span>).append(costTime).append(<span class="string">"μs"</span>);  </span><br><span class="line">        logger.info(end);  </span><br><span class="line">        <span class="keyword">return</span> result;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">argsToString</span><span class="params">(String className, String methodName, Object[] args)</span> </span>&#123;  </span><br><span class="line">        String[] paraNames = paraMap.get(className + methodName);  </span><br><span class="line">        <span class="keyword">boolean</span> appendParaName = <span class="keyword">true</span>;  </span><br><span class="line">        <span class="keyword">if</span> (paraNames == <span class="keyword">null</span> || paraNames.length != args.length) &#123;  </span><br><span class="line">            logger.warn(<span class="string">"Fail to get parameter(s)' name. ClassName = "</span> + className + <span class="string">", MethodName = "</span> + methodName  </span><br><span class="line">                    + <span class="string">", Expected ParaNum = "</span> + args.length);  </span><br><span class="line">            appendParaName = <span class="keyword">false</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();  </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; args.length; i++) &#123;  </span><br><span class="line">            Object obj = args[i];  </span><br><span class="line">            String paraName = paraNames[i];  </span><br><span class="line">            <span class="keyword">if</span> (sb.length() != <span class="number">0</span>) &#123;  </span><br><span class="line">                sb.append(DELIMITER);  </span><br><span class="line">            &#125;  </span><br><span class="line">            <span class="keyword">if</span> (appendParaName) &#123;  </span><br><span class="line">                sb.append(paraName).append(<span class="string">"="</span>);  </span><br><span class="line">            &#125;  </span><br><span class="line">            sb.append(String.valueOf(obj));  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> sb.toString();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">reflectGetParamName</span><span class="params">(Class&lt;?&gt; clazz)</span> <span class="keyword">throws</span> NotFoundException </span>&#123;  </span><br><span class="line">        ClassPool pool = ClassPool.getDefault();  </span><br><span class="line">        pool.insertClassPath(<span class="keyword">new</span> ClassClassPath(clazz));  </span><br><span class="line">        CtClass cc = pool.get(clazz.getName());  </span><br><span class="line">        <span class="keyword">for</span> (CtMethod cm : cc.getDeclaredMethods()) &#123;  </span><br><span class="line">            String methodName = cm.getName();  </span><br><span class="line">            <span class="comment">// 使用javaassist的反射方法获取方法的参数名  </span></span><br><span class="line">            MethodInfo methodInfo = cm.getMethodInfo();  </span><br><span class="line">            CodeAttribute codeAttribute = methodInfo.getCodeAttribute();  </span><br><span class="line">            LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute  </span><br><span class="line">                    .getAttribute(LocalVariableAttribute.tag);  </span><br><span class="line">            <span class="keyword">if</span> (attr == <span class="keyword">null</span>) &#123;  </span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> NotFoundException(<span class="string">"CodeAttribute Not Found. ClassName = "</span> + clazz.getName()  </span><br><span class="line">                        + <span class="string">", MethodName = "</span> + methodName);  </span><br><span class="line">            &#125;  </span><br><span class="line">            String[] paramNames = <span class="keyword">new</span> String[cm.getParameterTypes().length];  </span><br><span class="line">            <span class="keyword">int</span> pos = Modifier.isStatic(cm.getModifiers()) ? <span class="number">0</span> : <span class="number">1</span>;  </span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; paramNames.length; i++)  </span><br><span class="line">                paramNames[i] = attr.variableName(i + pos);  </span><br><span class="line">            paraMap.put(clazz.getSimpleName() + methodName, paramNames);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li>首先初始化的时候调用reflectGetParamName，运用反射获取所有方法的参数名，并保存到paraMap中。</li>
-<li>在方法执行的前后分别打印日志并计算执行时间，方法名和参数值从JoinPoint中获取，参数名从paraMap中获取</li>
-</ol>
-<div class="note info"><h2>配置文件applicationContext.xml：</h2></div>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>    </span><br><span class="line">    </span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span>    </span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd    </span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd    </span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"</span>&gt;</span>    </span><br><span class="line">               </span><br><span class="line">    <span class="comment">&lt;!-- 启用AspectJ对Annotation的支持 --&gt;</span>           </span><br><span class="line">    <span class="tag">&lt;<span class="name">aop:aspectj-autoproxy</span>/&gt;</span>                    </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"service"</span> <span class="attr">class</span>=<span class="string">"test.ServiceImpl"</span>/&gt;</span>    </span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"aspcejHandler"</span> <span class="attr">class</span>=<span class="string">"test.LogHelper"</span> <span class="attr">init-method</span>=<span class="string">"init"</span>/&gt;</span>    </span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<div class="note info"><h2>测试代码：</h2></div>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.Properties;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        ApplicationContext context = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"applicationContext.xml"</span>);  </span><br><span class="line">        Service service = (Service) context.getBean(<span class="string">"service"</span>);  </span><br><span class="line">        service.put(<span class="string">"1"</span>, <span class="string">"one"</span>);  </span><br><span class="line">        service.putAll(<span class="keyword">new</span> Properties());  </span><br><span class="line">        System.out.println(service.get(<span class="string">"1"</span>));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><div class="note info"><h2>测试结果：</h2></div></p>
-<blockquote>
-<p>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=put, Args=[key=1 | value=one]<br>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=put, Args=[key=1 | value=one], Cost=1539μs<br>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=putAll, Args=[props={}]<br>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=putAll, Args=[props={}], Cost=148μs<br>15/07/16 10:19:38 INFO test.ServiceImpl: Begin Method=get, Args=[key=1]<br>15/07/16 10:19:38 INFO test.ServiceImpl: End Method=get, Args=[key=1], Cost=86μs</p>
-</blockquote>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/16/2015-07-16_AspectJ+Javasist记录日志/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1364,59 +1254,16 @@
 
       
         
-          
-            <p>hbase（hadoop）是用java编写的，有些语言（例如python）能够对它提供良好的支持，但也有很多语言使用起来并不是那么方便，比如c#只能通过thrift访问。Rest就能很好的解决这个问题。Hbase的org.apache.hadoop.hbase.rest包提供了rest接口，它内嵌了jetty作为servlet容器。</p>
+          <p>hbase（hadoop）是用java编写的，有些语言（例如python）能够对它提供良好的支持，但也有很多语言使用起来并不是那么方便，比如c#只能通过thrift访问。Rest就能很好的解决这个问题。Hbase的org.apache.hadoop.hbase.rest包提供了rest接口，它内嵌了jetty作为servlet容器。</p>
 <p>启动命令：./bin/hbase rest start -p &lt;port&gt;</p>
 <p>默认端口8080.</p>
-<p>以下介绍如何使用rest api查询hbase数据。</p>
-<div class="note info"><h2>rowkey查询</h2></div>
-
-<ul>
-<li>单值查询。</li>
-</ul>
-<p>只查询单个column family或column。</p>
-<p>语法：<code>GET /&amp;lt;table&amp;gt;/&amp;lt;row&amp;gt;/&amp;lt;column&amp;gt;(:&amp;lt;qualifier&amp;gt; )?(/&amp;lt;timestamp&amp;gt;)?</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table/key/cf:raw</code></p>
-<p>在测试中我发现加入&lt;timestamp&gt;参数之后就找不到数据了，不知道是不是bug</p>
-<ul>
-<li>多值查询。</li>
-</ul>
-<p>查询多个column family或column。</p>
-<p>语法：<code>GET /&amp;lt;table&amp;gt;/&amp;lt;row&amp;gt; ( / ( &amp;lt;column&amp;gt; ( : &amp;lt;qualifier&amp;gt; )? ( , &amp;lt;column&amp;gt; ( : &amp;lt;qualifier&amp;gt; )? )+ )?( / ( &amp;lt;start-timestamp&amp;gt; &#39;,&#39; )? &amp;lt;end-timestamp&amp;gt; )? )?( ?v= &amp;lt;num-versions&amp;gt; )?</code></p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot;  http://localhost:8000/table1/key1/cf1:q1,cf2/1436350580000,1436350590000/3</code></p>
-<p>可以通过timestamp过滤查询结果，也可以通过&lt;num-versions&gt;设定返回的最大版本数</p>
-<div class="note info"><h2>通配符查询</h2></div>
-
-<p>在rowkey后添加*号，可以返回以该rowkey为前缀的所有记录，如果以*号为rowkey来查询，则返回该table中所有的记录。</p>
-<p>范例：<code>curl -H &quot;Accept: application/json&quot; http://localhost:8000/table/keyprefix*/cf</code></p>
-<ul>
-<li>key list查询</li>
-</ul>
-<p>据我所知，暂不支持该功能，只能对循环key list对每个key做查询。</p>
-<ul>
-<li>key范围查询</li>
-</ul>
-<p><strong>有状态scanner</strong></p>
-<p>首先在server端创建scanner:<br>PUT /&lt;table&gt;/scanner</p>
-<p>范例：<code>curl -H &quot;Content-Type: text/xml&quot; -d &#39;&amp;lt;Scanner batch=&quot;1&quot;/&amp;gt;&#39; http://localhost:8000/table/scanner</code></p>
-<p>在response中获得scanner id，然后可以使用这个id拿到这个scanner查询到的所有cell的值，</p>
-<p>语法：<code>GET /&amp;lt;table&amp;gt;/scanner/&amp;lt;scanner-id&amp;gt;</code></p>
-<p>范例：<code>curl -H &quot;Content-Type: application/json&quot; http://localhost:8000/table/scanner/12447063229213b1937</code></p>
-<p>注意每次调用只能返回一个cell的值，而且比较奇怪的是只返回值而没有cf和qualifier，所以使用起来很不方便。</p>
-<p>使用完之后删除scanner:DELETE /&lt;table&gt;/scanner/&lt;scanner-id&gt;</p>
-<p><strong>无状态scanner</strong></p>
-<p>无状态的scanner不保存任何关于查询的状态，它把所有的查询条件作为参数进行一次性的查询。</p>
-<p>查询参数包括：</p>
-<blockquote>
-<p>startrow - 查询起始key<br>endrow - 查询终止key<br>columns - 查询的column<br>starttime, endtime - 通过指定起始时间选择特定的数据版本，starttime和endtime必须同时设置<br>maxversions - 每个返回的cell的版本数<br>limit - 返回数据条数</p>
-</blockquote>
-<p>范例：</p>
-<p>查询单个column cf:q：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*?columns=cf:q</code></p>
-<p>查询多个column cf1:q1和cf2:q2：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*?columns=cf1:q1,cf2:q2</code></p>
-<p>从key1开始查询两条记录：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*?startrow=key1&amp;limit=2</code></p>
-<p>查询1389900769772和1389900800000之间的版本：<br><code>curl -H &quot;Content-Type: text/xml&quot; https://localhost:8080/table/*？starttime=1389900769772&amp;endtime=1389900800000</code></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/13/2015-07-13_Hbase Rest API ： 数据查询/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1554,17 +1401,15 @@
 
       
         
-          
-            <p>根据这篇<a href="http://www.ibm.com/developerworks/cn/java/j-lo-spring-boot/" target="_blank" rel="noopener">guide</a>创建了一个简单的spring boot应用，能运行且成功的访问。但移植到现有项目（基于hbase）中的时候，却报出以下错误：</p>
+          <p>根据这篇<a href="http://www.ibm.com/developerworks/cn/java/j-lo-spring-boot/" target="_blank" rel="noopener">guide</a>创建了一个简单的spring boot应用，能运行且成功的访问。但移植到现有项目（基于hbase）中的时候，却报出以下错误：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">SEVERE: A child container failed during start  </span><br><span class="line">java.util.concurrent.ExecutionException: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Tomcat].StandardHost[localhost].StandardContext[]]  </span><br><span class="line">    at java.util.concurrent.FutureTask.report(FutureTask.java:122)  </span><br><span class="line">    at java.util.concurrent.FutureTask.get(FutureTask.java:188)  </span><br><span class="line">    at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:1123)  </span><br><span class="line">    at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:801)  </span><br><span class="line">    at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)  </span><br><span class="line">    at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1559)  </span><br><span class="line">    at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1549)  </span><br><span class="line">    at java.util.concurrent.FutureTask.run(FutureTask.java:262)  </span><br><span class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)  </span><br><span class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)  </span><br><span class="line">    at java.lang.Thread.run(Thread.java:745)  </span><br><span class="line">Caused by: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Tomcat].StandardHost[localhost].StandardContext[]]  </span><br><span class="line">    at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:154)  </span><br><span class="line">    ... 6 more  </span><br><span class="line">Caused by: java.lang.NoSuchMethodError: javax.servlet.ServletContext.addServlet(Ljava/lang/String;Ljavax/servlet/Servlet;)Ljavax/servlet/ServletRegistration$Dynamic;  </span><br><span class="line">    at org.springframework.boot.context.embedded.ServletRegistrationBean.onStartup(ServletRegistrationBean.java:156)  </span><br><span class="line">    at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext$1.onStartup(EmbeddedWebApplicationContext.java:219)  </span><br><span class="line">    at org.springframework.boot.context.embedded.tomcat.ServletContextInitializerLifecycleListener.lifecycleEvent(ServletContextInitializerLifecycleListener.java:54)  </span><br><span class="line">    at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:119)  </span><br><span class="line">    at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:90)  </span><br><span class="line">    at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5343)  </span><br><span class="line">    at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)  </span><br><span class="line">    ... 6 more</span><br></pre></td></tr></table></figure>
-<p>一般碰到NoSuchMethodError，要么是没有引入dependency，要么是jar包冲突。在这里应该是servlet-api.jar有冲突。</p>
-<p>用命令mvn dependency:tree查看项目所有dependencies，发现有以下依赖：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[INFO] | +- org.apache.hbase:hbase-server:jar:0.96.1.1-cdh5.0.2:compile</span><br><span class="line">...</span><br><span class="line">[INFO] | | +- org.mortbay.jetty:servlet-api-2.5:jar:6.1.14:compile</span><br><span class="line">...</span><br><span class="line">[INFO] | | +- org.apache.hadoop:hadoop-common:jar:2.3.0-cdh5.0.2:compile</span><br><span class="line">...</span><br><span class="line">[INFO] | | | +- javax.servlet:servlet-api:jar:2.5:compile</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>hbase-server中也有servlet-api的jar包，尝试将其移除：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hbase<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hbase-server<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.96.1.1-cdh5.0.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span>  </span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mortbay.jetty<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>servlet-api-2.5<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span>  </span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span>  </span><br><span class="line">    <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>运行成功。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/10/2015-07-10_Spring boot内嵌的tomcat启动失败/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1702,21 +1547,15 @@
 
       
         
-          
-            <p>kafka最初是被LinkedIn设计用来处理log的分布式消息系统，因此它的着眼点不在数据的安全性（log偶尔丢几条无所谓），换句话说kafka并不能完全保证数据不丢失。</p>
+          <p>kafka最初是被LinkedIn设计用来处理log的分布式消息系统，因此它的着眼点不在数据的安全性（log偶尔丢几条无所谓），换句话说kafka并不能完全保证数据不丢失。</p>
 <p>尽管kafka官网声称能够保证at-least-once，<strong>但如果consumer进程数小于partition_num</strong>，这个结论不一定成立。</p>
-<p>考虑这样一个case，partiton_num=2，启动一个consumer进程订阅这个topic，对应的，stream_num设为2，也就是说启两个线程并行处理message。</p>
-<p>如果auto.commit.enable=true，当consumer fetch了一些数据但还没有完全处理掉的时候，刚好到commit interval出发了提交offset操作，接着consumer crash掉了。这时已经fetch的数据还没有处理完成但已经被commit掉，因此没有机会再次被处理，数据丢失。</p>
-<p>如果auto.commit.enable=false，假设consumer的两个fetcher各自拿了一条数据，并且由两个线程同时处理，这时线程t1处理完partition1的数据，手动提交offset，<strong>这里需要着重说明的是，当手动执行commit的时候，实际上是对这个consumer进程所占有的所有partition进行commit，kafka暂时还没有提供更细粒度的commit方式，也就是说，即使t2没有处理完partition2的数据，offset也被t1提交掉了</strong>。如果这时consumer crash掉，t2正在处理的这条数据就丢失了。</p>
-<p>如果希望能够严格的不丢数据，解决办法有两个：</p>
-<ol>
-<li>手动commit offset，并针对partition_num启同样数目的consumer进程，这样就能保证一个consumer进程占有一个partition，commit offset的时候不会影响别的partition的offset。但这个方法比较局限，因为partition和consumer进程的数目必须严格对应。</li>
-<li>另一个方法同样需要手动commit offset，另外在consumer端再将所有fetch到的数据缓存到queue里，当把queue里所有的数据处理完之后，再批量提交offset，这样就能保证只有处理完的数据才被commit。当然这只是基本思路，实际上操作起来不是这么简单，具体做法以后我再另开一篇。</li>
-</ol>
-<p>———————————- 更新 ——————————————–</p>
-<p>Kafka在0.9版本重新设计的Consumer解决了这个问题,解决的方法是…………..不允许在多个线程中使用同一个Consumer实例,服气服气</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/07/2015-07-07_kafka consumer防止数据丢失/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1854,19 +1693,16 @@
 
       
         
-          
-            <p>在早前的kafka版本中（0.8.0），offset是被存储在zookeeper中的。</p>
+          <p>在早前的kafka版本中（0.8.0），offset是被存储在zookeeper中的。</p>
 <p>到当前版本（0.8.2）为止，kafka同时支持offset存储在zookeeper和offset manager（broker）中。</p>
 <p>从官方的说明来看，未来offset的zookeeper存储将会被弃用。因此现有的基于kafka的项目如果今后计划保持更新的话，可以考虑在合适的时候将offset迁移到kafka broker上。</p>
-<p>以下是迁移步骤：</p>
-<ol>
-<li>在consume config中，修改offsets.storage=kafka并且dual.commit.enabled=true。第一个修改不用解释。第二个配置项的意思是，同时提交offset到zookeeper和offset manager上，这是为了保证在迁移过程中offset不会丢失。</li>
-<li>rolling restart consumers并且确认运行正常。这时已经完成offset的迁移工作。</li>
-<li>修改consumer config，dual.commit.enabled=false。双重提交offset会带来额外的开销，在完成迁移工作之后最好把这项配置关闭。</li>
-<li>rolling restart consumers</li>
-</ol>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2015/07/05/2015-07-05_kafka offset迁移/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>

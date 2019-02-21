@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。 如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本">
+<meta name="description" content="Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka0.10升级潜在影响（一）">
 <meta property="og:url" content="http://kane-xie.github.io/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。 如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本">
+<meta property="og:description" content="Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.953Z">
+<meta property="og:updated_time" content="2019-02-21T03:20:23.846Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka0.10升级潜在影响（一）">
-<meta name="twitter:description" content="Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。 如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本">
+<meta name="twitter:description" content="Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。">
 
 
 
@@ -364,6 +364,7 @@
 
       
         <p>Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。</p>
+<a id="more"></a>
 <p>如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本格式。但同时broker将不能使用zero-copy传输，因为数据必须读到application cache中进行数据格式转换。为了避免这种转换开销，我们可以在broker升级到0.10之后，将数据声明为更低版本的格式，比如0.9.0.1。这样，当老版本的consumer尝试获取数据时，broker能够使用zero-copy直接将数据传输给consumer。当大多数consumer都升级到最新版本之后，我们可以将消息格式重新声明称0.10（默认值）。而对于已经升级到0.10的client来说则不受影响。</p>
 <p>另外有一些需要注意的是：</p>
 <ul>

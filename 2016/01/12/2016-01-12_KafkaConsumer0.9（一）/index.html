@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。 新的consumer实">
+<meta name="description" content="Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="KafkaConsumer0.9（一）">
 <meta property="og:url" content="http://kane-xie.github.io/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。 新的consumer实">
+<meta property="og:description" content="Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.933Z">
+<meta property="og:updated_time" content="2019-02-21T03:22:16.241Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="KafkaConsumer0.9（一）">
-<meta name="twitter:description" content="Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。 新的consumer实">
+<meta name="twitter:description" content="Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。">
 
 
 
@@ -364,6 +364,7 @@
 
       
         <p>Kafka0.9发布了新版consumer client。它与旧版本最大的区别是移除了基于zookeeper的high-level consumer和low-level SimpleConsumer，而代之于一个统一的consumer API，它集成了之前high-level consumer的group管理功能和low-level consumer的offset控制功能。</p>
+<a id="more"></a>
 <p>新的consumer实现了一套新的group管理机制，它使得consumer clients变得更简洁（真的比以前简洁很多。。。），并且获得更快的rebalancing。同时这个版本也完全解除了consumer client对zookeeper的依赖，直接访问kafka server使得consumer变得简单，并且能够使用到kafka server提供的安全（security）和配额机制(quota)。</p>
 <p>这里多说一句，consumer不依赖zookeeper是对的，由于zookeeper本质上是一个cp而不是ap系统，它更适于用于服务协调而不是服务发现，因为对于后者来说，信息中可能包含错误总比没有信息要好。</p>
 <p>为了让用户平滑地升级，0.8的consumer依然可以连接到0.9的kafka cluster。</p>

@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="在早前的kafka版本中（0.8.0），offset是被存储在zookeeper中的。 到当前版本（0.8.2）为止，kafka同时支持offset存储在zookeeper和offset manager（broker）中。 从官方的说明来看，未来offset的zookeeper存储将会被弃用。因此现有的基于kafka的项目如果今后计划保持更新的话，可以考虑在合适的时候将offset迁移到kafka">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.890Z">
+<meta property="og:updated_time" content="2019-02-21T03:26:01.070Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka offset迁移">
 <meta name="twitter:description" content="在早前的kafka版本中（0.8.0），offset是被存储在zookeeper中的。 到当前版本（0.8.2）为止，kafka同时支持offset存储在zookeeper和offset manager（broker）中。 从官方的说明来看，未来offset的zookeeper存储将会被弃用。因此现有的基于kafka的项目如果今后计划保持更新的话，可以考虑在合适的时候将offset迁移到kafka">
@@ -366,6 +366,7 @@
         <p>在早前的kafka版本中（0.8.0），offset是被存储在zookeeper中的。</p>
 <p>到当前版本（0.8.2）为止，kafka同时支持offset存储在zookeeper和offset manager（broker）中。</p>
 <p>从官方的说明来看，未来offset的zookeeper存储将会被弃用。因此现有的基于kafka的项目如果今后计划保持更新的话，可以考虑在合适的时候将offset迁移到kafka broker上。</p>
+<a id="more"></a>
 <p>以下是迁移步骤：</p>
 <ol>
 <li>在consume config中，修改offsets.storage=kafka并且dual.commit.enabled=true。第一个修改不用解释。第二个配置项的意思是，同时提交offset到zookeeper和offset manager上，这是为了保证在迁移过程中offset不会丢失。</li>

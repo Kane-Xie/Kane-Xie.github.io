@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。 从广义上来讲，这实际上是个broker分组功能，可以将不同组的broke">
+<meta name="description" content="从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka机架感知">
 <meta property="og:url" content="http://kane-xie.github.io/2016/08/05/2016-08-05_Kafka机架感知/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。 从广义上来讲，这实际上是个broker分组功能，可以将不同组的broke">
+<meta property="og:description" content="从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.961Z">
+<meta property="og:updated_time" content="2019-02-21T03:19:53.629Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka机架感知">
-<meta name="twitter:description" content="从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。 从广义上来讲，这实际上是个broker分组功能，可以将不同组的broke">
+<meta name="twitter:description" content="从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。">
 
 
 
@@ -364,6 +364,7 @@
 
       
         <p>从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。</p>
+<a id="more"></a>
 <p>从广义上来讲，这实际上是个broker分组功能，可以将不同组的brokers分散到不同的区域中，以提高单个区域发生故障时整个集群的可用性。比如碰到有个用户，他们公司的网络分成若干个分区，他们希望当单个网络分区故障，或者跟其他分区无法通信时，Kafka仍旧能够保证正常工作，这就可以用到broker分组功能。</p>
 <p>你可以通过修改server.properties来指定broker属于哪个特定的组（机架）：</p>
 <p><code>broker.rack=rack-id-n</code></p>

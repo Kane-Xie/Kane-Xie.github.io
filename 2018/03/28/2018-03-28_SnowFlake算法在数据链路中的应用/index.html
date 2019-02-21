@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="数据链路追踪  在实时数据平台中,为了保证数据是可追溯的，一般会在数据生成时给每一条数据分配一个唯一的ID，以及生成的时间，最好再带上数据源的信息，这样DEBUG的时候就能知道数据是从哪来的。然后在数据的每个流转环节中，将每一条数据的ID和到达时间记录到日志或者其他存储中 这样在发生问题或者调试时，就能通过ID重现数据的轨迹，包括数据行经的每个组件以及消耗的时间。这个过程能够通过ELK轻松完成，将">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.010Z">
+<meta property="og:updated_time" content="2019-02-21T03:15:45.542Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SnowFlake算法在数据链路中的应用">
 <meta name="twitter:description" content="数据链路追踪  在实时数据平台中,为了保证数据是可追溯的，一般会在数据生成时给每一条数据分配一个唯一的ID，以及生成的时间，最好再带上数据源的信息，这样DEBUG的时候就能知道数据是从哪来的。然后在数据的每个流转环节中，将每一条数据的ID和到达时间记录到日志或者其他存储中 这样在发生问题或者调试时，就能通过ID重现数据的轨迹，包括数据行经的每个组件以及消耗的时间。这个过程能够通过ELK轻松完成，将">
@@ -367,6 +367,7 @@
 
 <p>在实时数据平台中,为了保证数据是可追溯的，一般会在数据生成时给每一条数据分配一个唯一的ID，以及生成的时间，最好再带上数据源的信息，这样DEBUG的时候就能知道数据是从哪来的。然后在数据的每个流转环节中，将每一条数据的ID和到达时间记录到日志或者其他存储中</p>
 <p>这样在发生问题或者调试时，就能通过ID重现数据的轨迹，包括数据行经的每个组件以及消耗的时间。这个过程能够通过ELK轻松完成，将所有组件的日志导入ES，然后使用ID在Kibana中搜索，甚至可以通过定制图表来实现数据链路可视化，这里不做展开</p>
+<a id="more"></a>
 <p>以Flume为例，我们可以在最外层的Agent（即跟数据源最近的一层，了解Flume分层架构请自行搜索）通过UUIDInterceptor生成唯一ID，然后连同数据源信息（机房ID,机器ID）和数据接收的时间戳一起放到event header中，最后带到数据流里</p>
 <blockquote>
 <p>注： 一般情况下数据的唯一ID和生成时间event_time应该由数据的生成方指定，如果没有，则由Flume生成。当然也可以强制由Flume生成，主要取决于是否将平台与用户之间的网络视同内网</p>

@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="写一个ES的清理小工具，需要找出一个月之前创建的index  if(createTS &amp;lt; System.currentTimeMillis() - 30  24  3600 * 1000)  血崩。。。int越界。。。 然后找出超过100G的index  if(size &amp;gt; 100  1024  1024 * 1024)  再次血崩。。。 这种问题不应该，幸好不是PROD，要不就收拾细">
+<meta name="description" content="写一个ES的清理小工具，需要找出一个月之前创建的index  if(createTS &amp;lt; System.currentTimeMillis() - 30  24  3600 * 1000)  血崩。。。int越界。。。">
 <meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一个坑掉两次。。">
 <meta property="og:url" content="http://kane-xie.github.io/2018/05/14/2018-05-14_一个坑掉两次。。/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="写一个ES的清理小工具，需要找出一个月之前创建的index  if(createTS &amp;lt; System.currentTimeMillis() - 30  24  3600 * 1000)  血崩。。。int越界。。。 然后找出超过100G的index  if(size &amp;gt; 100  1024  1024 * 1024)  再次血崩。。。 这种问题不应该，幸好不是PROD，要不就收拾细">
+<meta property="og:description" content="写一个ES的清理小工具，需要找出一个月之前创建的index  if(createTS &amp;lt; System.currentTimeMillis() - 30  24  3600 * 1000)  血崩。。。int越界。。。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.014Z">
+<meta property="og:updated_time" content="2019-02-21T03:15:09.872Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一个坑掉两次。。">
-<meta name="twitter:description" content="写一个ES的清理小工具，需要找出一个月之前创建的index  if(createTS &amp;lt; System.currentTimeMillis() - 30  24  3600 * 1000)  血崩。。。int越界。。。 然后找出超过100G的index  if(size &amp;gt; 100  1024  1024 * 1024)  再次血崩。。。 这种问题不应该，幸好不是PROD，要不就收拾细">
+<meta name="twitter:description" content="写一个ES的清理小工具，需要找出一个月之前创建的index  if(createTS &amp;lt; System.currentTimeMillis() - 30  24  3600 * 1000)  血崩。。。int越界。。。">
 
 
 
@@ -368,6 +368,7 @@
 <p>if(createTS &lt; System.currentTimeMillis() - 30 <em> 24 </em> 3600 * 1000)</p>
 </blockquote>
 <p>血崩。。。int越界。。。</p>
+<a id="more"></a>
 <p>然后找出超过100G的index</p>
 <blockquote>
 <p>if(size &gt; 100 <em> 1024 </em> 1024 * 1024)</p>

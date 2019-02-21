@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="Kafka REST proxy的request和response的content type包含了数据的三种属性：序列化格式（比如json），API版本（比如v1）和内嵌格式（比如binary）。目前序列化格式只有json，API版本只有v1。 内嵌格式是指produce或者consume的数据的格式，这些数据本身是被内嵌在request或者response中。举个例子，你可以在json序列化的r">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.966Z">
+<meta property="og:updated_time" content="2019-02-21T03:19:34.607Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka REST Proxy Content Types">
 <meta name="twitter:description" content="Kafka REST proxy的request和response的content type包含了数据的三种属性：序列化格式（比如json），API版本（比如v1）和内嵌格式（比如binary）。目前序列化格式只有json，API版本只有v1。 内嵌格式是指produce或者consume的数据的格式，这些数据本身是被内嵌在request或者response中。举个例子，你可以在json序列化的r">
@@ -365,6 +365,7 @@
       
         <p>Kafka REST proxy的request和response的content type包含了数据的三种属性：序列化格式（比如json），API版本（比如v1）和内嵌格式（比如binary）。目前序列化格式只有json，API版本只有v1。</p>
 <p>内嵌格式是指produce或者consume的数据的格式，这些数据本身是被内嵌在request或者response中。举个例子，你可以在json序列化的request中嵌入binary格式的数据，数据必须是base64编码的字符串。如果数据本身就是JSON，那么你可以以json格式直接嵌入。</p>
+<a id="more"></a>
 <p>Content Type的格式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">application/vnd.kafka[.embedded_format].[api_version]+[serialization_format]</span><br></pre></td></tr></table></figure></p>
 <p>当没有内嵌数据时，序列化格式是不能省略的。建议的Content Type是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">application/vnd.kafka.[embedded_format].v1+json</span><br></pre></td></tr></table></figure></p>
 <p>但省略部分声明也是允许的，比如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">application/vnd.kafka+json</span><br><span class="line">application/json</span><br><span class="line">application/octet-stream</span><br></pre></td></tr></table></figure></p>

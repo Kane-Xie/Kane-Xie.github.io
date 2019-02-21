@@ -365,21 +365,16 @@
 
       
         
-          
-            <div class="note info"><h2>timeout</h2></div>
+          <div class="note info"><h2>timeout</h2></div>
 
 <p>单次poll最大等待时间，consumer.poll(1000)意味着在缓存中的数据被消费完之后，consumer会到broker中拉取数据，最多等待1000毫秒。很明显，timeout越大，单次poll返回的数据就越多。但前提是有足够多的数据可供消费，如果在1000毫秒内，consumer已经拿完所有能拿的数据，就会立即返回。</p>
-<div class="note info"><h2>max.poll.records</h2></div>
-
-<p>单次poll最大返回数据条数，默认值2,147,483,647。这应该不需要解释。</p>
-<div class="note info"><h2>receive.buffer.bytes</h2></div>
-
-<p>用于TCP读取数据的缓存（SO_RCVBUF）大小，默认值64k。之前做过小测试，发现消费10万条大小1k的数据，花费5秒左右，设置max.poll.records=1，理论上来说性能应该大大下降才对，但实际测试结果也在5秒左右。后来发现消费端有64k缓存，换句话说每次TCP请求会拿64条数据，因此虽然poll每次只拿一条数据，但也是从缓存中拿，拿64次才会真正发送一次TCP请求。而相对于1k大小数据的消费，TCP请求的开销可以忽略，因此消费时间差不多。当测试数据大小为1个字节时，TCP请求的开销就不能忽略了，而测试结果也证实，max.poll.records=1会使消费性能下降2/3。</p>
-<div class="note info"><h2>max.partition.fetch.bytes</h2></div>
-
-<p>单次poll对于每个partition最大返回数据量，默认值1M。如果消费的topic有3个partition，那么单次poll最多返回3M数据。但实际上发现单次poll一般都只返回1M的数据，而不是3M。检查数据的分布，也都分散在3个partition中。原因是consumer会启动3个fetcher分别到每个partition抓取数据，而考虑到性能问题，consumer会在fetch一个partition一定时间后才会fetch下一个partition，所以单次poll很可能只是在拿一个partition中的数据，所以返回1M数据。把测试时间延长之后发现，偶尔会有一次poll拿到2M数据，符合刚才的分析。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -517,13 +512,14 @@
 
       
         
-          
-            <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log4j:WARN Continuable parsing error 39 and column 23</span><br><span class="line">log4j:WARN The content of element type &quot;log4j:configuration&quot; must match &quot;(renderer*,appender*,plugin*,(category|logger)*,root?,(categoryFactory|loggerFactory)?)&quot;.</span><br></pre></td></tr></table></figure>
-<p>log4j.xml的DTD规定log4j:configuration中的所有元素应该按照如下的顺序排列：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">renderer</span>&gt;</span><span class="tag">&lt;/<span class="name">renderer</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">appender</span>&gt;</span><span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">logger</span>&gt;</span><span class="tag">&lt;/<span class="name">logger</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">category</span>&gt;</span><span class="tag">&lt;/<span class="name">category</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">root</span>&gt;</span><span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">loggerfactory</span>&gt;</span><span class="tag">&lt;/<span class="name">loggerfactory</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">categoryfactory</span>&gt;</span><span class="tag">&lt;/<span class="name">categoryfactory</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>因此调整log4j.xml中的元素顺序即可避免该warnning</p>
-
-          
+          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log4j:WARN Continuable parsing error 39 and column 23</span><br><span class="line">log4j:WARN The content of element type &quot;log4j:configuration&quot; must match &quot;(renderer*,appender*,plugin*,(category|logger)*,root?,(categoryFactory|loggerFactory)?)&quot;.</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/23/2016-08-23_log4j warnning/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -661,18 +657,18 @@
 
       
         
-          
-            <p>Martingale大致意思是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">地下庄家开了一个赌局:猜硬币的正反。假设你下注1元，如果猜中，你可以赢1元，如果猜错，你要输1元。</span><br><span class="line">那有人想出来一个必胜法，先赌2元，赢了就收手。如果输了就赌4元。如果再输就赌8元，再输就赌16元，如此继续。这是必胜的赌博策略。</span><br></pre></td></tr></table></figure></p>
+          <p>Martingale大致意思是</p>
+<blockquote>
+<p>地下庄家开了一个赌局:猜硬币的正反。假设你下注1元，如果猜中，你可以赢1元，如果猜错，你要输1元。<br>那有人想出来一个必胜法，先赌2元，赢了就收手。如果输了就赌4元。如果再输就赌8元，再输就赌16元，如此继续。这是必胜的赌博策略。</p>
+</blockquote>
 <p>问，这个真的是赌博的必胜法吗？</p>
-<p>知乎上有很多讨论，结论是，本金足够的情况下，是必胜的，但是收益率很低，换句话说，这样赌博是不划算的。</p>
-<p>所以写了段代码来模拟这个问题</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestGamble</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> win = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">int</span> lose = <span class="number">0</span>;</span><br><span class="line">		<span class="comment">// 赌博次数</span></span><br><span class="line">		<span class="keyword">int</span> times = <span class="number">10000</span>;</span><br><span class="line">		<span class="comment">// 赌博总收益</span></span><br><span class="line">		<span class="keyword">long</span> money = <span class="number">0</span>;</span><br><span class="line">		<span class="comment">// 单次赌博本金</span></span><br><span class="line">		<span class="keyword">long</span> capital = <span class="number">100</span> * <span class="number">10000</span>;</span><br><span class="line">		<span class="comment">// 期望收益率</span></span><br><span class="line">		<span class="keyword">double</span> yield = <span class="number">0.1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; times; i++) &#123;</span><br><span class="line">			<span class="keyword">long</span> result = gamble(capital, yield);</span><br><span class="line">			<span class="keyword">if</span> (result &gt; <span class="number">0</span>) &#123;</span><br><span class="line">				win++;</span><br><span class="line">				money += result;</span><br><span class="line">				System.out.println(<span class="string">"win!! money = "</span> + money);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				lose++;</span><br><span class="line">				money -= capital;</span><br><span class="line">				System.out.println(<span class="string">"lose!! money = "</span> + money);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(<span class="string">"total win = "</span> + win);</span><br><span class="line">		System.out.println(<span class="string">"total lose = "</span> + lose);</span><br><span class="line">		System.out.println(<span class="string">"total money = "</span> + money);</span><br><span class="line">		System.out.println(<span class="string">"total yield = "</span> + money * <span class="number">1.0</span> / (capital * times));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">gamble</span><span class="params">(<span class="keyword">long</span> capital, <span class="keyword">double</span> yield)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">		<span class="keyword">long</span> original = capital;</span><br><span class="line">		<span class="comment">// 下注额</span></span><br><span class="line">		<span class="keyword">long</span> seed = <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">while</span> (capital &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">if</span> (dice()) &#123;</span><br><span class="line">				capital += seed;</span><br><span class="line">				 System.out.println(<span class="string">"seed = "</span> + seed + <span class="string">", win --- "</span> +</span><br><span class="line">				 capital);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				capital -= seed;</span><br><span class="line">				System.out.println(<span class="string">"seed = "</span> + seed + <span class="string">", lose --- "</span> + capital);</span><br><span class="line">				seed = Math.min(seed * <span class="number">2</span>, capital);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (capital &gt; original * (<span class="number">1</span> + yield)) &#123;</span><br><span class="line">				<span class="keyword">return</span> capital - original;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">dice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Math.abs((Math.random() + <span class="string">""</span>).hashCode()) % <span class="number">2</span> == <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>测试结果如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">……</span><br><span class="line">total win = 8544</span><br><span class="line">total lose = 1456</span><br><span class="line">total money = 78812408</span><br><span class="line">total yield = 0.0078812408</span><br></pre></td></tr></table></figure>
-<p>也就是说，你准备了100亿来赌博，每次拿出100万来赌，一共赌10000次，每次赌博要么赢10%收手，要么输光。那么最终会赚7千多万，收益率0.79%，只是刚跑赢一年活期利率。把期望收益率调成50%或100%其实都差不多，只是输赢次数比例会有变化，收益率是差不多的。</p>
-<p>总之，不划算。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/17/2016-08-17_加倍下注法Martingale测试/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -810,17 +806,15 @@
 
       
         
-          
-            <p>Kafka REST proxy的request和response的content type包含了数据的三种属性：序列化格式（比如json），API版本（比如v1）和内嵌格式（比如binary）。目前序列化格式只有json，API版本只有v1。</p>
+          <p>Kafka REST proxy的request和response的content type包含了数据的三种属性：序列化格式（比如json），API版本（比如v1）和内嵌格式（比如binary）。目前序列化格式只有json，API版本只有v1。</p>
 <p>内嵌格式是指produce或者consume的数据的格式，这些数据本身是被内嵌在request或者response中。举个例子，你可以在json序列化的request中嵌入binary格式的数据，数据必须是base64编码的字符串。如果数据本身就是JSON，那么你可以以json格式直接嵌入。</p>
-<p>Content Type的格式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">application/vnd.kafka[.embedded_format].[api_version]+[serialization_format]</span><br></pre></td></tr></table></figure></p>
-<p>当没有内嵌数据时，序列化格式是不能省略的。建议的Content Type是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">application/vnd.kafka.[embedded_format].v1+json</span><br></pre></td></tr></table></figure></p>
-<p>但省略部分声明也是允许的，比如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">application/vnd.kafka+json</span><br><span class="line">application/json</span><br><span class="line">application/octet-stream</span><br></pre></td></tr></table></figure></p>
-<p>这些Content Type没有声明API版本，默认使用最近的稳定版本。如果省略嵌入格式，默认使用binary格式。尽管以上Content Type都是允许的，但考虑到今后版本的兼容性问题，建议写全Content Type，并且检查response的Content Type</p>
-<p>Content negotiation也是支持的，所以你可以在Content Type中包含多个不同权重的设置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Accept: application/vnd.kafka.v1+json; q=0.9, application/json; q=0.5</span><br></pre></td></tr></table></figure></p>
-<p>当你想用一个新版本的API但又不确定它是否能使用的时候，这就很有用</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/09/2016-08-09_Kafka REST Proxy Content Types/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -958,16 +952,15 @@
 
       
         
-          
-            <p>Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。</p>
+          <p>Kafka REST Proxy的最终目标肯定是实现所有Java Client和命令行工具所有的功能，但目前只开发了或者说只开放了部分。</p>
 <p><div class="note info"><h2>Metadata</h2></div><br>大部分关于brokers，topics，partitions和config的metadata都能通过GET请求获取</p>
-<p><div class="note info"><h2>Producers</h2></div><br>Producer API并不暴露producer对象，它创建了一个很小的producer池（每种格式一个producer），接受produce request并使用对应的producer来发送</p>
-<p><div class="note info"><h2>Consumers</h2></div><br>REST Proxy实现了high-level consumer的consumer-groups功能。Consumers是有状态的，因此需要跟REST Proxy的实例绑定。Offset的提交可以是自动的，也可以由client发送请求来提交。目前每个consumer都是单线程消费，所以如果希望通过多线程来提升吞吐量，那么需要使用多个consumer</p>
-<p><div class="note info"><h2>数据格式</h2></div><br>REST Proxy目前支持三种格式：JSON，base64编码二进制和Avro。如果使用Avro，需要在Schema Registry中注册和验证schema</p>
-<p><div class="note info"><h2>负载均衡</h2></div><br>REST Proxy可以启动多个实例来分担压力，并可以通过round robin DNS, 发现服务或者其他基于软件或硬件的负载均衡器来进行请求转发。但注意，由于consumer是有状态的，因此必须保证consumer必须跟REST Proxy实例绑定</p>
-<p><div class="note info"><h2>Simple Consumer</h2></div><br>一般来说high-level consumer是推荐使用的，但如果有特殊的需求需要消费特定offset的消息，也可以使用Rest Proxy的low-level consumer</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/08/2016-08-08_Kafka REST Proxy主要功能/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1105,32 +1098,22 @@
 
       
         
-          
-            <p>Kafka REST Proxy是Confluent的一个组件，它提供了访问Kafka集群的RESTful接口。对于一些暂不支持Kafka的平台或编程语言来说，可以使用Kafka REST Proxy来发送和消费消息，查看集群状态和执行集群管理命令。</p>
-<div class="note info"><h2>安装</h2></div><br><em> 要求Java版本 &gt;= 1.7
-
-</em> 下载<a href="http://www.confluent.io/download#download" target="_blank" rel="noopener">Confluent Platform安装包</a>并解压<br><br><div class="note info"><h2>启动</h2></div>
+          <p>Kafka REST Proxy是Confluent的一个组件，它提供了访问Kafka集群的RESTful接口。对于一些暂不支持Kafka的平台或编程语言来说，可以使用Kafka REST Proxy来发送和消费消息，查看集群状态和执行集群管理命令。</p>
+<div class="note info"><h2>安装</h2></div>
 
 <ul>
-<li><p>cd confluent-&lt;version>/</p>
+<li><p>要求Java版本 &gt;= 1.7</p>
 </li>
-<li><p>配置</p>
-<ul>
-<li>修改etc/kafka-rest/kafka-rest.properties的zookeeper.connect为Kafka的zookeeper地址</li>
-<li>因为我的应用并不需要发送/消费Avro格式的消息，也就不需要Schema Registry，所以将etc/kafka-rest/kafka-rest.properties的schema.registry.url配置项注释掉</li>
-</ul>
-</li>
-<li><p>启动，bin/kafka-rest-start etc/kafka-rest/kafka-rest.properties</p>
+<li><p>下载<a href="http://www.confluent.io/download#download" target="_blank" rel="noopener">Confluent Platform安装包</a>并解压</p>
 </li>
 </ul>
-<div class="note info"><h2>发送JSON消息</h2></div><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -H &quot;Content-Type: application/vnd.kafka.json.v1+json&quot; \</span><br><span class="line">      --data &apos;&#123;&quot;records&quot;:[&#123;&quot;value&quot;:&#123;&quot;foo&quot;:&quot;bar&quot;&#125;&#125;]&#125;&apos; &quot;http://localhost:8082/topics/jsontest&quot;</span><br><span class="line">  &#123;&quot;offsets&quot;:[&#123;&quot;partition&quot;:0,&quot;offset&quot;:0,&quot;error_code&quot;:null,&quot;error&quot;:null&#125;],&quot;key_schema_id&quot;:null,&quot;value_schema_id&quot;:null&#125;</span><br></pre></td></tr></table></figure><br><br>发送的消息体必须是key为records的JSON，每个record可以有key和value属性，其中value是必须的<br><br><div class="note info"><h2>消费JSON消息</h2></div>
-
-<p>创建Consumer实例</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -H &quot;Content-Type: application/vnd.kafka.v1+json&quot; \</span><br><span class="line">      --data &apos;&#123;&quot;name&quot;: &quot;my_consumer_instance&quot;, &quot;format&quot;: &quot;json&quot;, &quot;auto.offset.reset&quot;: &quot;smallest&quot;&#125;&apos; \</span><br><span class="line">      http://localhost:8082/consumers/my_consumer_group</span><br><span class="line">  &#123;&quot;instance_id&quot;:&quot;my_consumer_instance&quot;,</span><br><span class="line"> &quot;base_uri&quot;:&quot;http://localhost:8082/consumers/my_consumer_group/instances/my_consumer_instance&quot;&#125;</span><br></pre></td></tr></table></figure>
-<p>使用已创建的Consumer实例消费消息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -X GET -H &quot;Accept: application/vnd.kafka.json.v1+json&quot; \     http://localhost:8082/consumers/my_consumer_group/instances/my_consumer_instance/topics/jsontest</span><br><span class="line">  [&#123;&quot;key&quot;:null,&quot;value&quot;:&#123;&quot;foo&quot;:&quot;bar&quot;&#125;,&quot;partition&quot;:0,&quot;offset&quot;:0&#125;]</span><br></pre></td></tr></table></figure></p>
-<p>删除Consumer实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X DELETE \     http://localhost:8082/consumers/my_consumer_group/instances/my_consumer_instance</span><br></pre></td></tr></table></figure></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/07/2016-08-07_Kafka REST Proxy快速入门/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1268,15 +1251,14 @@
 
       
         
-          
-            <p>从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。</p>
-<p>从广义上来讲，这实际上是个broker分组功能，可以将不同组的brokers分散到不同的区域中，以提高单个区域发生故障时整个集群的可用性。比如碰到有个用户，他们公司的网络分成若干个分区，他们希望当单个网络分区故障，或者跟其他分区无法通信时，Kafka仍旧能够保证正常工作，这就可以用到broker分组功能。</p>
-<p>你可以通过修改server.properties来指定broker属于哪个特定的组（机架）：</p>
-<p><code>broker.rack=rack-id-n</code></p>
-<p>当创建，更新或者replicas重新分布时，将会遵从分组规则，确保单个partition的所有replicas被分散到尽可能多的组内，最多会被分散到min(#racks, replication-factor) 个不同的组。</p>
-<p>Kafka的replicas分配算法确保每个broker的leader数目都是恒定的，而不取决于如何分组。这保证了整个集群的吞吐量负载均衡。但如果不同的组被分配了不同数量的broker的话，则每个组的总备份数不一定是平均的。因为broker少的那些组将会分配到更多的replicas，这意味着这些broker会有更大的磁盘和其他用于replicas的资源开销。因此比较明智的做法是给每个组都分配相同数量的broker。</p>
-
-          
+          <p>从狭义字面上理解，机架感知的意思是Kafka会把partition的各个replicas分散到不同的机架上，以提高机架故障时的数据安全性。假如所有replicas（包括leader）都在一个机架上，那么当这个机架发生故障时，所有这个机架上的server都不能提供服务，就会发生数据丢失，而多个机架同时发生故障的概率则要小得多。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/08/05/2016-08-05_Kafka机架感知/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1414,26 +1396,14 @@
 
       
         
-          
-            <p>在<a href="http://kane-xie.github.io/pages/1467469031001.html">之前一篇文章</a>中介绍了Kakfa0.10中提供的SASL/PLAIN安全认证机制，这种认证使用起来非常简单，但如果直接应用到生产环境中，就不够严谨了。但好在Kafka提供了接口可以让我们对其进行优化和增强。</p>
-<ul>
-<li><p>为了保证不会在网络中明文传输密码，SASL/PLAIN应该使用SSL(TLS)作为传输层协议</p>
-</li>
-<li><p>在Kafka client中，默认的SASL/PLAIN登录模式是在JAAS配置文件中指定用户名和密码。如果要避免把密码保存在磁盘上，可以自己实现javax.security.auth.spi.LoginModule来通过其他方式提供用户名和密码。新实现的登录模块必须提供用户名作为public credential，密码作为private credential，设置到subject中</p>
-</li>
-<li><p>在生产系统中，可以通过添加javax.security.sasl.SaslServer的实现来提供额外的认证server。默认的实现在Kafka的org.apache.kafka.common.security.plain包中。</p>
-<ul>
-<li><p>新的Providers必须安装和注册在JVM中。安装的话，可以直接将Providers的classes加入到CLASSPATH中，或者打成jar包并加入JAVA_HOME/lib/ext</p>
-</li>
-<li><p>可以将Providers注册到security配置文件JAVA_HOME/lib/security/java.security中：<br><code>security.provider.n=providerClassName</code>，<br>其中providerClassName是provider的全名（包括包名），n指的是优先权，n越小认证优先权越大</p>
-</li>
-<li><p>除此之外，你也可以在运行时在应用程序开始时调用Security.addProvider来注册provider，例如<code>Security.addProvider(new PlainSaslServerProvider());</code></p>
-</li>
-</ul>
-</li>
-</ul>
-
-          
+          <p>在<a href="http://kane-xie.github.io/pages/1467469031001.html">之前一篇文章</a>中介绍了Kakfa0.10中提供的SASL/PLAIN安全认证机制，这种认证使用起来非常简单，但如果直接应用到生产环境中，就不够严谨了。但好在Kafka提供了接口可以让我们对其进行优化和增强。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/07/31/2016-07-31_在Kafka生产中使用SASL/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1571,15 +1541,14 @@
 
       
         
-          
-            <p><strong>先说结论，ScheduledExecutorService.scheduleAtFixedRate只能保证执行的频率，并不能精确保证两次执行的时间间隔。</strong></p>
-<p>之前有个定时数据采集的任务，使用ScheduledExecutorService.scheduleAtFixedRate每隔10秒钟触发一次，将数据采集并保存下来。为了便于查询，以触发采集的时间（秒）向下取整作为主键，例如当前时间08:21:18触发，那么这次采集的数据的key就是08:21:10。</p>
-<p>后来发现偶尔会有某个时间点的数据没有采集到，而某个时间点又会采集两次，比如11:27:20，11:27:30，11:27:50，11:27:50（缺少11:27:40）。</p>
-<p>经过排查，发现任务启动的时间是11:27:29，所以理论上来说，应该在11:27:39，11:27:49，11:27:59都会触发一次，但从日志上看，实际上的触发时间是11:27:29，11:27:39，<strong>11:27:50</strong>，11:27:59，其中本该在11:27:49的采集任务延迟了一秒才被触发。</p>
-<p>这个问题本质的原因是ScheduledThreadPool利用一个DelayQueue来保存下一次需要被触发的任务。DelayQueue使用System.nanoTime()来计算任务还有多久被触发。</p>
-<p>在x86系统中，System.nanoTime()是跟CPU内置的counter紧密相关，那么问题来了, 在一个多核的操作系统中，第一次任务可能被CPU core1安排，第二次任务可能被CPU core2安排，两个核的counter很有可能是不同的，那么两次任务的System.nanoTime()相减就不能保证是精确的10秒钟。</p>
-
-          
+          <p><strong>先说结论，ScheduledExecutorService.scheduleAtFixedRate只能保证执行的频率，并不能精确保证两次执行的时间间隔。</strong></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/07/26/2016-07-26_ScheduledExecutorService.scheduleAtFixedRate精确性/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1717,25 +1686,16 @@
 
       
         
-          
-            <p>接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。</p>
+          <p>接上篇，今天做了个测试，看log.message.format.version对consumer性能的影响到底有多大，一共20万条数据，每条数据大小1K，总共200M。</p>
 <p>首先在Kafka 0.9上的平均测试结果是8.362秒。</p>
 <p>而升级到Kafka 0.10之后，平均测试结果如下：</p>
-<table><br><tr><th>producer version</th><th>log.message. format.version</th><th>consumer version</th><th>cost</th></tr><tr><td>0.9 </td><td>0.10 </td><td>0.9 </td><td>8.966s </td></tr><tr><td>0.9 </td><td>0.10 </td><td>0.10 </td><td>6.470s</td></tr><tr><td>0.10</td><td>0.10 </td><td>0.9 </td><td>8.834s</td></tr><tr><td>0.10</td><td>0.10 </td><td>0.10</td><td>6.604s</td></tr><tr><td>0.9</td><td>0.9</td><td>0.9</td><td>8.355s</td></tr><tr><td>0.9</td><td>0.9</td><td>0.10</td><td>6.242s</td></tr><tr><td>0.10</td><td>0.9</td><td>0.9</td><td>8.233s</td></tr><tr><td>0.10</td><td>0.9</td><td>0.10</td><td>6.310s</td></tr></table>
-
-<ul>
-<li>对比1-5，2-6，3-7，4-8，使用默认的log.message.format.version=0.10.0会使吞吐量降低，因为消息里增加了8个字节timestamp，虽然原始size是1K，只增加了8‰的大小，但从测试结果看，吞吐量降低远远不止8‰ 。</li>
-<li>设置log.message.format.version=0.9，吞吐量和kafka0.9差不多。这个很好理解。 </li>
-<li>producer的版本不影响消费吞吐量。无论produce的message是什么版本，保存到broker之后都以log.message.format.version为准，因此consume的性能是不受影响的。</li>
-<li>0.10的consumer吞吐量大大优于0.9consumer，</li>
-</ul>
-<p>结论： </p>
-<ul>
-<li>无论如何，kafka broker升级到0.10之后，优先使用0.10 consumer，效率高</li>
-<li>从性能上考虑，应该设置log.message.format.version=0.9，但这样就不能使用0.10的message的新特性，比如timestamp</li>
-</ul>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/07/05/2016-07-05_Kafka0.10升级潜在影响（二）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>

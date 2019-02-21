@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单 bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &amp;lt;group&amp;gt; 输出">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.906Z">
+<meta property="og:updated_time" content="2019-02-21T03:25:09.475Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka实时监控">
 <meta name="twitter:description" content="在kafka的开发和维护中，我们经常需要了解kafka topic以及连接在其上的consumer的实时信息，比如logsize，offset，owner等。为此kafka提供了ConsumerOffsetChecker，它的用法很简单 bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --group &amp;lt;group&amp;gt; 输出">
@@ -369,6 +369,7 @@
 <blockquote>
 <p>Group Topic Pid Offset logSize Lag Owner<br>Group1 a.topic 0 2 2 0 none<br>Group1 a.topic 1 0 0 0 none<br>Group1 a.topic 2 2 2 0 none</p>
 </blockquote>
+<a id="more"></a>
 <p>我们也可以通过kafka web console一类的工具直观地获取kafka信息，但如果我们要构建自己的监控系统，需要抓取这些信息的话，有两种办法：一种是运行ConsumerOffsetChecker然后解析输出的字符串；另一种就是通过SimpleConsumer和Zookeeper实时抓取信息（换句话说就是把ConsumerOffsetChecker翻译一下：）），以下介绍第二种方法的思路。</p>
 <p>首先我们看kafka信息在zookeeper的存储结构</p>
 <blockquote>

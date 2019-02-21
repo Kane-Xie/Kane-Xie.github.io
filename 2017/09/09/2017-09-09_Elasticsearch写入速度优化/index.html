@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M 多线程单线程批量发送数据无法达到最大效率。使用多线程">
+<meta name="description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M">
 <meta name="keywords" content="elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Elasticsearch写入速度优化">
 <meta property="og:url" content="http://kane-xie.github.io/2017/09/09/2017-09-09_Elasticsearch写入速度优化/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M 多线程单线程批量发送数据无法达到最大效率。使用多线程">
+<meta property="og:description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.994Z">
+<meta property="og:updated_time" content="2019-02-21T03:17:07.071Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Elasticsearch写入速度优化">
-<meta name="twitter:description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M 多线程单线程批量发送数据无法达到最大效率。使用多线程">
+<meta name="twitter:description" content="批量操作  批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M">
 
 
 
@@ -366,6 +366,7 @@
         <div class="note info"><h2>批量操作</h2></div>
 
 <p>批量写入比单条写入能够提供更好的性能。BulkProcessor可以通过三个阈值控制批量大小，分别是数据条数，数据size和时间间隔。通常来讲更大的批量会带来更好的性能，但也并不尽然，如果单个批次数据量过大，高并发的情况下会导致集群内存压力增大，官方建议是不要一次发送几十兆的数据，从我测试的结果来看，这个说法过于乐观，建议不超过5M</p>
+<a id="more"></a>
 <p><div class="note info"><h2>多线程</h2></div><br>单线程批量发送数据无法达到最大效率。使用多线程或者多进程能够更充分地利用集群资源，同时也能减少fsync的开销，因为数据的集中发送可以减少磁盘交互</p>
 <p>但要注意响应码TOO_MANY_REQUESTS (429)，在Java Client中会返回EsRejectedExecutionException异常，这说明数据总发送速度已经超过了ES集群的处理能力，这时就需要发送端限流，比如加入时间补偿机制。或者也可以调大ES的bulk queue size，通常并不建议这么做，但某些版本的bulk queue size确实过于小，比如5.1的默认值是50,而5.5是200，所以如果你使用的是5.1版本，则可以在elasticsearch.yml加入以下配置<code>thread_pool.bulk.queue_size: 200</code></p>
 <p><div class="note info"><h2>增大refresh interval</h2></div><br>默认的index.refresh_interval是1秒，使用默认配置的index会每隔一秒钟创建一个新的segment，这会给ES带来比较大的merge压力，因此如果对延迟没有特别高的要求，可以适当调大index.refresh_interval，比如10秒</p>

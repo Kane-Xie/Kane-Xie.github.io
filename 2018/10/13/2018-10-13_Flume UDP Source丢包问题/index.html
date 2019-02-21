@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="问题描述有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求 flume配置如下1234a2.sources.syslog_udp_src.type=syslogudpa2.sources.syslog_udp_src.host=0.0.0.0a2.sources.syslog_udp_src.port=5340a2.sources.sy">
+<meta name="description" content="问题描述  有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求">
 <meta name="keywords" content="flume">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Flume UDP Source丢包问题">
 <meta property="og:url" content="http://kane-xie.github.io/2018/10/13/2018-10-13_Flume UDP Source丢包问题/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="问题描述有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求 flume配置如下1234a2.sources.syslog_udp_src.type=syslogudpa2.sources.syslog_udp_src.host=0.0.0.0a2.sources.syslog_udp_src.port=5340a2.sources.sy">
+<meta property="og:description" content="问题描述  有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.020Z">
+<meta property="og:updated_time" content="2019-02-21T03:31:00.265Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume UDP Source丢包问题">
-<meta name="twitter:description" content="问题描述有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求 flume配置如下1234a2.sources.syslog_udp_src.type=syslogudpa2.sources.syslog_udp_src.host=0.0.0.0a2.sources.syslog_udp_src.port=5340a2.sources.sy">
+<meta name="twitter:description" content="问题描述  有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求">
 
 
 
@@ -363,9 +363,25 @@
       
 
       
-        <div class="note info"><h2>问题描述</h2></div><br>有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求<br><br><em> flume配置如下<br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a2.sources.syslog_udp_src.type=syslogudp</span><br><span class="line">a2.sources.syslog_udp_src.host=0.0.0.0</span><br><span class="line">a2.sources.syslog_udp_src.port=5340</span><br><span class="line">a2.sources.syslog_udp_src.channels=test_channel</span><br></pre></td></tr></table></figure>
+        <div class="note info"><h2>问题描述</h2></div>
 
-</em> 系统环境如下<br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CentOS Linux release 7.2.1511</span><br><span class="line">4核cpu</span><br><span class="line">8G内存</span><br></pre></td></tr></table></figure><br><br>在测试中发现当发送速度超过500/s时开始出现数据丢失，开始以为是网络丢包，但通过tcpdump抓包比对发现并没有丢包<br><br><code>netstat -su</code>命令显示有数据包接收失败<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Udp:</span><br><span class="line">    4329216468 packets received</span><br><span class="line">    329761 packets to unknown port received.</span><br><span class="line">    301745872 packet receive errors</span><br><span class="line">    337569082 packets sent</span><br><span class="line">    RcvbufErrors: 1061789</span><br></pre></td></tr></table></figure><br><br>- <code>packets received</code>表示application接收到的数据包的数量<br>- <code>packets to unknown port</code>表示由于端口没有打开而丢失的数据包数据量，例如应用挂掉或者重启<br>- <code>packet receive errors</code>表示接收数据包的异常的数量，需要注意的是error和接收失败的数据包并不是一对一的关系，即有一个数据包有可能会产生多个error<br><br><div class="note info"><h2>问题原因</h2></div>
+<p>有用户提出通过udp协议发送数据到实时平台，所以考虑在flume接收节点添加udp source来接收udp请求<br><a id="more"></a></p>
+<ul>
+<li>flume配置如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a2.sources.syslog_udp_src.type=syslogudp</span><br><span class="line">a2.sources.syslog_udp_src.host=0.0.0.0</span><br><span class="line">a2.sources.syslog_udp_src.port=5340</span><br><span class="line">a2.sources.syslog_udp_src.channels=test_channel</span><br></pre></td></tr></table></figure>
+<ul>
+<li>系统环境如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CentOS Linux release 7.2.1511</span><br><span class="line">4核cpu</span><br><span class="line">8G内存</span><br></pre></td></tr></table></figure>
+<p>在测试中发现当发送速度超过500/s时开始出现数据丢失，开始以为是网络丢包，但通过tcpdump抓包比对发现并没有丢包</p>
+<p><code>netstat -su</code>命令显示有数据包接收失败<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Udp:</span><br><span class="line">    4329216468 packets received</span><br><span class="line">    329761 packets to unknown port received.</span><br><span class="line">    301745872 packet receive errors</span><br><span class="line">    337569082 packets sent</span><br><span class="line">    RcvbufErrors: 1061789</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><code>packets received</code>表示application接收到的数据包的数量</li>
+<li><code>packets to unknown port</code>表示由于端口没有打开而丢失的数据包数据量，例如应用挂掉或者重启</li>
+<li><code>packet receive errors</code>表示接收数据包的异常的数量，需要注意的是error和接收失败的数据包并不是一对一的关系，即有一个数据包有可能会产生多个error</li>
+</ul>
+<div class="note info"><h2>问题原因</h2></div>
 
 <p>当客户端发送一个udp请求到flume时，整个流转顺序是这样的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Client -&gt; Kernel UDP socket buffer(4MB) -&gt; Flume UDP Source buffer(64KB) -&gt; Flume Channel buffer(磁盘，file channel)</span><br></pre></td></tr></table></figure></p>
 <ul>

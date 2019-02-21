@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。 用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下： 12345DELETE /&amp;amp;lt;index&amp;">
+<meta name="description" content="项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。 用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下：">
 <meta name="keywords" content="elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Elasticsearch删除所有数据">
 <meta property="og:url" content="http://kane-xie.github.io/2015/11/10/2015-11-10_Elasticsearch删除所有数据/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。 用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下： 12345DELETE /&amp;amp;lt;index&amp;">
+<meta property="og:description" content="项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。 用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.928Z">
+<meta property="og:updated_time" content="2019-02-21T03:22:33.894Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Elasticsearch删除所有数据">
-<meta name="twitter:description" content="项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。 用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下： 12345DELETE /&amp;amp;lt;index&amp;">
+<meta name="twitter:description" content="项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。 用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下：">
 
 
 
@@ -365,6 +365,7 @@
       
         <p>项目中碰到一个elasticsearch的purge需求，就是说在不删除index和type的前提下，清除其中的所有数据。</p>
 <p>用es的delete by query api可以做到，尽管官方声明deprecated in 1.5.3，但是经过测试1.8还是可以用的（真不敢想象要是不能用了怎么办。。。连个purge的api都没有。。），语法如下：</p>
+<a id="more"></a>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DELETE /&amp;lt;index&amp;gt;/&amp;lt;type&amp;gt;/\_query -d &apos;&#123;</span><br><span class="line">    &quot;query&quot; : &#123; </span><br><span class="line">        &quot;match_all&quot; : &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;&apos;</span><br></pre></td></tr></table></figure>
 <p>简单来说就是根据查询条件查出所有符合条件的数据然后删掉，然后传入的查询条件是match_all。</p>
 <p>注意DELETE /&lt;index&gt;/* 也可以删除所有数据，但相应的mapping也都没了，还不如重建索引。</p>

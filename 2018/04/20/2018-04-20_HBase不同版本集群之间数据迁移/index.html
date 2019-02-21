@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import   export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下1hbase org.apache.hadoop.hbase.mapreduce.Export [option">
+<meta name="description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个：">
 <meta name="keywords" content="hbase">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HBase不同版本集群之间数据迁移">
 <meta property="og:url" content="http://kane-xie.github.io/2018/04/20/2018-04-20_HBase不同版本集群之间数据迁移/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import   export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下1hbase org.apache.hadoop.hbase.mapreduce.Export [option">
+<meta property="og:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.012Z">
+<meta property="og:updated_time" content="2019-02-21T03:15:34.447Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HBase不同版本集群之间数据迁移">
-<meta name="twitter:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个： export + distcp + import   export  在CDH4集群上，将制定表的数据导出为sequence file到指定目录，基本命令如下1hbase org.apache.hadoop.hbase.mapreduce.Export [option">
+<meta name="twitter:description" content="由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个：">
 
 
 
@@ -364,6 +364,7 @@
 
       
         <p>由于HBase CDH4和CDH5数据格式不兼容，所以不能用“CopyTable”之类的方法来进行数据迁移。取而代之的方法有两个：</p>
+<a id="more"></a>
 <div class="note info"><h2>export + distcp + import</h2></div>
 
 <ul>

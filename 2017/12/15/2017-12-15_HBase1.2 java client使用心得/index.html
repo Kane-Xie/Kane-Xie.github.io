@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="最近对HBase做了升级，从0.92升级到了1.2.0-cdh5.11.1，版本跨度很大，而且从社区版转向了Cloudera。之所以改用CDH，是因为大概两年前在前一个公司做HBase CDH4到CDH5的升级，由于一开始搭建集群的时候就没用Cloudera Manager，所以导致升级非常痛苦，因为两个版本之间底层文件的格式变了，所以为了稳定，找了另外一批机器装了CDH5，然后实现源数据的双写，">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.006Z">
+<meta property="og:updated_time" content="2019-02-21T03:16:06.924Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HBase1.2 java client使用心得">
 <meta name="twitter:description" content="最近对HBase做了升级，从0.92升级到了1.2.0-cdh5.11.1，版本跨度很大，而且从社区版转向了Cloudera。之所以改用CDH，是因为大概两年前在前一个公司做HBase CDH4到CDH5的升级，由于一开始搭建集群的时候就没用Cloudera Manager，所以导致升级非常痛苦，因为两个版本之间底层文件的格式变了，所以为了稳定，找了另外一批机器装了CDH5，然后实现源数据的双写，">
@@ -364,6 +364,7 @@
 
       
         <p>最近对HBase做了升级，从0.92升级到了1.2.0-cdh5.11.1，版本跨度很大，而且从社区版转向了Cloudera。之所以改用CDH，是因为大概两年前在前一个公司做HBase CDH4到CDH5的升级，由于一开始搭建集群的时候就没用Cloudera Manager，所以导致升级非常痛苦，因为两个版本之间底层文件的格式变了，所以为了稳定，找了另外一批机器装了CDH5，然后实现源数据的双写，再用export+import把CDH4的数据全量导过去，最后稳定并行一段时间之后把CDH4停掉。整个流程听着就很麻烦，开销也很大（相当于资源*2），所以这次选择了先把0.92平移到CDH4，然后用Cloudera Manager升级，整个过程非常平滑</p>
+<a id="more"></a>
 <p>升级之后（准确说是升级之前就需要准备）发现HBase client的API已经有了很大的变动，所以也花了一些时间来研究，以下是一些心得</p>
 <ul>
 <li><p>有些旧的类和函数已经被废弃或将要被废弃，尽量使用新的API，比如：</p>

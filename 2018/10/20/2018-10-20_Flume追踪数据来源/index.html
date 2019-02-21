@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收 流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.022Z">
+<meta property="og:updated_time" content="2019-02-21T03:14:22.698Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flume追踪数据来源">
 <meta name="twitter:description" content="需求  我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收 流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更">
@@ -367,6 +367,7 @@
 
 <p>我司的实时平台是用Flume来做实时数据的采集,多数场景下是用户发送TCP请求,Flume通过MultiportSyslogTCPSource接收</p>
 <p>流平台的一个关键的监控环节是数据来源，但通过Flume采集下来数据并不带有数据来源的信息，这样就给整个数据流的监控带来很大的麻烦，比如收到某些不合规范的数据，导致Avro转换失败，如果能定位到某个表的话还不算太糟糕，至少还能联系到owner，更坏的情况是收到一些垃圾信息，根本定位不到属于哪个应用或者表，冤无头债无主，一脸懵逼</p>
+<a id="more"></a>
 <div class="note info"><h2>解决方案1.0</h2></div>
 
 <p>改造的思路是，在MultiportSyslogTCPSource中接收数据的同时，将client端的ip写到flume event header中，再把header的信息通过kafka sink带到kafka message的headers中，这样后续流处理发生异常时就可以把client ip打印出来，便于找人背锅</p>

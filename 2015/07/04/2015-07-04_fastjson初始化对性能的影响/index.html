@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="之前在项目中序列化是用thrift，性能一般，而且需要用编译器生成新的类，在序列化和反序列化的时候感觉很繁琐，因此想转到json阵营。对比了jackson，gson等框架之后，决定用fastjson，为什么呢，因为看名字感觉很快。。。 网上的说法：  fastjson 是一个性能很好的 Java 语言实现的 JSON 解析器和生成器，来自阿里巴巴的工程师开发。   主要特点：  快速FAST (比">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.887Z">
+<meta property="og:updated_time" content="2019-02-21T03:26:14.521Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="fastjson初始化对性能的影响">
 <meta name="twitter:description" content="之前在项目中序列化是用thrift，性能一般，而且需要用编译器生成新的类，在序列化和反序列化的时候感觉很繁琐，因此想转到json阵营。对比了jackson，gson等框架之后，决定用fastjson，为什么呢，因为看名字感觉很快。。。 网上的说法：  fastjson 是一个性能很好的 Java 语言实现的 JSON 解析器和生成器，来自阿里巴巴的工程师开发。   主要特点：  快速FAST (比">
@@ -377,6 +377,7 @@
 </ul>
 </blockquote>
 <p>但是测试的结果让我大跌眼镜。</p>
+<a id="more"></a>
 <p>Test Case: 对一个User类（空）的对象分别用java和fastjson序列化1000次，再反序列化1000次，计算时间。注： 测试不是非常严谨，只是做个简单的比较。</p>
 <p>Test Result： </p>
 <blockquote>

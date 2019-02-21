@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们">
+<meta name="description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用">
 <meta name="keywords" content="elasticsearch">
 <meta property="og:type" content="article">
 <meta property="og:title" content="实时场景中Elasticsearch冷热索引分离">
 <meta property="og:url" content="http://kane-xie.github.io/2017/09/24/2017-09-24_实时场景中Elasticsearch冷热索引分离/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们">
+<meta property="og:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.996Z">
+<meta property="og:updated_time" content="2019-02-21T03:17:00.035Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实时场景中Elasticsearch冷热索引分离">
-<meta name="twitter:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用 node分组首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们">
+<meta name="twitter:description" content="如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用">
 <meta name="twitter:image" content="http://kane-xie.github.io/attachment/20170924/es_alias.png">
 
 
@@ -366,6 +366,7 @@
 
       
         <p>如果你的ES集群的每台机器性能有比较大的差距，比如其中几台机器有SSD而其他机器用的普通磁盘，或者部分机器内存比较大，并且低配机器已经拖累了整个集群的读写性能，那么你需要考虑把写入频率和搜索频率比较高的热索引放到高性能的机器上，以获得更高的读写效率，同时把冷索引移到性能较差的机器上，以做到物尽其用</p>
+<a id="more"></a>
 <p><div class="note info"><h2>node分组</h2></div><br>首先我们需要根据所在机器性能的高低给node(这里专指data node)分组，这样我们在分离索引的时候才能知道热索引应该移到哪些高性能节点上去。这可以在启动时通过给每个节点设置属性来实现。例如我们有一台高性能机器，那么在这台机器上启动ES时我们可以通过以下方式声明它是“高性能的”<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/elasticsearch -Enode.attr.performance=high</span><br></pre></td></tr></table></figure></p>
 <p>或者在elasticsearch.yml中配置<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">node.attr.performance=high</span></span><br></pre></td></tr></table></figure></p>
 <p>但是注意，这里的声明仅仅只是声明了一个属性键值对“performance=high”了，相当于给节点逻辑上做了分组，但并没有任何实际的作用，你甚至可以声明“a=b”，但为了可维护性考虑，最好还是起有意义的名称</p>

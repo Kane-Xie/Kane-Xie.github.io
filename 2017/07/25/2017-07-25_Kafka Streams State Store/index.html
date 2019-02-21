@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="Kafka Streams默认使用RocksDB来存储状态 In-memory or persistent ?  状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor AP">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.990Z">
+<meta property="og:updated_time" content="2019-02-21T03:17:33.556Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka Streams State Store">
 <meta name="twitter:description" content="Kafka Streams默认使用RocksDB来存储状态 In-memory or persistent ?  状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor AP">
@@ -367,6 +367,7 @@
 <div class="note info"><h2>In-memory or persistent ?</h2></div>
 
 <p>状态可配置为保存在内存中或者持久化，RocksDB对于两者都适用，并且可以通过Stores factory API在两者间切换。StateStoreSupplier被创建之后，可以用于Kafka Streams DSL API（high level），也可以用于Processor API（low level）</p>
+<a id="more"></a>
 <div class="note info"><h2>持久化</h2></div>
 
 <p>为了保存状态，RocksDB会把state store的内容flush到StreamsConfig.STATE_DIR_CONFIG指定的磁盘上</p>

@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？ 先了解一下-Xms和-Xmx的含义 -Xms  初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64">
+<meta name="description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？">
 <meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="xms和xmx是否必须设置相等">
 <meta property="og:url" content="http://kane-xie.github.io/2017/10/13/2017-10-13_xms和xmx是否必须设置相等/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？ 先了解一下-Xms和-Xmx的含义 -Xms  初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64">
+<meta property="og:description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:37.000Z">
+<meta property="og:updated_time" content="2019-02-21T03:16:50.265Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="xms和xmx是否必须设置相等">
-<meta name="twitter:description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？ 先了解一下-Xms和-Xmx的含义 -Xms  初始堆的大小，也是堆大小的最小值，默认值是总共的物理内存/64">
+<meta name="twitter:description" content="最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了-Xms2G -Xmx2G，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？">
 
 
 
@@ -364,6 +364,7 @@
 
       
         <p>最近申请了几台机器专门用来运行Kafka Streams应用，发现经常发生OOM导致应用挂掉，原因是启动的时候指定了<code>-Xms2G -Xmx2G</code>，所以16G内存的机器没启几个应用内存就被占满了，尽管这些程序只是空跑。查了一下一般都建议-Xms和-Xmx设置为相等，那么能不能设置为不一样呢？</p>
+<a id="more"></a>
 <p>先了解一下-Xms和-Xmx的含义</p>
 <div class="note info"><h2>-Xms</h2></div>
 

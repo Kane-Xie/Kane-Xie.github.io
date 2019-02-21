@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。 同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例 12345678910111213DataSource&amp;lt;String&amp;gt; lines = env.fromElements(    &quot;Apache Flink is a community-driven open sour">
+<meta name="description" content="Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。 同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例">
 <meta name="keywords" content="flink,lambda">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Flink使用lambda表达式">
 <meta property="og:url" content="http://kane-xie.github.io/2017/07/12/2017-07-12_Flink使用lambda表达式/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。 同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例 12345678910111213DataSource&amp;lt;String&amp;gt; lines = env.fromElements(    &quot;Apache Flink is a community-driven open sour">
+<meta property="og:description" content="Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。 同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.985Z">
+<meta property="og:updated_time" content="2019-02-21T03:18:07.566Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Flink使用lambda表达式">
-<meta name="twitter:description" content="Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。 同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例 12345678910111213DataSource&amp;lt;String&amp;gt; lines = env.fromElements(    &quot;Apache Flink is a community-driven open sour">
+<meta name="twitter:description" content="Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。 同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例">
 
 
 
@@ -365,6 +365,7 @@
       
         <p>Java8出来之后，lambda表达式由于简单易读，在流式计算中的使用开始变得普遍。</p>
 <p>同样,Flink也支持lambda表达式，例如我们改写一下wordcount样例</p>
+<a id="more"></a>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">DataSource&lt;String&gt; lines = env.fromElements(</span><br><span class="line">    <span class="string">"Apache Flink is a community-driven open source framework for distributed big data analytics,"</span>,</span><br><span class="line">    <span class="string">"like Hadoop and Spark. The core of Apache Flink is a distributed streaming dataflow engine written"</span>,</span><br><span class="line">            ...</span><br><span class="line">);</span><br><span class="line">lines.flatMap(<span class="keyword">new</span> FlatMapFunction&lt;String, Object&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flatMap</span><span class="params">(String line, Collector&lt; Object&gt; out)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (String word : line.split(<span class="string">"\\W+"</span>)) &#123;</span><br><span class="line">            out.collect(<span class="keyword">new</span> Tuple2&lt;&gt;(word, <span class="number">1</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).groupBy(<span class="number">0</span>).sum(<span class="number">1</span>).print();</span><br></pre></td></tr></table></figure>
 <p>这段代码很简单，先把每一行按空格拆分成若干单词，并将每个单词和数字1组成一个Tuple，然后把所有Tuple按照单词聚合，计算出每个单词的出现次数</p>
 <p>尝试用lambda表达式来替换FlatMapFunction，代码如下</p>

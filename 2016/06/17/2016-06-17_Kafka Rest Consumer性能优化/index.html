@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用。 但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。 下载了源码debug了一下，发现每次con">
+<meta name="description" content="之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用 但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka Rest Consumer性能优化">
 <meta property="og:url" content="http://kane-xie.github.io/2016/06/17/2016-06-17_Kafka Rest Consumer性能优化/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用。 但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。 下载了源码debug了一下，发现每次con">
+<meta property="og:description" content="之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用 但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.945Z">
+<meta property="og:updated_time" content="2019-02-21T03:21:02.092Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka Rest Consumer性能优化">
-<meta name="twitter:description" content="之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用。 但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。 下载了源码debug了一下，发现每次con">
+<meta name="twitter:description" content="之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用 但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。">
 
 
 
@@ -363,8 +363,9 @@
       
 
       
-        <p>之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用。</p>
+        <p>之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用</p>
 <p>但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。</p>
+<a id="more"></a>
 <p>下载了源码debug了一下，发现每次consume都需要判断一下topic是否存在</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Topic&gt; <span class="title">getTopics</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Seq&lt;String&gt; topicNames = zkUtils.getAllTopics().sorted(Ordering.String$.MODULE$);</span><br><span class="line">      <span class="keyword">return</span> getTopicsData(topicNames);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RestNotFoundException e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> InternalServerErrorException(e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">topicExists</span><span class="params">(String topicName)</span> </span>&#123;</span><br><span class="line">    List&lt;Topic&gt; topics = getTopics();</span><br><span class="line">    <span class="keyword">for</span> (Topic topic : topics) &#123;</span><br><span class="line">      <span class="keyword">if</span> (topic.getName().equals(topicName)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 <p>MetadataObserver.getTopics()耗时非常长，该函数先从zookeeper中取出所有的topicName，然后再到zookeeper中把所有的topic的metaData查询出来封装成Topic对象然后返回。增加了200个topic之后，获取所有topic的metaData变得非常的耗时间，其实这是完全没有必要的，直接将Seq<string> topicNames返回就行了，因为判断topic是否存在只需要比较topicName。</string></p>

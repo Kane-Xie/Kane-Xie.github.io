@@ -365,20 +365,14 @@
 
       
         
-          
-            <p>Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。</p>
-<p>如果一个consumer的版本低于0.10，那么它只能解析0.10以前的数据格式。在这种情况下，Kafka broker会为这个低版本consumer将数据转换到它能够解析的低版本格式。但同时broker将不能使用zero-copy传输，因为数据必须读到application cache中进行数据格式转换。为了避免这种转换开销，我们可以在broker升级到0.10之后，将数据声明为更低版本的格式，比如0.9.0.1。这样，当老版本的consumer尝试获取数据时，broker能够使用zero-copy直接将数据传输给consumer。当大多数consumer都升级到最新版本之后，我们可以将消息格式重新声明称0.10（默认值）。而对于已经升级到0.10的client来说则不受影响。</p>
-<p>另外有一些需要注意的是：</p>
-<ul>
-<li><p>在设置log.message.format.version时，必须保证所有的存量数据必须是不高于设置的消息格式。否则低版本的consumer会中断。尤其需要注意在消息格式在设置为0.10之后，不能再设置回低于0.10的版本。</p>
-</li>
-<li><p>由于timestamp字段被加入消息中，消息本身的开销会增加，因此producer的吞吐量会降低。如果消息本身的size很小，那么新字段对于开销的增加会很明显，吞吐量会明显降低；而相对来说如果消息的size比较大，性能影响就不那么大。同样的，消息的replication也同样会增加8个字节的开销。如果Kafka已经快要把网络压榨到极限，那么这个改动可能会成为最后一根稻草，你可能会遇到一些报错和性能问题。</p>
-</li>
-<li><p>如果已经在producer中使用了压缩机制，那么你可能会感觉到性能相比之前有所降低，又或者是数据压缩率降低。在0.10中，当broker收到压缩的消息时，它会避免再将消息压缩，一般来说这可以降低延迟和提高吞吐量。但在特定情况下，这可能反而会降低producer的batch size，从而使吞吐量进一步降低。如果碰到这种情况，可以调整producer的linger.ms和batch.size。</p>
-</li>
-</ul>
-
-          
+          <p>Kafka 0.10的消息格式有新的变化，加入了timestamp字段。磁盘存储的消息格式可以通过server.properties的log.message.format.version配置，默认值是0.10.0.0。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/07/04/2016-07-04_Kafka0.10升级潜在影响（一）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -516,41 +510,19 @@
 
       
         
-          
-            <p>Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。</p>
+          <p>Kafka0.10提供SASL/PLAIN，这是一种简单的用户名/密码安全认证机制。</p>
 <div class="note info"><h2>配置Kafka Brokers</h2></div>
 
 <ul>
-<li>创建kafka_server_jaas.conf，<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">KafkaServer &#123;</span><br><span class="line">    org.apache.kafka.common.security.plain.PlainLoginModule required</span><br><span class="line">    username=&quot;admin&quot;</span><br><span class="line">    password=&quot;admin-secret&quot;</span><br><span class="line">    user_admin=&quot;admin-secret&quot;</span><br><span class="line">    user_alice=&quot;alice-secret&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-</li>
+<li>创建kafka_server_jaas.conf</li>
 </ul>
-<p>这里定义了两个用户，admin和alice。username和password用于集群内部通讯，即当前broker使用admin/admin-secret去连接别的broker。而user_userName=”password”定义了能够访问这个broker的用户及其密码。</p>
-<p>将kafka_server_jaas.conf拷贝到Kafka的所有broker上</p>
-<ul>
-<li><p>将kafka_server_jaas.conf加入到Kafka broker启动参数中</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Djava.security.auth.login.config=$&#123;PATH&#125;/kafka_server_jaas.conf</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在server.properties中配置SASL端口和SASL实现机制，例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">listeners=SASL_PLAINTEXT://localhost:9092</span><br><span class="line">security.inter.broker.protocol=SASL_PLAINTEXT</span><br><span class="line">sasl.mechanism.inter.broker.protocol=PLAIN</span><br><span class="line">sasl.enabled.mechanisms=PLAIN</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<div class="note info"><h2>配置Kafka Clients</h2></div>
-
-<ul>
-<li>创建kafka_client_jaas.conf，consumer和producer使用它来访问Kafka broker<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">KafkaClient &#123;</span><br><span class="line">    org.apache.kafka.common.security.plain.PlainLoginModule required</span><br><span class="line">    username=&quot;alice&quot;</span><br><span class="line">    password=&quot;alice-secret&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>属性username和password被用于配置到Kafka broker的连接。在这个例子中，clients使用用户alice连接broker</p>
-<ul>
-<li><p>将kafka_client_jaas.conf加入到Kafka client启动参数中:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Djava.security.auth.login.config=$&#123;PATH&#125;/kafka_client_jaas.conf</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在producer.properties或者consumer.properties中加入以下配置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">security.protocol=SASL_PLAINTEXT</span><br><span class="line">sasl.mechanism=PLAIN</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/07/02/2016-07-02_Kafka安全认证-SASL/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -688,45 +660,17 @@
 
       
         
-          
-            <p>用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题：</p>
+          <p>用mirrormaker在多个数据中心做Kafka的数据同步还需要考虑几个问题：</p>
 <div class="note info"><h2>如何提高同步效率？</h2></div>
 
 <p>跨数据中心的数据传输，瓶颈在于带宽。我们采取的办法是启多个mirrormaker进程和压缩。</p>
-<ul>
-<li><p>在两台机器间带宽固定的情况下，理论上在多台机器上启多个mirrormaker进程能扩大总带宽。但在实际应用中的效果，还要看具体的网络配置</p>
-</li>
-<li><p>Kafka本身支持GZIP，Snappy和LZ4压缩协议。从我的测试结果来看，LZ4压缩和解压效率最高，GZIP压缩率最高，具体还是要看数据格式。</p>
-</li>
-</ul>
-<div class="note info"><h2>mirrormaker部署在哪？</h2></div>
-
-<p>将数据从数据中心A同步到数据中心B，mirrormaker部署在A端（Source端）或者B端（Destination端）都可以，但还是会有点区别。</p>
-<ul>
-<li><p>LinkedIn建议部署在Destination端。对于跨数据中心的数据同步来说，最不稳定的因素就是网络，我们需要保证的，是在网络断开的情况下不丢数据或者丢尽量少的数据。mirrormaker本质上是consumer + cache + producer，offset在放进cache之后就commit，因此mirrormaker部署在Destination端的好处显而易见，假如数据中心间的网络出了问题，mirrormaker根本就收不到数据，也就不存在丢数据的问题；但如果部署在Source端，网络出问题之后，mirrormaker consumer仍然能够从本地Kafka集群获取数据放进cache中，并commit offset，但数据并没有成功的produce到Destination端，mirrormaker也不再有机会重新获取数据。</p>
-</li>
-<li><p>我个人建议是部署在Source端。原因很简单，为了压缩。我们压缩的目的是为了数据在producer远程传输的过程中能尽量的减少带宽占用，如果部署在Destination端，mirrormaker consumer消费的是原始数据，并没有节省带宽。</p>
-</li>
-</ul>
-<div class="note info"><h2>如果数据本身是压缩过的，mirrormaker怎么处理？</h2></div>
-
-<p>理想情况下，我们应该直接把压缩的数据传输到远端，但现在mirrormaker内置的consumer会在消费后先把数据解压缩，然后producer发送前再把数据压缩。</p>
-<p>这样对CUP的消耗很大且不必要，当至少到现在为止Kafka还没有给出解决办法。</p>
-<div class="note info"><h2>如何保证数据有序？</h2></div>
-
-<p>只有满足以下条件才能保证partition内数据有序：</p>
-<ul>
-<li>同步的数据是keyed的</li>
-<li>mirrormaker和数据原来的producer使用相同的partitioner</li>
-<li>Source topic和Destination topic的partition数目相同</li>
-</ul>
-<div class="note info"><h2>双向同步？</h2></div>
-
-<p>mirrormaker不支持相同topic的双向同步。如果这么做了，会导致数据在两个Kafka集群之间无限的重复同步，因为mirrormaker并不能判断一条数据是被普通producer发进来的还是之前被它自己从另一个数据中心同步过来的。</p>
-<p>我的建议是，用上一篇文章说的聚合集群。如果不想这么大动干戈，也可以用不同的topic后缀来区分，比如topicA_sh，topicA_bj，保证数据不会被重复同步。</p>
-<p>或者有个更简单但不是很合理的做法。强制在所有的数据的key中划分出一段来专门记录数据被发送到的数据中心名字，然后在MirrorMakerMessageHandler中解析key，判断是否需要同步。比如如果发现一条数据来自shanghai，那么beijing到shanghai的mirrormaker不会对它做同步。这种做法对数据格式有很强的侵入性，所以不是很建议。其实个人认为如果给kafka record本身加上metamap就能解决这个问题。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/06/30/2016-06-30_ Kafka多数据中心架构设计（二）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -864,20 +808,15 @@
 
       
         
-          
-            <p>将Kafka部署在单一数据中心是一种相对比较常见的架构，所有的broker，producer和consumer都在同一个数据中心内，一般来说，也都在同一个内网里。</p>
+          <p>将Kafka部署在单一数据中心是一种相对比较常见的架构，所有的broker，producer和consumer都在同一个数据中心内，一般来说，也都在同一个内网里。</p>
 <p>但考虑这样一个问题，公司在北京，上海和深圳都有业务系统，其中上海和北京会生成一些数据或日志，并且这些信息都需要被三地的业务系统所使用。假如我们考虑用Kafka来作为消息系统，那么就不得不考虑多数据中心的部署问题。</p>
-<p><img src="/attachment/mirrormaker/mm-1.png" alt="abc"></p>
-<p>上图是一个跨数据中心使用一个kafka集群的例子。我们不会搭建一个跨数据中心的集群，因为这会带来极高的复杂度。此外，kafka不能读replicas，因此即使集群做到跨数据中心，clients仍旧不能保证本地读。</p>
-<p>但是很明显，这个架构的问题在于，如果kafka集群所在的数据中心挂掉了，那么所有的数据都丢了。</p>
-<p><img src="/attachment/mirrormaker/mm-2.png" alt="abc"></p>
-<p>为了解决这些问题，我们可以在A和B两个主要的数据中心各搭建一个kafka集群。而对于像C这样的只需要consume而不需要produce的数据中心，我们通常把它作为一个后端的环境，来跑一些离线的应用。</p>
-<p>在这个设计中，所有的producer都向本地发送数据，数据中心A和B的consumer从本地消费数据。如果A或者B挂掉了，另一个数据中心仍旧能工作。但这么也需要付出一定的代价，如果consumer需要获取所有的数据，就必须连接到所有的数据中心，并且需要处理跨数据中心的网络的连接和延迟问题。</p>
-<p><img src="/attachment/mirrormaker/mm-3.png" alt="abc"></p>
-<p>为了把这个模型再优化一下，我们增加了聚合集群的概念，这个集群包含了所有其他集群聚合起来的数据。对于消费者来说，他们只需要在本地就能从聚合集群中拿到所需的数据。当然，我们仍然有跨数据中心的网络问题，但这其实是无法避免的，毕竟我们需要把数据从一个数据中心拷贝或移动到另一个数据中心。我们可以把这些事情都集中到一个应用中完成，这个应用叫做mirrormaker，然后我们可以对mirrormaker进行集中的监控以确保它正常工作。这样对于每个consumer来说，他们就不需要关心消费的网络和延迟问题了。</p>
-<p>尽管这种架构更加复杂，但对于client来说，他们使用kafka会变得更简单。对于producer，他们只需要往本地集群中发数据，而不需要关心数据会存放到何处；对于consumer，只要选择一个聚合集群就能获取所有数据。而其他的所有问题，比如数据如何流转，如何传输，都将交给mirrormaker来处理。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/06/25/2016-06-25_Kafka多数据中心架构设计（一）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1015,24 +954,15 @@
 
       
         
-          
-            <p>之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用。</p>
+          <p>之前有多语言consume kafka的需求，因此决定采用Confluent的Kafka Rest2.0.1。虽然测试的结果不如人意（java consumer大约60M/s，但用rest的话只有5M/s）,考虑到消息量不大，也能凑合用</p>
 <p>但最近在kafka集群中新创建了200个测试的空topic，rest consumer的性能急剧降低，惨不忍睹。。。</p>
-<p>下载了源码debug了一下，发现每次consume都需要判断一下topic是否存在</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Topic&gt; <span class="title">getTopics</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Seq&lt;String&gt; topicNames = zkUtils.getAllTopics().sorted(Ordering.String$.MODULE$);</span><br><span class="line">      <span class="keyword">return</span> getTopicsData(topicNames);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RestNotFoundException e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> InternalServerErrorException(e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">topicExists</span><span class="params">(String topicName)</span> </span>&#123;</span><br><span class="line">    List&lt;Topic&gt; topics = getTopics();</span><br><span class="line">    <span class="keyword">for</span> (Topic topic : topics) &#123;</span><br><span class="line">      <span class="keyword">if</span> (topic.getName().equals(topicName)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<p>MetadataObserver.getTopics()耗时非常长，该函数先从zookeeper中取出所有的topicName，然后再到zookeeper中把所有的topic的metaData查询出来封装成Topic对象然后返回。增加了200个topic之后，获取所有topic的metaData变得非常的耗时间，其实这是完全没有必要的，直接将Seq<string> topicNames返回就行了，因为判断topic是否存在只需要比较topicName。</string></p>
-<p>因此代码改成</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Collection&lt;String&gt; <span class="title">getTopicNames</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Seq&lt;String&gt; topicNames = zkUtils.getAllTopics().sorted(Ordering.String$.MODULE$);</span><br><span class="line">    <span class="keyword">return</span> JavaConversions.asJavaCollection(topicNames);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">topicExists</span><span class="params">(String topicName)</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; topics = Lists.newArrayList(getTopicNames());</span><br><span class="line">    <span class="keyword">for</span> (String topic : topics) &#123;</span><br><span class="line">      <span class="keyword">if</span> (topic.equals(topicName)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<p>那么，rest consumer为什么每次消费都需要先判断Topic是否存在呢？</p>
-<p>rest是无状态的，但kafka consumer必须要保存状态，因此必须在rest服务器端缓存consumer instances，每个consume rest请求都是通过缓存的instance向kafka server请求数据。</p>
-<p>rest consumer为了限制每次请求返回的数据量，避免客户端内存爆掉，提供了consumer.request.timeout.ms参数，默认值1000ms，意味着无论instance是否从kafka server端拿到了数据，1秒钟后必须给rest 客户端响应，如果没拿到数据，就返回空数组。</p>
-<p>那么问题来了，假如topic不存在，consumer instance会获取topic的metadata超时，但在超时之前，就已经超过了1秒，空数组会被返回给rest client。事实上，rest client的每次消费请求都会返回空数组，但它只知道没有拿到数据，并不知道是topic不存在，还是真的没有数据被produce进来。</p>
-<p>为了避免这种情况发生，必须处理每个consume请求时先判断topic是否存在。</p>
-<p>顺带说一句，java client也应该提供判断topic是否存在的api啊。。。不能让client等这么久最后返回个failed to update metadata after 60000ms…能不能友好一点。。</p>
-<p>———————————- 我是分割线 ——————————————–</p>
-<p>注：该BUG在3.0版本已被官方修复。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/06/17/2016-06-17_Kafka Rest Consumer性能优化/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1170,25 +1100,15 @@
 
       
         
-          
-            <p>在kafka client（consumer）的log中看到这样的异常：</p>
+          <p>在kafka client（consumer）的log中看到这样的异常：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[13/06/16 16:01:26:153 PM CST] 550 ERROR ConsumerCoordinator: Error ILLEGAL_GENERATION occurred while committing offsets for group group7</span><br><span class="line">`[13/06/16 16:01:26:154 PM CST] 424  WARN ConsumerCoordinator: Auto offset commit failed: Commit cannot be completed due to group rebalance</span><br></pre></td></tr></table></figure>
-<p>检查server端的log</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2016-06-13 04:01:16,458] INFO [GroupCoordinator 1]: Preparing to restabilize group group7 with old generation 0 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:16,458] INFO [GroupCoordinator 1]: Stabilized group group7 generation 1 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:16,462] INFO [GroupCoordinator 1]: Assignment received from leader for group group7 for generation 1 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:46,469] INFO [GroupCoordinator 1]: Preparing to restabilize group group7 with old generation 1 (kafka.coordinator.GroupCoordinator)</span><br><span class="line">[2016-06-13 04:01:46,470] INFO [GroupCoordinator 1]: Group group7 generation 1 is dead and removed (kafka.coordinator.GroupCoordinator)</span><br></pre></td></tr></table></figure>
-<p>Kafka consumer group有generation（代）的概念，一个group开始消费之后，被标记为G代，由于一些原因，G代过期，该group被标记为G+1代，这时如果G代的group尝试commit offset，就会发生本文开头出现的错误。</p>
-<p>那么什么会导致generation过期呢？</p>
-<ul>
-<li>Rebalance</li>
-</ul>
-<p>显然rebalance前后，consumer和partition之前的消费关系已经发生了变化，如果generation不过期，会发生offset的误提交</p>
-<ul>
-<li>session timeout</li>
-</ul>
-<p>每次consumer.poll的调用都会向server端发送心跳，如果server端在session.timeout.ms（默认30s）时间内没有收到心跳，则认为该consumer group已经断开或者shutdown</p>
-<p>经排查，我们这次问题的原因是每次poll会拿到一万多条数据，这些数据的处理需要耗费大概60s，所以当consumer执行下一次poll并commit offset时，server端发现该group的generation已经过期，因此报错。</p>
-<p>解决方案是修改consumer的参数session.timeout.ms为120s，或者限制每次poll最多只拿2000条数据（max.poll.records， kafka1.0）</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/06/13/2016-06-13_Kafka Consumer Session Timeout/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1326,16 +1246,15 @@
 
       
         
-          
-            <p>5月23日Confluent官方宣布Apache Kafka 0.10正式发布。该版本包含了很多新功能和优化，这里列出比较重要的几项：</p>
+          <p>5月23日Confluent官方宣布Apache Kafka 0.10正式发布。该版本包含了很多新功能和优化，这里列出比较重要的几项：</p>
 <p><div class="note info"><h2>Streams</h2></div><br>如果你有这样的需求，从Kafka拉取数据进行流处理然后再推送回Kafka，那么你会喜欢0.10的Kafka Streams。Kafka Streams是一个类库，它实现了一系列流处理动作（例如join，filter，aggregate等），能够帮助你构建一个功能齐全的低延迟的流处理系统。它支持有状态或无状态的处理，并且能够被部署在各种框架和容器中（例如YARN，Mesos，Docker），也可以集成在Java应用里。</p>
-<p><div class="note info"><h2>机架感知</h2></div><br>和Hadoop一样，Kafka现在也实现了机架感知。如果所有备份都在单个机架上，那么一旦这个机架出问题，那么所有的备份都将失效。现在Kafka会让备份分布在不同的机架上，显著的提高了可用性。</p>
-<p><div class="note info"><h2>Message中加入Timestamp</h2></div><br>在Message中加入了Timestamp，如果没有被用户声明，该字段会被自动设为被发送的时间。这使得Kafka Streams实现了基于时间事件的流处理，你也可以使用Timestamp来实现消息的追踪查找。除次之外Message中还加入了checksum（但并不是保存在Kafka中，只是取出来之后计算），可以以比较小的代价比对Message。</p>
-<p><div class="note info"><h2>SASL增强</h2></div><br>Kafka0.9提供了SASL/Kerberos，在0.10中增加了更多的SASL功能，比如SASL/Plaintext</p>
-<p><div class="note info"><h2>Kafka Connect Rest API</h2></div><br>在之前的版本中，用户只能通过log来监控Connector的状态。在0.10中增加了监控和控制的API，可以列出所有的Connector状态，并且可以暂停或重启任务。</p>
-<p><div class="note info"><h2>Kafka Consumer Max Record</h2></div><br>在0.9中，如果想要控制Consumer的单次请求返回数据量，只能控制timeout的大小，0.10加入新的Consumer参数max.poll.records来控制返回的数据条数。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/05/26/2016-05-26_Kafka0.10新特性/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1473,34 +1392,20 @@
 
       
         
-          
-            <p>最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：</p>
-<ul>
+          <p>最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：</p>
+<ol>
 <li>mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式）</li>
-</ul>
-<ol start="2">
-<li>启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容</li>
-<li>mirrormaker部署在destination datacenter，这样如果kafka集群之间发生网络问题，也不至于从src cluster拿到了数据但发不到dest cluster导致数据丢失</li>
-<li>mirrormaker不能防止数据循环发送，即如果使用mm将数据从ClusterA的TopicA复制到ClusterB的TopicA，另一个mm将数据从ClusterB的TopicA复制到ClusterA的TopicA，那么会产生endless loop，mm的负载会急剧上升</li>
-<li><p>mirrormaker的producer和consumer的一些配置的目标是数据不丢失，而不是高性能，它们分别是</p>
-<ul>
-<li>acks=all(kafka consumer默认1), 意味着数据被拷贝到dest cluster的所有replicas之后才响应</li>
-<li>retries=max integer(kafka producer默认0)</li>
-<li>block.on.buffer.full=true(kafka produmer默认false)</li>
-<li>max.in.flight.requests.per.connection=1(kafka producer默认5), 提升该值可以获得更快的速度，同时意味着如果mirrormaker挂掉，将会丢更多的数据</li>
-<li>auto.commit.enable=false(默认true)</li>
-<li>abort.on.send.failure=true(mirrormaker配置)</li>
-</ul>
-</li>
-<li><p>其他配置：<br>linger.ms=0（kafka producer默认0）, 调高linger.ms会使mirrormaker能够将更多的消息打包发送以提升效率，同时意味着消息的平均延迟上升</p>
-</li>
-<li>可以给所有需要mm的topics设置优先级，优先级高的topic将获得更低的延迟，并且能在更短的时间内重启，重启之后也能更快的追上拷贝进度</li>
-</ol>
-
-          
+<li>启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/04/20/2016-04-20_Kafka MirrorMaker实践/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
-    </div>
+    </li></ol></div>
     
     
     
@@ -1635,21 +1540,14 @@
 
       
         
-          
-            <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>);  </span><br><span class="line">props.put(<span class="string">"group.id"</span>, <span class="string">"test_group"</span>);  </span><br><span class="line">props.put(<span class="string">"enable.auto.commit"</span>, <span class="string">"true"</span>);  </span><br><span class="line">props.put(<span class="string">"auto.commit.interval.ms"</span>, <span class="string">"1000"</span>);  </span><br><span class="line">props.put(<span class="string">"session.timeout.ms"</span>, <span class="string">"30000"</span>);  </span><br><span class="line">props.put(<span class="string">"key.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">props.put(<span class="string">"value.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="keyword">new</span> KafkaConsumer&lt;String, String&gt;(props);  </span><br><span class="line">List&lt;TopicPartition&gt; list = <span class="keyword">new</span> ArrayList&lt;TopicPartition&gt;();  </span><br><span class="line">TopicPartition tp = <span class="keyword">new</span> TopicPartition(<span class="string">"test_topic"</span>, <span class="number">0</span>);  </span><br><span class="line">list.add(tp);  </span><br><span class="line">consumer.assign(list);  </span><br><span class="line">consumer.seek(tp, <span class="number">96</span>);  </span><br><span class="line"><span class="comment">// consumer.seekToBeginning(tp);  </span></span><br><span class="line"><span class="comment">// consumer.seekToEnd(tp);  </span></span><br><span class="line"><span class="keyword">int</span> commitInterval = <span class="number">200</span>;  </span><br><span class="line">List&lt;ConsumerRecord&lt;String, String&gt;&gt; buffer = <span class="keyword">new</span> ArrayList&lt;ConsumerRecord&lt;String, String&gt;&gt;();  </span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;  </span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);  </span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;  </span><br><span class="line">        buffer.add(record);  </span><br><span class="line">        <span class="keyword">if</span> (buffer.size() &gt;= commitInterval) &#123;  </span><br><span class="line">            batchProcessRecords(buffer);  </span><br><span class="line">            consumer.commitSync();  </span><br><span class="line">            buffer.clear();  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>在上一篇中我们看了一个简单的自动提交offset的example，但很多情况下我们为了避免消息丢失，需要确保消息被处理完了之后才提交offset，这就需要手动地提交。在上面这个例子中，我们从kafka中抓取数据并缓存在List中，只有当消息达到一定的数量的时候我们才批量处理，假设我们使用自动提交，如果在我们还没来得及处理之前consumer就异常终止，那么有可能这些消息的offset已经被自动提交掉了，等我们的consumer重新连接上来了之后，上次没有处理完成的消息会被我们完全略过，造成数据丢失，这就是”at-most-once delivery”。解决的办法是，只有在批量处理完消息之后，才用consumer.commitSync()手动地提交offset，但这样的副作用的，假如我们正在批量处理消息，这时consumer异常终止，offset没有被提交但有部分消息已经被处理过了，当consumer重连上来时，这批没有被commit的消息会被重新处理一次，造成会有部分消息被重复处理，这就是”at-least-once delivery”。</p>
-</li>
-<li><p>kafka提供load balance机制来确保consumer正常工作，简单的说partitions会被分配给正在监听这个topic的多个consumers（同一个group），当其中一个consumer process异常终止，它之前所占有的partitions会被分配给其他consumer process，从而保证所有的数据都能被正常消费掉。但有时我们并不需要load balance机制，例如：</p>
-<pre><code>* 为了节省网络带宽，我们只希望consumer从某一个partition抓取数据，并存储在本地。这在大数据计算或存储中是很常见的行为。在这种情况下我们并不希望另一台机器的consumer来消费这台机器的partition。
-* 如果程序本身带有HA机制，例如使用类似于YARN,Mesos等集群管理框架，那么当一个consumer终止了之后，它会被重启，或者是另一个consumer会被启动来替代它，在这种情况下我们不需要kafka重新分配partition。
-</code></pre><p>要做到这点很简单，替换掉上个例子的consumer.subscribe(Arrays.asList(“test_topic”))，我们使用consumer.assign(list)，在本例中，consumer只会消费partition0的数据。</p>
-</li>
-<li><p>在之前的版本中，如果我们需要消费旧数据（已经commit offset），我们需要用SimpleConsumer。但是在0.9中，这变得更简单了。在本例中，consumer.seek(tp, 96)表示我们从partition 0的offset 96开始抓取数据，consumer.seekToBeginning(tp)表示从头开始抓取数据，consumer.seekToEnd(tp)表示从最后开始抓取数据，换句话说，只消费consumer启动之后新进来的数据。</p>
-</li>
-</ul>
-
-          
+          <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>);  </span><br><span class="line">props.put(<span class="string">"group.id"</span>, <span class="string">"test_group"</span>);  </span><br><span class="line">props.put(<span class="string">"enable.auto.commit"</span>, <span class="string">"true"</span>);  </span><br><span class="line">props.put(<span class="string">"auto.commit.interval.ms"</span>, <span class="string">"1000"</span>);  </span><br><span class="line">props.put(<span class="string">"session.timeout.ms"</span>, <span class="string">"30000"</span>);  </span><br><span class="line">props.put(<span class="string">"key.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">props.put(<span class="string">"value.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="keyword">new</span> KafkaConsumer&lt;String, String&gt;(props);  </span><br><span class="line">List&lt;TopicPartition&gt; list = <span class="keyword">new</span> ArrayList&lt;TopicPartition&gt;();  </span><br><span class="line">TopicPartition tp = <span class="keyword">new</span> TopicPartition(<span class="string">"test_topic"</span>, <span class="number">0</span>);  </span><br><span class="line">list.add(tp);  </span><br><span class="line">consumer.assign(list);  </span><br><span class="line">consumer.seek(tp, <span class="number">96</span>);  </span><br><span class="line"><span class="comment">// consumer.seekToBeginning(tp);  </span></span><br><span class="line"><span class="comment">// consumer.seekToEnd(tp);  </span></span><br><span class="line"><span class="keyword">int</span> commitInterval = <span class="number">200</span>;  </span><br><span class="line">List&lt;ConsumerRecord&lt;String, String&gt;&gt; buffer = <span class="keyword">new</span> ArrayList&lt;ConsumerRecord&lt;String, String&gt;&gt;();  </span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;  </span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);  </span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;  </span><br><span class="line">        buffer.add(record);  </span><br><span class="line">        <span class="keyword">if</span> (buffer.size() &gt;= commitInterval) &#123;  </span><br><span class="line">            batchProcessRecords(buffer);  </span><br><span class="line">            consumer.commitSync();  </span><br><span class="line">            buffer.clear();  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/01/18/2016-01-18_KafkaConsumer0.9（三）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1787,21 +1685,15 @@
 
       
         
-          
-            <p>先看一个简单的KafkaConsumer例子：</p>
+          <p>先看一个简单的KafkaConsumer例子：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>);  </span><br><span class="line">props.put(<span class="string">"group.id"</span>, <span class="string">"test_group"</span>);  </span><br><span class="line">props.put(<span class="string">"enable.auto.commit"</span>, <span class="string">"true"</span>);  </span><br><span class="line">props.put(<span class="string">"auto.commit.interval.ms"</span>, <span class="string">"1000"</span>);  </span><br><span class="line">props.put(<span class="string">"session.timeout.ms"</span>, <span class="string">"30000"</span>);  </span><br><span class="line">props.put(<span class="string">"key.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">props.put(<span class="string">"value.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="keyword">new</span> KafkaConsumer&lt;String, String&gt;(props);  </span><br><span class="line">consumer.subscribe(Arrays.asList(<span class="string">"test_topic"</span>));  </span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;  </span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);  </span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records)&#123;  </span><br><span class="line">        System.out.printf(<span class="string">"offset = %d, key = %s, value = %s"</span>, record.offset(), record.key(), record.value());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>我们看到0.9的consumer最大的变化是：</p>
-<ul>
-<li>通过consumer.subscribe(Arrays.asList(“test_topic”))来声明要订阅的topic，而之前的版本是用Whitelist声明。</li>
-<li>通过consumer.poll(100)直接抓取消息，而之前需要遍历KafkaStream的迭代器。（这个比之前方便太多了。。。）。</li>
-<li>MessageAndMetadata变成了ConsumerRecords</li>
-</ul>
-<p>enable.auto.commit表示已一个固定的时间间隔自动提交offsets，时间间隔由auto.commit.interval.ms控制。</p>
-<p>bootstrap.servers表示kafka集群的broker列表。客户端会连接到这个列表中的任意一台机器，获取到整个集群的信息，因此理论上只需要在bootstrap.servers列出一台机器就够了，但是考虑到灾备，建议在bootstrap.servers中包含所有broker。</p>
-<p>key.deserializer和value.deserializer指定了如何解析记录的key和value，在本例中我们认定key和value都是字符串。</p>
-<p>在本例中，client端启动了一个从属于test_group的consumer来订阅test_topic。当其中一个consumer process断开之后，kafka broker会通过心跳机制自动检测到，因此集群始终能够知道哪些consumer是活着的。只要被认为是活着，这个consumer就能够从分配给它的partition中获取数据；一旦心跳丢失超过session.timeout.ms，consumer会被认为死掉，它所占有的partition将会被分配给别的process。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>

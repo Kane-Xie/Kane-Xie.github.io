@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用   需求  在实时平台的各个环节中，由于网络或其他问题，有时会出现数据重复的情况，本质上是由于at least once保障机制造成的。例如  flume agent之间的数据传输，如果网络不稳定，有可能出现src_agent发送数据超时而导致重发，但实际上dest_">
+<meta name="description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用">
 <meta name="keywords" content="snowflake">
 <meta property="og:type" content="article">
 <meta property="og:title" content="海量数据去重">
 <meta property="og:url" content="http://kane-xie.github.io/2019/01/30/2019-01-30_海量数据去重/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用   需求  在实时平台的各个环节中，由于网络或其他问题，有时会出现数据重复的情况，本质上是由于at least once保障机制造成的。例如  flume agent之间的数据传输，如果网络不稳定，有可能出现src_agent发送数据超时而导致重发，但实际上dest_">
+<meta property="og:description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://kane-xie.github.io/attachment/20190130/duplication-eliminator.png">
-<meta property="og:updated_time" content="2019-02-19T10:35:36.522Z">
+<meta property="og:updated_time" content="2019-02-21T03:13:30.324Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="海量数据去重">
-<meta name="twitter:description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用   需求  在实时平台的各个环节中，由于网络或其他问题，有时会出现数据重复的情况，本质上是由于at least once保障机制造成的。例如  flume agent之间的数据传输，如果网络不稳定，有可能出现src_agent发送数据超时而导致重发，但实际上dest_">
+<meta name="twitter:description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用">
 <meta name="twitter:image" content="http://kane-xie.github.io/attachment/20190130/duplication-eliminator.png">
 
 
@@ -373,6 +373,7 @@
 <li>id由SnowFlake算法生成，参考之前的文章<a href="http://kane-xie.github.io/2018/03/28/2018-03-28_SnowFlake%E7%AE%97%E6%B3%95%E5%9C%A8%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/">SnowFlake算法在数据链路中的应用</a></li>
 </ul>
 </blockquote>
+<a id="more"></a>
 <div class="note info"><h2>需求</h2></div>
 
 <p>在实时平台的各个环节中，由于网络或其他问题，有时会出现数据重复的情况，本质上是由于at least once保障机制造成的。例如</p>

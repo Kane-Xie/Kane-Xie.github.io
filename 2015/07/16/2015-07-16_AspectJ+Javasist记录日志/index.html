@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="在项目中碰到这样一个需求，对一个服务类的每一个方法，在方法开始和结束的时候分别记录一条日志，内容包括方法名，参数名+参数值以及方法执行的时间。 12345678@Override  public String get(String key) &amp;#123;  //  long start = System.currentTimeMillis();  //  System.out.println(&quot;B">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.900Z">
+<meta property="og:updated_time" content="2019-02-21T03:25:32.670Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AspectJ+Javasist记录日志">
 <meta name="twitter:description" content="在项目中碰到这样一个需求，对一个服务类的每一个方法，在方法开始和结束的时候分别记录一条日志，内容包括方法名，参数名+参数值以及方法执行的时间。 12345678@Override  public String get(String key) &amp;#123;  //  long start = System.currentTimeMillis();  //  System.out.println(&quot;B">
@@ -365,6 +365,7 @@
       
         <p>在项目中碰到这样一个需求，对一个服务类的每一个方法，在方法开始和结束的时候分别记录一条日志，内容包括方法名，参数名+参数值以及方法执行的时间。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  </span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">get</span><span class="params">(String key)</span> </span>&#123;  </span><br><span class="line"><span class="comment">//  long start = System.currentTimeMillis();  </span></span><br><span class="line"><span class="comment">//  System.out.println("Begin Method = get, Args = [key=" + key + "]");  </span></span><br><span class="line">    String value = props.getProperty(key);  </span><br><span class="line"><span class="comment">//  System.out.println("End Method = get, Args = [key=" + key + "], Cost=" + (System.currentTimeMillis() - start)+ "ms");  </span></span><br><span class="line">    <span class="keyword">return</span> value;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>以上注释的代码能够满足要求，但是如果类中的方法比较多得时候，会有大量的冗余代码，不利于维护。这个时候可以用AspectJ实现日志代码的嵌入，但是JointPoint只能拿到参数值，无法拿到参数名。因此考虑用Javasist在初始化的时候先把参数名保存到内存中。以下是代码：</p>
 <div class="note info"><h2>服务实现类（接口略）：</h2></div>
 

@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理  在大部分K">
+<meta name="description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka Connect">
 <meta property="og:url" content="http://kane-xie.github.io/2016/01/11/2016-01-11_Kafka Connect/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理  在大部分K">
+<meta property="og:description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.932Z">
+<meta property="og:updated_time" content="2019-02-21T03:22:21.456Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka Connect">
-<meta name="twitter:description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理  在大部分K">
+<meta name="twitter:description" content="Kafka Connect是Kafka0.9新增的模块。可以从名称看出，它可以和外部系统、数据集建立一个数据流的连接，实现数据的输入、输出。有以下特性：  使用了一个通用的框架，可以在这个框架上非常方面的开发、管理Kafka Connect接口 支持分布式模式或单机模式进行运行 支持REST接口，可以通过REST API提交、管理 Kafka Connect集群 offset自动管理">
 
 
 
@@ -370,6 +370,7 @@
 <li>支持REST接口，可以通过REST API提交、管理 Kafka Connect集群</li>
 <li>offset自动管理</li>
 </ul>
+<a id="more"></a>
 <p>在大部分Kafka应用场景中，我们常常需要从某一数据源导入数据到Kafka中，或者将Kafka中的数据导出（准确说是被取出）到其他系统中。为了实现这一功能，我们一般需要在上游系统中创建一个Kafka Producer，或在下游系统中创建Kafka Consumer。</p>
 <p>在Kafka0.9中新增的Kafka Connect模块实现了以上功能，这样我们就可以省掉了一些通用交互代码，而只需要做简单的配置就行了。这和Logstash的思路很相似，Kafka提供了connector的接口，通过实现该接口来，我们可以创建各种各样的Input和Output插件。当然Kafka Connect才刚刚推出，插件远没有Logstash丰富，不过相信随着Kafka0.9的普及，这一功能将变得更加实用。</p>
 <p>以下介绍Kafka Connect的一个简单的实现，FileInput和FileOutput，启动方式如下：</p>

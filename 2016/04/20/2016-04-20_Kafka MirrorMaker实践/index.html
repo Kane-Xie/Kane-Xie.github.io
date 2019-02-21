@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：  mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式）   启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容 mirrormaker部署在d">
+<meta name="description" content="最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：  mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式） 启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容">
 <meta name="keywords" content="kafka,mirrormaker">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka MirrorMaker实践">
 <meta property="og:url" content="http://kane-xie.github.io/2016/04/20/2016-04-20_Kafka MirrorMaker实践/index.html">
 <meta property="og:site_name" content="Kane Xie">
-<meta property="og:description" content="最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：  mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式）   启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容 mirrormaker部署在d">
+<meta property="og:description" content="最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：  mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式） 启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-02T03:46:36.939Z">
+<meta property="og:updated_time" content="2019-02-21T03:22:00.402Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kafka MirrorMaker实践">
-<meta name="twitter:description" content="最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：  mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式）   启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容 mirrormaker部署在d">
+<meta name="twitter:description" content="最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：  mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式） 启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容">
 
 
 
@@ -364,11 +364,9 @@
 
       
         <p>最近准备使用Kafka Mirrormaker做两个数据中心的数据同步，以下是一些要点：</p>
-<ul>
+<ol>
 <li>mirrormaker必须提供一个或多个consumer配置，一个producer配置，一个whitelist或一个blacklist（支持java正则表达式）</li>
-</ul>
-<ol start="2">
-<li>启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容</li>
+<li>启动多个mirrormaker进程，单个进程启动多个consuemr streams， 可以提高吞吐量和提供容<a id="more"></a></li>
 <li>mirrormaker部署在destination datacenter，这样如果kafka集群之间发生网络问题，也不至于从src cluster拿到了数据但发不到dest cluster导致数据丢失</li>
 <li>mirrormaker不能防止数据循环发送，即如果使用mm将数据从ClusterA的TopicA复制到ClusterB的TopicA，另一个mm将数据从ClusterB的TopicA复制到ClusterA的TopicA，那么会产生endless loop，mm的负载会急剧上升</li>
 <li><p>mirrormaker的producer和consumer的一些配置的目标是数据不丢失，而不是高性能，它们分别是</p>
