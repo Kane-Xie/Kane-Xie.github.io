@@ -88,7 +88,7 @@
 <meta property="og:description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://kane-xie.github.io/attachment/20190130/duplication-eliminator.png">
-<meta property="og:updated_time" content="2019-02-21T03:13:30.324Z">
+<meta property="og:updated_time" content="2019-02-28T02:09:47.221Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="海量数据去重">
 <meta name="twitter:description" content="前提    通过id去重，而不是整条数据 id由SnowFlake算法生成，参考之前的文章SnowFlake算法在数据链路中的应用">
@@ -389,7 +389,7 @@
 <ol>
 <li>原始的id是由41位时间戳，8位机器信息和12位序列号组合而成</li>
 <li>将时间戳拆分成秒和毫秒两部分</li>
-<li>重新将各部分组合成新的key-value pair，秒数和机器信息拼接为一个long型的key，序列号和毫秒数拼接成一个int型的value。假设对n分钟内的数据进行过滤，则key的最大个数为n<em>60</em>256，value最大个数为4096*1000</li>
+<li>重新将各部分组合成新的key-value pair，秒数和机器信息拼接为一个long型的key，序列号和毫秒数拼接成一个int型的value。假设对n分钟内的数据进行过滤，则key的最大个数为n*60*256，value最大个数为4096*1000</li>
 <li>将相同key的数据放到同一个BitSet中，并缓存到LoadingCache中</li>
 </ol>
 <div class="note info"><h2>代码</h2></div>
