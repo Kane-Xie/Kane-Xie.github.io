@@ -274,6 +274,152 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kane Shieh">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/" itemprop="url">KafkaConsumer0.9（二）</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-13T00:00:00+08:00">
+                2016-01-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/13/2016-01-13_KafkaConsumer0.9（二）/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/" class="leancloud_visitors" data-flag-title="KafkaConsumer0.9（二）">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>先看一个简单的KafkaConsumer例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();  </span><br><span class="line">props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>);  </span><br><span class="line">props.put(<span class="string">"group.id"</span>, <span class="string">"test_group"</span>);  </span><br><span class="line">props.put(<span class="string">"enable.auto.commit"</span>, <span class="string">"true"</span>);  </span><br><span class="line">props.put(<span class="string">"auto.commit.interval.ms"</span>, <span class="string">"1000"</span>);  </span><br><span class="line">props.put(<span class="string">"session.timeout.ms"</span>, <span class="string">"30000"</span>);  </span><br><span class="line">props.put(<span class="string">"key.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">props.put(<span class="string">"value.deserializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);  </span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="keyword">new</span> KafkaConsumer&lt;String, String&gt;(props);  </span><br><span class="line">consumer.subscribe(Arrays.asList(<span class="string">"test_topic"</span>));  </span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;  </span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);  </span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records)&#123;  </span><br><span class="line">        System.out.printf(<span class="string">"offset = %d, key = %s, value = %s"</span>, record.offset(), record.key(), record.value());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/01/13/2016-01-13_KafkaConsumer0.9（二）/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/01/12/2016-01-12_KafkaConsumer0.9（一）/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1591,155 +1737,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/" itemprop="url">Scala入门（二）：流程控制</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-08-27T00:00:00+08:00">
-                2015-08-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/" class="leancloud_visitors" data-flag-title="Scala入门（二）：流程控制">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <blockquote>
-<p>最近在做一个spark项目，顺便分享一下我的Scala入门过程。这一系列文章假定读者有一定的java或者其他面向对象编程语言基础。本文主要介绍Scala的流程控制和异常处理。</p>
-</blockquote>
-<p>先上一段代码</p>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">TestScala2</span> </span>&#123;  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;  </span><br><span class="line">    <span class="comment">//test 'for'  </span></span><br><span class="line">    <span class="keyword">for</span> (i &lt;- <span class="number">1</span> to <span class="number">10</span>) println(i)  </span><br><span class="line">    <span class="comment">//test 'dowhile'  </span></span><br><span class="line">    <span class="keyword">var</span> line = <span class="string">""</span>  </span><br><span class="line">    do &#123;  </span><br><span class="line">      line = <span class="type">StdIn</span>.readLine()  </span><br><span class="line">      println(line)  </span><br><span class="line">    &#125; <span class="keyword">while</span> (line != <span class="string">""</span>)  </span><br><span class="line">    <span class="comment">//test 'if else'  </span></span><br><span class="line">    <span class="keyword">val</span> a = (<span class="type">Math</span>.random() * <span class="number">10</span>).toInt;  </span><br><span class="line">    <span class="keyword">val</span> result = <span class="keyword">if</span> (a % <span class="number">2</span> == <span class="number">0</span>) <span class="string">"even:"</span> + a <span class="keyword">else</span> <span class="string">"odd:"</span> + a  </span><br><span class="line">    println(result)  </span><br><span class="line">    <span class="comment">//test 'try catch finally'  </span></span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">      <span class="comment">//....  </span></span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">Exception</span>(<span class="string">"--exception message--"</span>)  </span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;  </span><br><span class="line">      <span class="keyword">case</span> e: <span class="type">Exception</span> =&gt; println(<span class="string">"the exception is "</span> + e.getMessage)  </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;  </span><br><span class="line">      println(<span class="string">"finally"</span>)  </span><br><span class="line">    &#125;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2015/08/27/2015-08-27_ Scala入门（二） - 流程控制/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1792,7 +1789,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-count">74</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1805,7 +1802,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">29</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
