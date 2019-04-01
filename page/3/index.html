@@ -1598,7 +1598,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/09/07/2016-09-07_Cloudera Manager配置/">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/09/07/2016-09-07_Cloudera Manager安装/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Kane Shieh">
@@ -1617,7 +1617,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/07/2016-09-07_Cloudera Manager配置/" itemprop="url">Cloudera Manager配置</a></h1>
+                <a class="post-title-link" href="/2016/09/07/2016-09-07_Cloudera Manager安装/" itemprop="url">Cloudera Manager安装</a></h1>
         
 
         <div class="post-meta">
@@ -1648,8 +1648,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/09/07/2016-09-07_Cloudera Manager配置/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/07/2016-09-07_Cloudera Manager配置/" itemprop="commentCount"></span>
+                <a href="/2016/09/07/2016-09-07_Cloudera Manager安装/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/07/2016-09-07_Cloudera Manager安装/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1657,7 +1657,7 @@
 
           
           
-             <span id="/2016/09/07/2016-09-07_Cloudera Manager配置/" class="leancloud_visitors" data-flag-title="Cloudera Manager配置">
+             <span id="/2016/09/07/2016-09-07_Cloudera Manager安装/" class="leancloud_visitors" data-flag-title="Cloudera Manager安装">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1690,12 +1690,13 @@
       
         
           <ul>
-<li>登录<code>http://&lt;cm-server&gt;:7180/cmf/login</code>，用户名/密码：admin/admin。由于cm-server的启动需要花点时间，这里可能要等待一会才能访问。</li>
+<li>准备一台虚拟机作为cm-server</li>
+<li>配置ssh免密码登录，在cm-server上执行脚本<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NODES=localhost</span><br><span class="line"><span class="comment">#replace ',' with space</span></span><br><span class="line">CLUSTER_NODES=<span class="variable">$&#123;CLUSTER_NODES//,/ &#125;</span></span><br><span class="line"></span><br><span class="line">FILE=~/.ssh/id_rsa.pub</span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">"<span class="variable">$&#123;FILE&#125;</span>"</span> ]; <span class="keyword">then</span> </span><br><span class="line">    ssh-keygen -t rsa -P <span class="string">''</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$CLUSTER_NODES</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	scp ~/.ssh/id_rsa.pub root@<span class="variable">$&#123;i&#125;</span>:/tmp</span><br><span class="line">	ssh root@<span class="variable">$&#123;i&#125;</span> <span class="string">"cat /tmp/id_rsa.pub &gt;&gt; /root/.ssh/authorized_keys"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+</li>
 </ul>
-<p><img src="/attachment/cm-confifure/Picture1.png" alt=""></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/09/07/2016-09-07_Cloudera Manager配置/#more" rel="contents">
+            <a class="btn" href="/2016/09/07/2016-09-07_Cloudera Manager安装/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1861,15 +1862,13 @@
 </div>
 
 
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
 
 
 
 
 
 
-
-  <div class="footer-custom">Hosted by <a target="_blank" href="https://pages.github.com">GitHub Pages</a></div>
+  <div class="footer-custom"><blockquote class="blockquote-center"><h1>蚂蚁金服大量职位内推，请将简历投递至<a href="mailto:kane.xiejing@qq.com" target="_blank">kane.xiejing@qq.com</a><br>欢迎你的加入！</h1></blockquote></div>
 
 
         
