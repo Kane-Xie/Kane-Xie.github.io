@@ -81,13 +81,13 @@
 
 <meta name="description" content="不吃早餐才是一件很嘻哈的事">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Kane Shieh">
+<meta property="og:title" content="Kane Xie">
 <meta property="og:url" content="http://kane-xie.github.io/page/4/index.html">
-<meta property="og:site_name" content="Kane Shieh">
+<meta property="og:site_name" content="Kane Xie">
 <meta property="og:description" content="不吃早餐才是一件很嘻哈的事">
 <meta property="og:locale" content="zh-Hans">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Kane Shieh">
+<meta name="twitter:title" content="Kane Xie">
 <meta name="twitter:description" content="不吃早餐才是一件很嘻哈的事">
 
 
@@ -124,7 +124,7 @@
 
 
 
-  <title>Kane Shieh</title>
+  <title>Kane Xie</title>
   
 
 
@@ -155,7 +155,7 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Kane Shieh</span>
+        <span class="site-title">Kane Xie</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -274,16 +274,16 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/09/07/2016-09-07_Cloudera Manager配置/">
+    <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/09/07/2016-09-07_Cloudera Manager安装/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -293,7 +293,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/07/2016-09-07_Cloudera Manager配置/" itemprop="url">Cloudera Manager配置</a></h1>
+                <a class="post-title-link" href="/2016/09/07/2016-09-07_Cloudera Manager安装/" itemprop="url">Cloudera Manager安装</a></h1>
         
 
         <div class="post-meta">
@@ -324,8 +324,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2016/09/07/2016-09-07_Cloudera Manager配置/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/07/2016-09-07_Cloudera Manager配置/" itemprop="commentCount"></span>
+                <a href="/2016/09/07/2016-09-07_Cloudera Manager安装/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/07/2016-09-07_Cloudera Manager安装/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -333,7 +333,7 @@
 
           
           
-             <span id="/2016/09/07/2016-09-07_Cloudera Manager配置/" class="leancloud_visitors" data-flag-title="Cloudera Manager配置">
+             <span id="/2016/09/07/2016-09-07_Cloudera Manager安装/" class="leancloud_visitors" data-flag-title="Cloudera Manager安装">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -366,12 +366,13 @@
       
         
           <ul>
-<li>登录<code>http://&lt;cm-server&gt;:7180/cmf/login</code>，用户名/密码：admin/admin。由于cm-server的启动需要花点时间，这里可能要等待一会才能访问。</li>
+<li>准备一台虚拟机作为cm-server</li>
+<li>配置ssh免密码登录，在cm-server上执行脚本<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NODES=localhost</span><br><span class="line"><span class="comment">#replace ',' with space</span></span><br><span class="line">CLUSTER_NODES=<span class="variable">$&#123;CLUSTER_NODES//,/ &#125;</span></span><br><span class="line"></span><br><span class="line">FILE=~/.ssh/id_rsa.pub</span><br><span class="line"><span class="keyword">if</span> [ ! -f <span class="string">"<span class="variable">$&#123;FILE&#125;</span>"</span> ]; <span class="keyword">then</span> </span><br><span class="line">    ssh-keygen -t rsa -P <span class="string">''</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$CLUSTER_NODES</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	scp ~/.ssh/id_rsa.pub root@<span class="variable">$&#123;i&#125;</span>:/tmp</span><br><span class="line">	ssh root@<span class="variable">$&#123;i&#125;</span> <span class="string">"cat /tmp/id_rsa.pub &gt;&gt; /root/.ssh/authorized_keys"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+</li>
 </ul>
-<p><img src="/attachment/cm-confifure/Picture1.png" alt=""></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/09/07/2016-09-07_Cloudera Manager配置/#more" rel="contents">
+            <a class="btn" href="/2016/09/07/2016-09-07_Cloudera Manager安装/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -425,13 +426,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/25/2016-08-25_影响单次poll返回最大数据量的几个因素/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -572,13 +573,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/23/2016-08-23_log4j warnning/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -717,13 +718,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/17/2016-08-17_加倍下注法Martingale测试/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -866,13 +867,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/09/2016-08-09_Kafka REST Proxy Content Types/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -1012,13 +1013,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/08/2016-08-08_Kafka REST Proxy主要功能/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -1158,13 +1159,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/07/2016-08-07_Kafka REST Proxy快速入门/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -1311,13 +1312,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/08/05/2016-08-05_Kafka机架感知/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -1456,13 +1457,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/07/31/2016-07-31_在Kafka生产中使用SASL/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -1601,13 +1602,13 @@
     <link itemprop="mainEntityOfPage" href="http://kane-xie.github.io/2016/07/26/2016-07-26_ScheduledExecutorService.scheduleAtFixedRate精确性/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/attachment/hexo/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kane Shieh">
+      <meta itemprop="name" content="Kane Xie">
     </span>
 
     
@@ -1769,9 +1770,9 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
-              <img class="site-author-image" itemprop="image" src="/attachment/hexo/avatar.jpg" alt="Kane Shieh">
+              <img class="site-author-image" itemprop="image" src="/attachment/hexo/avatar.jpg" alt="Kane Xie">
             
-              <p class="site-author-name" itemprop="name">Kane Shieh</p>
+              <p class="site-author-name" itemprop="name">Kane Xie</p>
               <p class="site-description motion-element" itemprop="description">不吃早餐才是一件很嘻哈的事</p>
           </div>
 
@@ -1852,7 +1853,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">Kane Shieh</span>
+  <span class="author" itemprop="copyrightHolder">Kane Xie</span>
 
   
 </div>
@@ -1864,7 +1865,7 @@
 
 
 
-  <div class="footer-custom"><blockquote class="blockquote-center"><h1>蚂蚁金服大量职位内推，请将简历投递至<a href="mailto:kane.xiejing@qq.com" target="_blank">kane.xiejing@qq.com</a><br>欢迎你的加入！</h1></blockquote></div>
+  <div class="footer-custom"><blockquote><b>蚂蚁金服大量职位内推，请将简历投递至<a href="mailto:kane.xiejing@qq.com" target="_blank">kane.xiejing@qq.com</a>，欢迎你的加入！<b></b></b></blockquote><br></div>
 
 
         
